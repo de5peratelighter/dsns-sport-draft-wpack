@@ -157,6 +157,16 @@ export default {
             }
           )
         } else if (this.isConfigCoreMain) {
+          if (!params.id) {
+            configItems = [
+              {
+                text: 'Змінити змагання',
+                disabled: false,
+                exact: true,
+                to: { name: 'selectCompetition' }
+              }
+            ];
+          }
           configItems.push(
             {
               text: 'Основні',

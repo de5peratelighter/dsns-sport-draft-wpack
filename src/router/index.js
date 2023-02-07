@@ -54,7 +54,7 @@ const routes = [
     component: () => import('../views/ConfigJudgesView.vue'),
   },
   {
-    path: '/configMain/:id',
+    path: '/configMain/:id?',
     name: 'configMain',
     component: () => import('../views/ConfigMain.vue'),
   },

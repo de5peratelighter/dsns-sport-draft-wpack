@@ -295,8 +295,17 @@ export default {
       selectedParalelCompetitions: []
     }
   },
+  computed: {
+    id() {
+      return this.$route.params.id;
+    }
+  },
   async mounted () {
-    await this.fetchCompetitionById();
+    if (this.id) {
+      await this.fetchCompetitionById();
+    } else {
+      this.assignConfig({});
+    }
   },
   watch: {
     time: {
@@ -311,10 +320,11 @@ export default {
      * {{
      *  name: string,
      *  organizer: string,
-     *  location: location,
+     *  location: string,
      *  gender: ('junes'|'juniors'|'young'|'adults'), 
      *  competitions: ('one_hundred_meters'|'assault_ladder'|'dueling'|'retractable_ladder'|'fire_relay'|'deployment')[],
      *  parallelItems: ('two'|'three'|'four')[],
+     *  otherOptions: string[]
      * }} config
      */
     assignConfig(config) {

@@ -35,7 +35,7 @@
       </v-list>
     </div>
     <div class="competitions-buttons mt-3 d-flex justify-space-between">
-      <v-btn color="white">
+      <v-btn color="white" @click="$router.push({name: 'configMain'})">
         Створити
       </v-btn>
       <div class="mx-2">
