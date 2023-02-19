@@ -78,6 +78,7 @@
             <v-list-item
               v-for="(item, i) in protocolMenuItems"
               :key="i"
+              @click="$router.push(item.to)"
             >
               <v-list-item-content>
                 <v-list-item-title v-text="item.title" />
@@ -99,8 +100,11 @@ export default {
     }
   },
   computed: {
+    id() {
+      return this.$route.params.id;
+    },
     registrationMenuItems() {
-      const params = {id: this.$route.params.id };
+      const params = {id: this.id };
       return [
           {
             title: 'Команди',
@@ -113,21 +117,27 @@ export default {
       ]
     },
     protocolMenuItems() {
+      const params = {id: this.id };
         return [
             {
-                title: '100 метрова полоса',
+              title: '100 метрова полоса',
+              to: { name: 'protocols', params }
             },
             {
-                title: 'Штурмова драбина',
+              title: 'Штурмова драбина',
+              to: { name: 'protocols', params }
             },
             {
-                title: 'Двоборство',
+              title: 'Двоборство',
+              to: { name: 'protocols', params }
             },
             {
-                title: 'Пожежна естафета',
+              title: 'Пожежна естафета',
+              to: { name: 'protocols', params }
             },
             {
-                title: 'Бойове розгортання',
+              title: 'Бойове розгортання',
+              to: { name: 'protocols', params }
             },
             {
                 title: 'Загальнокомандний',
@@ -138,7 +148,7 @@ export default {
         ]
     },
     adminMenuItems() {
-        const params = {id: this.$route.params.id };
+        const params = {id: this.id };
         return [
         {
           title: 'Параметри змаганнь',

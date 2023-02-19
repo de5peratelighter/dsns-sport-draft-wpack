@@ -48,42 +48,49 @@
 export default {
   computed: {
     isVisible() {
-      return this.breadCrumbItems.length > 0 || 
-        this.isSelectCompetitionRoute;
+      return this.breadCrumbItems.length > 0 || this.isSelectCompetitionRoute;
+    },
+    id() {
+      return this.$route.params.id;
+    },
+    routeName() {
+      return this.$route.name;
     },
     isSelectCompetitionRoute() {
-      console.warn('this.$route.name',this.$route.name)
-      return this.$route.name === 'selectCompetition'
+      return this.routeName === 'selectCompetition'
     },
     isEditCompetitionRoute() {
-      return this.$route.name === 'editCompetition'
+      return this.routeName === 'editCompetition'
     },
     isConfigByTypeRoute () {
-      return this.$route.name === 'configByType';
+      return this.routeName === 'configByType';
     },
     isConfigJudgesRoute () {
-      return this.$route.name === 'configJudges'
+      return this.routeName === 'configJudges'
     },
     isConfigCoreMain () {
-      return this.$route.name === 'configMain'
+      return this.routeName === 'configMain'
     },
     isConfigLogos () {
-      return this.$route.name === 'configLogos'
+      return this.routeName === 'configLogos'
     },
     isConfigAchievementsRoute () {
-      return this.$route.name === 'configAchievements'
+      return this.routeName === 'configAchievements'
     },
     isConfigNormativesRoute () {
-      return this.$route.name === 'configNormatives'
+      return this.routeName === 'configNormatives'
     },
     isRegisterTeamsRoute (){
-      return this.$route.name === 'registerTeams'
+      return this.routeName === 'registerTeams'
     },
     isRegisterParticipantsRoute (){
-      return this.$route.name === 'registerParticipants'
+      return this.routeName === 'registerParticipants'
+    },
+    isProtocolsRoute (){
+      return this.routeName === 'protocols'
     },
     breadCrumbItems() {
-      let params = { id: this.$route.params.id }
+      let params = { id: this.id }
       if (this.isConfigAchievementsRoute) {
         let configItems = [
           {
@@ -97,6 +104,16 @@ export default {
             disabled: true,
             exact: true,
           }
+        ];
+        return configItems;
+      } else if (this.isProtocolsRoute) {
+        let configItems = [
+          {
+            text: 'Протоколи',
+            disabled: false,
+            exact: true,
+            to: { name: 'editCompetition', params },
+          },
         ];
         return configItems;
       } else if (this.isRegisterTeamsRoute || this.isRegisterParticipantsRoute) {
