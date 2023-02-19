@@ -6,7 +6,7 @@
         <v-textarea
           dark
           label="Організація"
-          :value="organizer"
+          v-model="organizationName"
           hide-details
         ></v-textarea>
       </v-col>
@@ -14,7 +14,7 @@
         <v-textarea
           dark
           label="Назва змаганнь"
-          :value="name"
+          v-model="name"
           hide-details
         ></v-textarea>
       </v-col>
@@ -29,11 +29,11 @@
           transition="scale-transition"
           offset-y
           min-width="auto"
-          :return-value.sync="date"
+          :return-value.sync="competitionDate"
         >
           <template v-slot:activator="{ on, attrs }">
             <v-text-field
-              v-model="date"
+              v-model="competitionDate"
               label="Date"
               prepend-icon="mdi-calendar"
               readonly
@@ -44,9 +44,9 @@
             ></v-text-field>
           </template>
           <v-date-picker
-            v-model="date"
+            v-model="competitionDate"
             :min="(new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)"
-            @change="save"
+            @change="saveDate"
             elevation="0"
           ></v-date-picker>
         </v-menu>
@@ -86,7 +86,7 @@
       </v-col>
       <v-col cols="6">
         <v-combobox
-          v-model="location"
+          v-model="locationName"
           :items="['Lviv', 'Kyiv']"
           dense
           filled
@@ -99,8 +99,8 @@
     <v-row class="mt-0">
       <v-col cols="6">
         <v-combobox
-          v-model="selectedCompetitions"
-          :items="competitionItems"
+          v-model="sportTypes"
+          :items="sportTypesOptions"
           outlined
           chips
           clearable
@@ -129,8 +129,8 @@
 
       <v-col cols="6">
         <v-combobox
-          v-model="selectedParalelCompetitions"
-          :items="paralelCompetitionItems"
+          v-model="parallelItems"
+          :items="parallelItemsOptions"
           outlined
           chips
           clearable
@@ -191,13 +191,14 @@
       <v-col>
         <div class="h4 white--text">Додатково</div>
         <v-checkbox
-          v-for="(item, index) in otherItems"
+          v-for="(item, index) in protocolOptions"
           :key="index"
           dark
-          v-model="item.value"
+          :value="protocolOptionTypes.includes(item.id)"
           :label="item.name"
           dense
           hide-details
+          @change="updateProtocolOptionTypes(item.id)"
         ></v-checkbox>
       </v-col>
     </v-row>
@@ -207,7 +208,8 @@
 
     <div class="mt-3 d-flex justify-space-between">
       <v-btn color="light-green white--text" :disabled="isDataInvalid"
-        @click="save">
+        @click="saveConfig"
+      >
         Save
       </v-btn>
       <v-btn color="white" @click="$router.push({ name: 'editCompetition', params: { id: $route.params.id}})">
@@ -221,7 +223,7 @@
 export default {
   data: function () {
     return {
-      otherItems: [
+      protocolOptions: [
         { id: 'show_logos', name: 'Відображати в протоколах логотипи', value: true },
         { id: 'show_competition_icon', name: 'Відображати графічні символи видім змаганнь', value: false },
         { id: 'show_protocol_normatives', name: 'Відображати в стартових протоколах розрядні нормативи', value: true },
@@ -235,7 +237,7 @@ export default {
         { id: 'sum_junior_data', name: 'Сумувати суми місць юніорських змаганнь', value: false },
         { id: 'show_print', name: 'Виводити на друк', value: false },
       ],
-      competitionItems: [
+      sportTypesOptions: [
         {
           id: 'one_hundred_meters', name: '100 метрова полоса'
         }, 
@@ -255,7 +257,7 @@ export default {
           id: 'deployment', name: 'Бойове розгортання'
         }
       ],
-      paralelCompetitionItems: [
+      parallelItemsOptions: [
         {
           id: 'two', name: 'Проводити паралельно друге змагання'
         },
@@ -283,16 +285,17 @@ export default {
       isDataInvalid: false,
 
       // config data holders below
-      organizer: '',
+      organizationName: '',
       name: '',
-      location: '',
+      locationName: '',
       selectedGender: '',
-      date: null,
+      competitionDate: null,
       dateMenu: false,
       time: null,
       timeMenu: false,
-      selectedCompetitions: [],
-      selectedParalelCompetitions: []
+      sportTypes: [],
+      parallelItems: [],
+      protocolOptionTypes: [],
     }
   },
   computed: {
@@ -307,55 +310,81 @@ export default {
       this.assignConfig({});
     }
   },
-  watch: {
-    time: {
-      handler(v) {
-        console.warn('date', v)
-      },
-      deep: true
-    }
-  },
   methods: {
+    validateConfig() {
+      // @TODO verify all values 
+    },
     /**
      * {{
      *  name: string,
-     *  organizer: string,
-     *  location: string,
+     *  organizerName: string,
+     *  locationName: string,
      *  gender: ('junes'|'juniors'|'young'|'adults'), 
-     *  competitions: ('one_hundred_meters'|'assault_ladder'|'dueling'|'retractable_ladder'|'fire_relay'|'deployment')[],
+     *  sportTypes: ('one_hundred_meters'|'ASSAULT_LADDER'|'dueling'|'retractable_ladder'|'fire_relay'|'deployment')[],
      *  parallelItems: ('two'|'three'|'four')[],
-     *  otherOptions: string[]
+     *  otherOptions: string[],
+     *  competitionDate: string,
+     *  protocolOptionTypes: ('show_logos'|'show_competition_icon')[]
      * }} config
      */
     assignConfig(config) {
       this.name = config.name || '';
-      this.organizer = config.organizer || '';
-      this.date = config.date || null;
+      this.organizationName = config.organizationName || '';
+      this.competitionDate = config.competitionDate || null;
       this.time = config.time || null;
+      this.locationName = config.locationName || null;
       this.selectedGender = this.genderItems.find(({ id }) => id === config.gender);
-      this.selectedCompetitions = this.competitionItems.filter(({ id }) => (config.competitions ||[]).includes(id));
-      this.selectedParalelCompetitions = this.paralelCompetitionItems.filter(({ id }) => (config.parallelItems ||[]).includes(id));
+      this.sportTypes = this.sportTypesOptions.filter(({ id }) => (config.sportTypes ||[]).includes(id));
+      this.parallelItems = this.parallelItemsOptions.filter(({ id }) => (config.parallelItems ||[]).includes(id));
+      this.protocolOptionTypes = config.protocolOptionTypes || [];
+    },
+    saveConfig() {
+      const id = this.id;
+      const requestData = {
+        name: this.name,
+        organizationName: this.organizationName,
+        competitionDate: this.competitionDate,
+        time: this.time,
+        gender: this.selectedGender.id,
+        locationName: this.locationName,
+        sportTypes: this.sportTypes,
+        parallelItems: this.parallelItems,
+        protocolOptionTypes: this.protocolOptionTypes,
+      };
+      if (id) {
+        return this.axios.put(`private/competitions/${id}`, requestData)
+      } else {
+        return this.axios.post(`private/competitions`, requestData)
+      }
     },
     async fetchCompetitionById() {
       const id = this.$route.params.id;
       return this.axios.get(`private/competitions/${id}/config`)
-        .then(({ data = {} }) => {
+        .finally((response) => { // should be 'then' data - (BE config doesnt work yet)
           // TODO update model
-          this.assignConfig({ name: 'test', gender: 'junes', date: '2023-02-24', time: '17:14', competitions: ['assault_ladder']});
+          this.assignConfig({ name: 'test', gender: 'junes', competitionDate: '2023-02-24', time: '17:14', sportTypes: ['ASSAULT_LADDER'], protocolOptionTypes: ['show_logos']});
         })
     },
-    save (date) {
+    saveDate(date) {
         this.$refs.dateMenu.save(date)
     },
     unselectCompetition(id) {
-      this.selectedCompetitions = this.selectedCompetitions.filter((item) => item.id !== id);
+      this.sportTypes = this.sportTypes.filter((item) => item.id !== id);
     },
     unselectParalelCompetition(id) {
-      this.selectedParalelCompetitions = this.selectedParalelCompetitions.filter((item) => item.id !== id);
+      this.parallelItems = this.parallelItems.filter((item) => item.id !== id);
     },
     unselectGender() {
       this.selectedGender = '';
     },
+    updateProtocolOptionTypes(id) {
+      if (!this.protocolOptions.find((option) => option.id === id)) return;
+
+      const items = this.protocolOptionTypes;
+      this.protocolOptionTypes = items.includes(id) ?
+        items.filter((optionId) => optionId !== id) :
+        [...items, id];
+    }
   }
 }
 </script>
