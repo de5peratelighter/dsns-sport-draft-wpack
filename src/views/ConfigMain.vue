@@ -216,6 +216,35 @@
         Скасувати
       </v-btn>
     </div>
+    <v-snackbar
+      v-model="showSnackbar"
+      :color="snackbarColor"
+      multi-line
+    >
+      <h3 class="text-center mb-4" v-if="snackbarError">Помилка! {{  snackbarError  }}</h3>
+      <h3 class="text-center mb-4" v-else>Змагання створене успішно!</h3>
+      <v-row class="text-center justify-center">
+        <v-btn
+          text
+          @click="reloadPage()"
+        >
+          Нове змагання
+        </v-btn>
+        <v-btn
+          v-if="nextReferenceId"
+          text
+          @click="openSavedCompetition()"
+        >
+          Перейти на змагання
+        </v-btn>
+        <v-btn
+          text
+          @click="resetSnackbar()"
+        >
+          Закрити
+        </v-btn>
+      </v-row>
+    </v-snackbar>
   </v-container>
 </template>
 
@@ -223,49 +252,53 @@
 export default {
   data: function () {
     return {
+      nextReferenceId: null,
+      showSnackbar: false,
+      snackbarColor: 'primary',
+      snackbarError: '',
       protocolOptions: [
-        { id: 'show_logos', name: 'Відображати в протоколах логотипи', value: true },
+        { id: 'SHOW_LOGOS', name: 'Відображати в протоколах логотипи', value: true },
         { id: 'show_competition_icon', name: 'Відображати графічні символи видім змаганнь', value: false },
         { id: 'show_protocol_normatives', name: 'Відображати в стартових протоколах розрядні нормативи', value: true },
         { id: 'show_protocol_achievements', name: 'Відображати в стартових протоколах вищі досягнення', value: true },
         { id: 'show_protocol_level', name: 'Відображати в стартових протоколах колонку Розряд', value: true },
         { id: 'show_protocol_best_score', name: 'Відображати в стартових протоколах колонку Кращий результат', value: true },
         { id: 'show_protocol_level_sports', name: 'Відображати в стартових протоколах колонку спортивні розряди', value: true },
-        { id: 'show_weather', name: 'Виводити в фінішних протоколах опис погоди', value: false },
+        { id: 'SHOW_WEATHER', name: 'Виводити в фінішних протоколах опис погоди', value: false },
         { id: 'english_data', name: 'Дублювати протоколи англійською', value: false },
         { id: 'english_protocols', name: 'Англійська версія протоколів', value: false },
         { id: 'sum_junior_data', name: 'Сумувати суми місць юніорських змаганнь', value: false },
-        { id: 'show_print', name: 'Виводити на друк', value: false },
+        { id: 'SHOW_PRINT', name: 'Виводити на друк', value: false },
       ],
       sportTypesOptions: [
         {
-          id: 'one_hundred_meters', name: '100 метрова полоса'
+          id: 'HUNDRED_METERS', name: '100 метрова полоса'
         }, 
         {
-          id: 'assault_ladder', name: 'Штурмова драбина'
+          id: 'ASSAULT_LADDER', name: 'Штурмова драбина'
         },
         {
-          id: 'dueling', name: 'Двоборство'
+          id: 'DUELING', name: 'Двоборство'
         },
         {
-          id: 'retractable_ladder', name: 'Висувна драбина'
+          id: 'RETRACEABLE_LADDER', name: 'Висувна драбина'
         },
         {
-          id: 'fire_relay', name: 'Пожежна естафета'
+          id: 'FIRE_DELAY', name: 'Пожежна естафета'
         },
         {
-          id: 'deployment', name: 'Бойове розгортання'
+          id: 'DEPLOYMENT', name: 'Бойове розгортання'
         }
       ],
       parallelItemsOptions: [
         {
-          id: 'two', name: 'Проводити паралельно друге змагання'
+          id: 'TWO', name: 'Проводити паралельно друге змагання'
         },
         {
-          id: 'three', name: 'Проводити паралельно третє змагання'
+          id: 'THREE', name: 'Проводити паралельно третє змагання'
         },
         {
-          id: 'four', name: 'Проводити паралельно четверте змагання'
+          id: 'FOUR', name: 'Проводити паралельно четверте змагання'
         },
       ],
       genderItems: [
@@ -311,6 +344,21 @@ export default {
     }
   },
   methods: {
+    reloadPage() {
+      this.assignConfig({});
+      this.resetSnackbar();
+    },
+    resetSnackbar() {
+      this.showSnackbar = false;
+      this.nextReferenceId = null;
+      this.snackbarError = '';
+    },
+    openSavedCompetition() {
+      this.$router.push({
+        name: 'configMain',
+        params: { id: this.nextReferenceId },
+      });
+    },
     validateConfig() {
       // @TODO verify all values 
     },
@@ -320,8 +368,8 @@ export default {
      *  organizerName: string,
      *  locationName: string,
      *  gender: ('junes'|'juniors'|'young'|'adults'), 
-     *  sportTypes: ('one_hundred_meters'|'ASSAULT_LADDER'|'dueling'|'retractable_ladder'|'fire_relay'|'deployment')[],
-     *  parallelItems: ('two'|'three'|'four')[],
+     *  sportTypes: ('HUNDRED_METERS'|'ASSAULT_LADDER'|'DUELING'|'RETRACEABLE_LADDER'|'FIRE_DELAY'|'DEPLOYMENT')[],
+     *  parallelItems: ('TWO'|'THREE'|'FOUR')[],
      *  otherOptions: string[],
      *  competitionDate: string,
      *  protocolOptionTypes: ('show_logos'|'show_competition_icon')[]
@@ -338,23 +386,38 @@ export default {
       this.parallelItems = this.parallelItemsOptions.filter(({ id }) => (config.parallelItems ||[]).includes(id));
       this.protocolOptionTypes = config.protocolOptionTypes || [];
     },
-    saveConfig() {
-      const id = this.id;
-      const requestData = {
+    async saveConfig() {
+      const configId = this.id;
+      let requestData = {
         name: this.name,
         organizationName: this.organizationName,
         competitionDate: this.competitionDate,
         time: this.time,
-        gender: this.selectedGender.id,
         locationName: this.locationName,
-        sportTypes: this.sportTypes,
-        parallelItems: this.parallelItems,
+        sportTypes: this.sportTypes.map(({id}) => id),
+        parallelItems: this.parallelItems.map(({id}) => id),
         protocolOptionTypes: this.protocolOptionTypes,
       };
-      if (id) {
-        return this.axios.put(`private/competitions/${id}`, requestData)
-      } else {
-        return this.axios.post(`private/competitions`, requestData)
+      if (this.selectedGender) {
+        requestData.gender = this.selectedGender.id;
+      }
+      if (this.time) {
+        requestData.time = this.time;
+      }
+
+      try {
+        const {data} = configId ?
+         await this.axios.put(`private/competitions/${configId}`, requestData) :
+         await this.axios.post(`private/competitions`, requestData);
+
+        this.nextReferenceId = !configId && data.reference ? data.reference : null;
+        this.snackbarError = '';
+        this.snackbarColor ='success';
+        this.showSnackbar = true;
+      } catch (error) {
+        this.snackbarError = 'TODO PARSE MESSAGE';
+        this.snackbarColor ='error';
+        this.showSnackbar = true;
       }
     },
     async fetchCompetitionById() {
@@ -362,7 +425,7 @@ export default {
       return this.axios.get(`private/competitions/${id}/config`)
         .finally((response) => { // should be 'then' data - (BE config doesnt work yet)
           // TODO update model
-          this.assignConfig({ name: 'test', gender: 'junes', competitionDate: '2023-02-24', time: '17:14', sportTypes: ['ASSAULT_LADDER'], protocolOptionTypes: ['show_logos']});
+          this.assignConfig({ name: 'test', gender: 'junes', competitionDate: '2023-02-24', time: '17:14', sportTypes: ['ASSAULT_LADDER'], protocolOptionTypes: ['SHOW_LOGOS']});
         })
     },
     saveDate(date) {
