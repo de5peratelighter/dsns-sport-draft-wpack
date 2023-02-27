@@ -40,7 +40,7 @@
       </v-btn>
       <div class="mx-2">
         <v-btn class="mx-2 white--text" color="green" @click="$router.push({
-            name: 'editCompetition', params: {id: chosenItem.reference} 
+            name: 'editCompetition', params: {id: chosenItem.competitionReference} 
           })"
           :disabled="!chosenItem">
           Вибрати

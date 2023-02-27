@@ -1,6 +1,9 @@
 <template>
   <v-container class="config-main white--text" ma-0 pa-0 fluid color="white">
-    <v-sheet :color="'rgba(0, 0, 0, 0.35)'" class="pa-3">
+    <v-sheet v-if="isConfigFetchFailed" :color="'rgba(0, 0, 0, 0.35)'" class="pa-3 white--text">
+      Некоректна конфігурація змаганнь...
+    </v-sheet>
+    <v-sheet v-else :color="'rgba(0, 0, 0, 0.35)'" class="pa-3">
     <v-row class="mt-0">
       <v-col cols="6" class="pt-0">
         <v-textarea
@@ -207,13 +210,13 @@
     <v-divider color="white" class="mt-4" />
 
     <div class="mt-3 d-flex justify-space-between">
-      <v-btn color="light-green white--text" :disabled="isDataInvalid"
+      <v-btn v-if="!isConfigFetchFailed" color="light-green white--text" :disabled="isDataInvalid"
         @click="saveConfig"
       >
         Save
       </v-btn>
       <v-btn color="white" @click="$router.push({ name: 'editCompetition', params: { id: $route.params.id}})">
-        Скасувати
+        {{ isConfigFetchFailed ? 'Назад ': 'Скасувати' }}
       </v-btn>
     </div>
     <v-snackbar
@@ -222,7 +225,7 @@
       multi-line
     >
       <h3 class="text-center mb-4" v-if="snackbarError">Помилка! {{  snackbarError  }}</h3>
-      <h3 class="text-center mb-4" v-else>Змагання створене успішно!</h3>
+      <h3 class="text-center mb-4" v-else>{{ nextReferenceId ? 'Змагання створене успішно!' : 'Змагання успішно змінене!' }}</h3>
       <v-row class="text-center justify-center">
         <v-btn
           text
@@ -250,6 +253,7 @@
 
 <script>
 export default {
+  name: 'ConfigMain',
   data: function () {
     return {
       nextReferenceId: null,
@@ -258,16 +262,16 @@ export default {
       snackbarError: '',
       protocolOptions: [
         { id: 'SHOW_LOGOS', name: 'Відображати в протоколах логотипи', value: true },
-        { id: 'show_competition_icon', name: 'Відображати графічні символи видім змаганнь', value: false },
-        { id: 'show_protocol_normatives', name: 'Відображати в стартових протоколах розрядні нормативи', value: true },
-        { id: 'show_protocol_achievements', name: 'Відображати в стартових протоколах вищі досягнення', value: true },
-        { id: 'show_protocol_level', name: 'Відображати в стартових протоколах колонку Розряд', value: true },
-        { id: 'show_protocol_best_score', name: 'Відображати в стартових протоколах колонку Кращий результат', value: true },
-        { id: 'show_protocol_level_sports', name: 'Відображати в стартових протоколах колонку спортивні розряди', value: true },
+        { id: 'SHOW_COMPETITION_ICON', name: 'Відображати графічні символи видім змаганнь', value: false },
+        { id: 'SHOW_PROTOCOL_NORMATIVES', name: 'Відображати в стартових протоколах розрядні нормативи', value: true },
+        { id: 'SHOW_PROTOCOL_ACHIEVEMENTS', name: 'Відображати в стартових протоколах вищі досягнення', value: true },
+        { id: 'SHOW_PROTOCOL_GRADE', name: 'Відображати в стартових протоколах колонку Розряд', value: true },
+        { id: 'SHOW_PROCOCOL_BEST_RESULTS', name: 'Відображати в стартових протоколах колонку Кращий результат', value: true },
+        { id: 'SHOW_PROTOCOL_SPORT_GRADES', name: 'Відображати в стартових протоколах колонку спортивні розряди', value: true },
         { id: 'SHOW_WEATHER', name: 'Виводити в фінішних протоколах опис погоди', value: false },
-        { id: 'english_data', name: 'Дублювати протоколи англійською', value: false },
-        { id: 'english_protocols', name: 'Англійська версія протоколів', value: false },
-        { id: 'sum_junior_data', name: 'Сумувати суми місць юніорських змаганнь', value: false },
+        { id: 'ENGLISH_DATA', name: 'Дублювати протоколи англійською', value: false },
+        { id: 'ENGLISH_PROTOCOLS', name: 'Англійська версія протоколів', value: false },
+        { id: 'SUM_JUNIOR_DATA', name: 'Сумувати суми місць юніорських змаганнь', value: false },
         { id: 'SHOW_PRINT', name: 'Виводити на друк', value: false },
       ],
       sportTypesOptions: [
@@ -303,16 +307,16 @@ export default {
       ],
       genderItems: [
         {
-          id: 'junes', name: 'Юнаки та дівчата(12-14 мол. та 15-16 стар.)'
+          id: 'JUNES', name: 'Юнаки та дівчата(12-14 мол. та 15-16 стар.)'
         },
         {
-          id: 'juniors', name: 'Юніори та юніорки (17-18)'
+          id: 'UNIORS', name: 'Юніори та юніорки (17-18)'
         },
         {
-          id: 'young', name: 'Молодь (18-23)'
+          id: 'YOUNGS', name: 'Молодь (18-23)'
         },
         {
-          id: 'adults', name: 'Дорослі (18+)'
+          id: 'ADULTS', name: 'Дорослі (18+)'
         },
       ],
       isDataInvalid: false,
@@ -329,6 +333,7 @@ export default {
       sportTypes: [],
       parallelItems: [],
       protocolOptionTypes: [],
+      isConfigFetchFailed: false,
     }
   },
   computed: {
@@ -345,8 +350,9 @@ export default {
   },
   methods: {
     reloadPage() {
-      this.assignConfig({});
       this.resetSnackbar();
+      this.$router.replace({ name: 'configMain' });
+      this.assignConfig({});
     },
     resetSnackbar() {
       this.showSnackbar = false;
@@ -376,6 +382,7 @@ export default {
      * }} config
      */
     assignConfig(config) {
+      this.nextReferenceId = null;
       this.name = config.name || '';
       this.organizationName = config.organizationName || '';
       this.competitionDate = config.competitionDate || null;
@@ -407,10 +414,10 @@ export default {
 
       try {
         const {data} = configId ?
-         await this.axios.put(`private/competitions/${configId}`, requestData) :
+         await this.axios.patch(`private/competitions/${configId}`, requestData) :
          await this.axios.post(`private/competitions`, requestData);
 
-        this.nextReferenceId = !configId && data.reference ? data.reference : null;
+        this.nextReferenceId = !configId && data.competitionReference ? data.competitionReference : null;
         this.snackbarError = '';
         this.snackbarColor ='success';
         this.showSnackbar = true;
@@ -423,10 +430,13 @@ export default {
     async fetchCompetitionById() {
       const id = this.$route.params.id;
       return this.axios.get(`private/competitions/${id}/config`)
-        .finally((response) => { // should be 'then' data - (BE config doesnt work yet)
-          // TODO update model
-          this.assignConfig({ name: 'test', gender: 'junes', competitionDate: '2023-02-24', time: '17:14', sportTypes: ['ASSAULT_LADDER'], protocolOptionTypes: ['SHOW_LOGOS']});
+        .then(({ data }) => {
+          this.isConfigFetchFailed = false;
+          this.assignConfig(data);
         })
+        .catch(() => {
+          this.isConfigFetchFailed = true;
+        });
     },
     saveDate(date) {
         this.$refs.dateMenu.save(date)
