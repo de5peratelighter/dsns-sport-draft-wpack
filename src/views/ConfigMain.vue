@@ -265,9 +265,9 @@ export default {
         { id: 'SHOW_COMPETITION_ICON', name: 'Відображати графічні символи видім змаганнь', value: false },
         { id: 'SHOW_PROTOCOL_NORMATIVES', name: 'Відображати в стартових протоколах розрядні нормативи', value: true },
         { id: 'SHOW_PROTOCOL_ACHIEVEMENTS', name: 'Відображати в стартових протоколах вищі досягнення', value: true },
-        { id: 'SHOW_PROTOCOL_GRADE', name: 'Відображати в стартових протоколах колонку Розряд', value: true },
-        { id: 'SHOW_PROCOCOL_BEST_RESULTS', name: 'Відображати в стартових протоколах колонку Кращий результат', value: true },
-        { id: 'SHOW_PROTOCOL_SPORT_GRADES', name: 'Відображати в стартових протоколах колонку спортивні розряди', value: true },
+        { id: 'SHOW_PROTOCOL_LEVEL', name: 'Відображати в стартових протоколах колонку Розряд', value: true },
+        { id: 'SHOW_PROCOCOL_BEST_SCORE', name: 'Відображати в стартових протоколах колонку Кращий результат', value: true },
+        { id: 'SHOW_PROTOCOL_LEVEL_SPORTS', name: 'Відображати в стартових протоколах колонку спортивні розряди', value: true },
         { id: 'SHOW_WEATHER', name: 'Виводити в фінішних протоколах опис погоди', value: false },
         { id: 'ENGLISH_DATA', name: 'Дублювати протоколи англійською', value: false },
         { id: 'ENGLISH_PROTOCOLS', name: 'Англійська версія протоколів', value: false },
@@ -288,10 +288,10 @@ export default {
           id: 'RETRACEABLE_LADDER', name: 'Висувна драбина'
         },
         {
-          id: 'FIRE_DELAY', name: 'Пожежна естафета'
+          id: 'RELAY', name: 'Пожежна естафета'
         },
         {
-          id: 'DEPLOYMENT', name: 'Бойове розгортання'
+          id: 'COMBAT_DEPLOYMENT', name: 'Бойове розгортання'
         }
       ],
       parallelItemsOptions: [
@@ -374,7 +374,7 @@ export default {
      *  organizerName: string,
      *  locationName: string,
      *  gender: ('junes'|'juniors'|'young'|'adults'), 
-     *  sportTypes: ('HUNDRED_METERS'|'ASSAULT_LADDER'|'DUELING'|'RETRACEABLE_LADDER'|'FIRE_DELAY'|'DEPLOYMENT')[],
+     *  sportTypes: ('HUNDRED_METERS'|'ASSAULT_LADDER'|'DUELING'|'RETRACEABLE_LADDER'|'RELAY'|'COMBAT_DEPLOYMENT')[],
      *  parallelItems: ('TWO'|'THREE'|'FOUR')[],
      *  otherOptions: string[],
      *  competitionDate: string,
