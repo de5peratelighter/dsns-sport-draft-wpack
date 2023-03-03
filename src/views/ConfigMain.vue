@@ -310,7 +310,7 @@ export default {
           id: 'JUNES', name: 'Юнаки та дівчата(12-14 мол. та 15-16 стар.)'
         },
         {
-          id: 'UNIORS', name: 'Юніори та юніорки (17-18)'
+          id: 'JUNIORS', name: 'Юніори та юніорки (17-18)'
         },
         {
           id: 'YOUNGS', name: 'Молодь (18-23)'
@@ -388,7 +388,7 @@ export default {
       this.competitionDate = config.competitionDate || null;
       this.time = config.time || null;
       this.locationName = config.locationName || null;
-      this.selectedGender = this.genderItems.find(({ id }) => id === config.gender);
+      this.ageType = this.genderItems.find(({ id }) => id === config.ageType);
       this.sportTypes = this.sportTypesOptions.filter(({ id }) => (config.sportTypes ||[]).includes(id));
       this.parallelItems = this.parallelItemsOptions.filter(({ id }) => (config.parallelItems ||[]).includes(id));
       this.protocolOptionTypes = config.protocolOptionTypes || [];
@@ -406,7 +406,7 @@ export default {
         protocolOptionTypes: this.protocolOptionTypes,
       };
       if (this.selectedGender) {
-        requestData.gender = this.selectedGender.id;
+        requestData.ageType = this.selectedGender.id;
       }
       if (this.time) {
         requestData.time = this.time;
@@ -414,7 +414,7 @@ export default {
 
       try {
         const {data} = configId ?
-         await this.axios.patch(`private/competitions/${configId}`, requestData) :
+         await this.axios.patch(`private/competitions/${configId}/config`, requestData) :
          await this.axios.post(`private/competitions`, requestData);
 
         this.nextReferenceId = !configId && data.competitionReference ? data.competitionReference : null;
