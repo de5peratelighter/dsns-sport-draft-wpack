@@ -8,68 +8,56 @@
             disable-pagination
             hide-default-footer
           >
-            <template #item="{ item }">
+            <template #item="{ item, index }">
               <tr>
                 <td>
-                  {{ item.id }}
+                  {{ index }}
                 </td>
                 <td>
-                  <v-edit-dialog
-                    :return-value.sync="item.teamName"
-                    large
-                    @save="updateName(item)"
-                  >
-                    <div>{{ item.teamName }}</div>
-                    <template #input>
-                      <div class="mt-4 text-h6">
-                        Назва команди
-                      </div>
-                      <v-text-field
-                        v-model="item.teamName"
-                        :rules="[max25chars]"
-                        label="Час в с"
-                        single-line
-                        counter
-                        autofocus
-                      ></v-text-field>
-                    </template>
-                  </v-edit-dialog>
+                    {{ item.teamName  }}
                 </td>
                 <td>
                     <v-edit-dialog
-                        :return-value.sync="item.num"
                         large
-                        @save="updateNum(item)"
+                        @open="newItemNum = item.lotNumber"
+                        @save="updateTeamNum(item)"
                     >
-                        <div>{{ item.num }}</div>
+                        <div>{{ item.lotNumber }}</div>
                         <template #input>
-                        <div class="mt-4 text-h6">
-                            Номер
-                        </div>
-                        <v-text-field
-                            v-model="item.num"
-                            :rules="[isNumeric]"
-                            label="Час в с"
-                            single-line
-                            counter
-                            autofocus
-                        ></v-text-field>
+                            <div class="mt-4 text-h6">
+                                Номерлоту
+                            </div>
+                            <v-text-field
+                                :value="newItemNum"
+                                :rules="numericRules"
+                                label="Номер лоту"
+                                single-line
+                                counter
+                                autofocus
+                                @input="newItemNum = $event"
+                            ></v-text-field>
                         </template>
                     </v-edit-dialog>
                 </td>
                 <td>
-                    <v-checkbox
-                        :value="item.isMain"
+                    <v-simple-checkbox
+                        color="primary"
+                        :value="item.generalCompetition"
+                        @input="toggleTeamBoolean(item, 'generalCompetition')"
                     />
                 </td>
                 <td>
-                    <v-checkbox
-                        :value="item.isNonCompetetive"
+                    <v-simple-checkbox
+                        color="primary"
+                        :value="item.outOfCompetition"
+                        @input="toggleTeamBoolean(item, 'outOfCompetition')"
                     />
                 </td>
                 <td>
-                    <v-checkbox
-                        :value="item.isIgnored"
+                    <v-simple-checkbox
+                        color="primary"
+                        :value="item.outOfReport"
+                        @input="toggleTeamBoolean(item, 'outOfReport')"
                     />
                 </td>
                 <td>
@@ -98,12 +86,14 @@
                             placeholder="Назва команди"
                             single-line
                         ></v-text-field>
+                        <!-- 
                         <v-text-field
                             v-model="newItemNum"
                             label="По жеребу"
                             placeholder="По жеребу"
                             single-line
                         ></v-text-field>
+                         -->
                         </template>
                     </v-edit-dialog>
                     <v-btn dark color="primary" class="ml-3" @click="pasteData">
@@ -122,7 +112,7 @@ export default {
     data: function () {
         return {
             headers: [
-                { text: '#', value: 'id', width: '5%' },
+                { text: '№ п/п', value: 'id', width: '5%' },
                 { text: 'Назва команди', value: 'teamName', width: '30%' },
                 { text: 'По жеребу', value: 'num' , width: '20%'},
                 { text: 'Основне змагання', value: 'isMain', width: '10%' },
@@ -131,69 +121,68 @@ export default {
                 { text: 'Дії', value: 'actions', width: '10%' },
             ],
             teams: [],
-            max25chars: v => v.length <= 25 || 'Input too long!',
-            isNumeric: v => !isNaN(v),
+            max25chars: v => v.length <= 25 || 'Назва не більше 25 символів!',
+            notEmpty: v => !!v || 'Значення пусте',
+            isNumeric: v => !isNaN(v) || 'Лише числа',
             newItemNum: '',
             newItemName: ''
         }
+    },
+    computed: {
+        teamId() {
+            return this.$route.params.id;
+        },
+        numericRules() {
+            return [this.notEmpty,this.isNumeric, this.isUniqueNumber];
+        },
     },
     mounted() {
         this.getTeams();
     },
     methods: {
+        isUniqueNumber(num) {
+            console.warn(num, typeof num, this.teams.find(({ lotNumber }) => Number(lotNumber) !== Number(num)))
+            return !this.teams.find(({ lotNumber }) => Number(lotNumber) === Number(num)) || 'Номер лоту має бути унікальним'
+        },
         openAddItem() {
             this.newItemNum = '';
             this.newItemName = '';
         },
         addItem() {
-            const name = this.newItemName.trim();
-            const num = this.newItemNum.trim();
-
-            // TODO request to BE
-            return Promise.resolve()
-                .then(() => {
-                    this.teams.push(
-                        {
-                            id: this.teams.length + 2,
-                            teamName: name,
-                            num: num,
-                            isMain: true,
-                            isNonCompetetive: false,
-                            isIgnored: true,
-                        }
-                    )
+            const data = {
+                teamName: this.newItemName.trim()
+            };
+            return this.axios.post(`private/competition/${this.teamId}/team`, data)
+                .then(({ data }) => {
+                    this.teams = [...this.teams, data];
+                });
+        },
+        async updateTeamNum(team) {
+            const lotNumber = Number(this.newItemNum);
+            const validationRules = this.numericRules;
+            if (validationRules.some(rule => typeof rule(lotNumber) === 'string')) return;
+            this.updateTeam(team, {lotNumber})
+        },
+        async toggleTeamBoolean(team, key) {
+            const reqData = { [key]: !team[key] };
+            return this.updateTeam(team, reqData)
+        },
+        async updateTeam(team, reqData) {
+            const teamIndex = this.teams.findIndex(({ teamReference }) => teamReference === team.teamReference);
+            return this.axios.patch(`private/teams/${team.teamReference}/competitions/${this.teamId}`, reqData)
+                .then(({ data }) => {
+                    // update state
+                    this.$set(this.teams, teamIndex, {...team, ...data});
+                })
+                .catch(() => {
+                    // revert state
+                    this.$set(this.teams, teamIndex, team);
                 })
         },
-        updateName() {
-            this.isChanged = true;
-        },
-        updateNum() {
-            this.isChanged = true;
-        },
-        deleteItem(item) {
-            this.teams = this.teams.filter(({ id }) => id !== item.id);
-        },
         async getTeams() {
-            return this.axios.get(`private/teams/${this.$route.params.id}`)
-                .finally(() => {
-                    this.teams = [
-                        {
-                            id: '11',
-                            teamName: 'RBG',
-                            num: '1',
-                            isMain: true,
-                            isNonCompetetive: true,
-                            isIgnored: true,
-                        },
-                        {
-                            id: '22',
-                            teamName: 'RBG',
-                            num: '2',
-                            isMain: true,
-                            isNonCompetetive: false,
-                            isIgnored: true,
-                        },
-                    ];
+            return this.axios.get(`private/competitions/${this.teamId}/teams`)
+                .then(({ data }) => {
+                    this.teams = data;
                 })
         },
         pasteData() {
@@ -203,7 +192,10 @@ export default {
                     // @todo parse excel/word format
                     console.warn('PASTED', clipText)
                 });
-        }
+        },
+        deleteItem(item) {
+            this.teams = this.teams.filter(({ id }) => id !== item.id);
+        },
     }
 }
 </script>
