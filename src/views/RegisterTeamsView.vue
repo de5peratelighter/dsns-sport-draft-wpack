@@ -14,12 +14,31 @@
                   {{ index }}
                 </td>
                 <td>
-                    {{ item.teamName  }}
+                    <v-edit-dialog
+                        large
+                        @open="teamName = item.teamName"
+                        @save="updateTeamName(item)"
+                    >
+                        <div>{{ item.teamName }}</div>
+                        <template #input>
+                            <div class="mt-4 text-h6">
+                                Назва команди
+                            </div>
+                            <v-text-field
+                                :value="teamName"
+                                label="Назва команди"
+                                single-line
+                                counter
+                                autofocus
+                                @input="teamName = $event"
+                            ></v-text-field>
+                        </template>
+                    </v-edit-dialog>
                 </td>
                 <td>
                     <v-edit-dialog
                         large
-                        @open="newItemNum = item.lotNumber"
+                        @open="lotNumber = item.lotNumber"
                         @save="updateTeamNum(item)"
                     >
                         <div>{{ item.lotNumber }}</div>
@@ -28,13 +47,13 @@
                                 Номерлоту
                             </div>
                             <v-text-field
-                                :value="newItemNum"
+                                :value="lotNumber"
                                 :rules="numericRules"
                                 label="Номер лоту"
                                 single-line
                                 counter
                                 autofocus
-                                @input="newItemNum = $event"
+                                @input="lotNumber = $event"
                             ></v-text-field>
                         </template>
                     </v-edit-dialog>
@@ -80,7 +99,7 @@
                         <v-btn dark color="primary" @click="openAddItem">Додати</v-btn>
                         <template #input>
                         <v-text-field
-                            v-model="newItemName"
+                            v-model="teamName"
                             :rules="[max25chars]"
                             label="Назва команди"
                             placeholder="Назва команди"
@@ -124,8 +143,8 @@ export default {
             max25chars: v => v.length <= 25 || 'Назва не більше 25 символів!',
             notEmpty: v => !!v || 'Значення пусте',
             isNumeric: v => !isNaN(v) || 'Лише числа',
-            newItemNum: '',
-            newItemName: ''
+            lotNumber: '',
+            teamName: '',
         }
     },
     computed: {
@@ -145,12 +164,12 @@ export default {
             return !this.teams.find(({ lotNumber }) => Number(lotNumber) === Number(num)) || 'Номер лоту має бути унікальним'
         },
         openAddItem() {
-            this.newItemNum = '';
-            this.newItemName = '';
+            this.lotNumber = '';
+            this.teamName = '';
         },
         addItem() {
             const data = {
-                teamName: this.newItemName.trim()
+                teamName: this.teamName.trim()
             };
             return this.axios.post(`private/competition/${this.teamId}/team`, data)
                 .then(({ data }) => {
@@ -158,10 +177,15 @@ export default {
                 });
         },
         async updateTeamNum(team) {
-            const lotNumber = Number(this.newItemNum);
+            const lotNumber = Number(this.lotNumber);
             const validationRules = this.numericRules;
             if (validationRules.some(rule => typeof rule(lotNumber) === 'string')) return;
             this.updateTeam(team, {lotNumber})
+        },
+        async updateTeamName(team) {
+            if (!this.teamName.trim()) return;
+            // todo maybe validate name?
+            this.updateTeam(team, {teamName: this.teamName.trim()})
         },
         async toggleTeamBoolean(team, key) {
             const reqData = { [key]: !team[key] };

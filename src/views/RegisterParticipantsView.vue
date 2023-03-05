@@ -10,7 +10,7 @@
                     v-model="selectedTeam"
                     :items="teams"
                     :item-text="'teamName'"
-                    :item-value="'reference'"
+                    :item-value="'teamReference'"
                     label="Команда"
                 />
             </v-col>
@@ -26,66 +26,85 @@
                     <template #item="{ item }">
                         <tr>
                             <td>
-                            {{ item.num }}
+                                {{ item.num }}
                             </td>
                             <td>
-                            {{ item.category }}
+                                {{ item.participantCategory }}
                             </td>
                             <td>
-                            {{ item.number }}
-                            </td>
-                            <td>
-                            <v-edit-dialog
-                                :return-value.sync="item.initials"
-                                large
-                                @save="updateItem(item)"
-                            >
-                                <div>{{ item.initials }}</div>
-                                <template #input>
-                                <div class="mt-4 text-h6">
-                                    Ініціали
-                                </div>
-                                <v-text-field
-                                    v-model="item.initials"
-                                    :rules="[max100chars]"
-                                    label="Призвіще та імя"
-                                    single-line
-                                    counter
-                                    autofocus
-                                />
-                                </template>
-                            </v-edit-dialog>
+                                {{ item.participantNumber }}
                             </td>
                             <td>
                                 <v-edit-dialog
-                                :return-value.sync="item.birthDate"
-                                large
-                                @save="updateItem(item)"
-                            >
-                                <div>{{ item.birthDate }}</div>
-                                <template #input>
+                                    large
+                                    @open="fullName = item.fullName"
+                                    @save="validateParticipantUpdate(item, 'fullName')"
+                                >
+                                    <div>{{ item.fullName }}</div>
+                                    <template #input>
                                     <div class="mt-4 text-h6">
-                                        Дата народження
-                                    </div>   
-                                    <v-date-picker
-                                        v-model="item.birthDate"
-                                        active-picker="YEAR"
-                                        :max="(new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)"
-                                        min="1950-01-01"
-                                    ></v-date-picker>
-                                </template>
-                            </v-edit-dialog>
+                                        Ініціали
+                                    </div>
+                                    <v-text-field
+                                        :value="fullName"
+                                        :rules="[max100chars]"
+                                        label="Призвіще та імя"
+                                        single-line
+                                        counter
+                                        autofocus
+                                        @input="fullName = $event"
+                                    />
+                                    </template>
+                                </v-edit-dialog>
                             </td>
                             <td>
-                            {{ item.group }}
+                                <v-edit-dialog
+                                    large
+                                    @open="birthday = item.birthday || null"
+                                    @save="validateParticipantUpdate(item, 'birthday')"
+                                >
+                                    <div>{{ item.birthday }}</div>
+                                    <template #input>
+                                        <div class="mt-4 text-h6">
+                                            Дата народження
+                                        </div>   
+                                        <v-date-picker
+                                            v-model="birthday"
+                                            active-picker="YEAR"
+                                            :max="(new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)"
+                                            min="1950-01-01"
+                                        ></v-date-picker>
+                                    </template>
+                                </v-edit-dialog>
                             </td>
                             <td>
-                            {{ item.grade }}
+                                {{ item.group }}
                             </td>
                             <td>
-                            <v-btn small icon @click="deleteItem(item)">
-                                <v-icon>mdi-delete</v-icon>
-                            </v-btn>
+                                {{ item.grade }}
+                            </td>
+                            <td>
+                                <v-edit-dialog
+                                    large
+                                    @open="openParticipantPosition(item, 'HUNDRED_METER')"
+                                    @save="validateParticipantPositionUpdate(item, 'HUNDRED_METER')"
+                                >
+                                    <div>{{ showParticipantPosition(item, 'HUNDRED_METER') }}</div>
+                                    <template #input>
+                                    <div class="mt-4 text-h6">
+                                        100м полоса
+                                    </div>
+                                    <v-text-field
+                                        :value="HUNDRED_METER"
+                                        :rules="[max100chars]"
+                                        label="Призвіще та імя"
+                                        single-line
+                                        counter
+                                        autofocus
+                                        @input="HUNDRED_METER = $event"
+                                    />
+                                    </template>
+                                </v-edit-dialog>
                             </td>
                         </tr>
                     </template>
@@ -102,7 +121,7 @@
                                 <v-btn dark color="primary" @click="openAddItem">Додати</v-btn>
                                 <template #input>
                                 <v-text-field
-                                    v-model="newInitials"
+                                    v-model="fullName"
                                     :rules="[max100chars]"
                                     label="Ініціали учасник"
                                     placeholder="Ініціали учасник"
@@ -128,25 +147,40 @@ export default {
         return {
             teams: [],
             participants: [],
+            competitionReferences: [],
             selectedTeam: null,
-            newInitials: '',
+            fullName: '',
             isChanged: false,
+            HUNDRED_METER: '',
             max100chars: v => v.length <= 100 || 'Input too long!',
             isNumeric: v => !isNaN(v),
             headers: [
                 { text: '№', value: 'num', width: '5%' },
-                { text: 'Категорія', value: 'category', width: '10%' },
-                { text: 'Номер', value: 'number' , width: '10%'},
-                { text: 'Ініціали', value: 'initials', width: '30%' },
-                { text: 'Дата народження', value: 'birthDate', width: '10%' },
-                { text: 'Група', value: 'group', width: '10%' },
-                { text: 'Розряд', value: 'grade', width: '10%' },
-                { text: '', value: 'delete', width: '5%' },
+                { text: 'Категорія', value: 'participantCategory', width: '5%' },
+                { text: 'Номер', value: 'participantNumber' , width: '5%'},
+                { text: 'Ініціали', value: 'fullName', width: '20%' },
+                { text: 'Дата народження', value: 'birthday', width: '5%' },
+                { text: 'Група', value: 'group', width: '5%' },
+                { text: 'Розряд', value: 'grade', width: '5%' },
+                { text: '100м полоса', value: '', width: '5%' },
+                { text: 'Штурмова драбина', value: '', width: '5%' },
+                { text: 'Двоборство', value: '', width: '5%' },
+                { text: 'Пожежна естафета', value: '', width: '5%' },
+                { text: 'Бойове розгортання', value: '', width: '5%' },
+                { text: 'Загальнокомандний', value: '', width: '5%' },
+                //{ text: '', value: 'delete', width: '5%' },
             ],
+            birthday: null,
         }
     },
+    computed: {
+        competitionId() {
+            return this.$route.params.id;
+        },
+    },
     mounted() {
-        this.fetchTeams();
+        this.getCompetitionReferences();
+        this.getTeams();
     },
     watch: {
         selectedTeam: {
@@ -157,24 +191,23 @@ export default {
         }
     },
     methods: {
-        fetchTeams() {
-            return this.axios.get(`private/teams`)
-                .then((response) => {
-                    this.teams = response.data.teams || [{reference: 'test', teamName: 'test1'},];
-                })
+        getTeams() {
+            return this.axios.get(`private/competitions/${this.competitionId}/teams`)
+                .then(({ data }) => {
+                    this.teams = data;
+                    this.selectedTeam = data[0].teamReference;
+                });
+        },
+        getCompetitionReferences() {
+            return this.axios.get(`private/competitions/${this.competitionId}/type`)
+                .then(({ data }) => {
+                    this.competitionReferences = data;
+                });
         },
         fetchTeamParticipantsByRef(ref) {
-            return this.axios.get(`private/teams/${ref}`)
-                .finally((response) => {
-                    this.participants = [{
-                        num: '1',
-                        category: 'v',
-                        number: '1',
-                        initials: 'Bobby Koko',
-                        group: 'B',
-                        grade: 'A',
-                        birthDate: ''
-                    }];
+            return this.axios.get(`private/teams/${ref}/participant`)
+                .then(({ data = [] }) => {
+                    this.participants = data;
                 })
         },
         pasteData() {
@@ -186,26 +219,58 @@ export default {
                 });
         },
         openAddItem() {
-            this.newInitials = '';
+            this.fullName = '';
         },
         updateItem() {
             this.isChanged = true;
         },
         addItem() {
-            if (!this.newInitials || !this.newInitials.trim()) return;
-            // todo call to save participant
-            this.participants = [...this.participants, {
-                num: '1',
-                category: 'v',
-                number: '1',
-                initials: this.newInitials,
-                group: 'B',
-                grade: 'A',
-                birthDate: ''
-            }];
+            if (!this.fullName || !this.fullName.trim()) return;
+            const reqData = {
+                fullName: this.fullName.trim(),
+                birthday: '2023-03-05'
+            };
+            return this.axios.post(`private/participants/teams/${this.selectedTeam}/participant`, reqData)
+                .then(({ data }) => {
+                    this.teams = [...this.teams, data];
+                });
         },
-        deleteItem(participant) {
-            // todo add id first
+        async validateParticipantUpdate(participant, key) {
+            const value = this[key];
+            if (!value) return Promise.reject(`Empty ${key}`)
+            const reqData = { [key]: value };
+            return this.updateParticipant(participant, reqData)
+        },
+        async updateParticipant(participant, reqData) {
+            const teamIndex = this.participants.findIndex(({ participantReference }) => participantReference === participant.teamReference);
+            return this.axios.patch(`private/participants/${participant.participantReference}/competitions/${this.competitionId}`, reqData)
+                .then(({ data }) => {
+                    // update state
+                    this.$set(this.participants, teamIndex, {...participant, ...data});
+                });
+        },
+        showParticipantPosition(participant, key) {
+            const found = participant.participantStartPositionList.find(({sportType}) => sportType === key);
+            if (found) return found.startingPosition;
+            return '';
+        },
+        openParticipantPosition(participant, key) {
+            this[key] = this.showParticipantPosition(participant, key);
+            console.warn('participant', participant, key, this[key])
+        },
+        validateParticipantPositionUpdate(participant, key) {
+            // todo validate
+            return this.updateParticipantPosition(participant, key)
+        },
+        updateParticipantPosition(participant, key) {
+            const teamIndex = this.participants.findIndex(({ participantReference }) => participantReference === participant.participantReference);
+            console.warn('update', this.competitionReferences, teamIndex, this[key])
+            // todo assign sportType reference
+            // return this.axios.patch(`private/participants/${participant.participantReference}/competition-type/${this.competitionId}`, reqData)
+            //     .then(({ data }) => {
+            //         // update state
+            //         this.$set(this.participants, teamIndex, {...participant, ...data});
+            //     });
         }
     }
 }
