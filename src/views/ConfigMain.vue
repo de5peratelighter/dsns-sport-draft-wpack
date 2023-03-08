@@ -267,16 +267,16 @@ export default {
         { id: 'SHOW_PROTOCOL_ACHIEVEMENTS', name: 'Відображати в стартових протоколах вищі досягнення', value: true },
         { id: 'SHOW_PROTOCOL_LEVEL', name: 'Відображати в стартових протоколах колонку Розряд', value: true },
         { id: 'SHOW_PROCOCOL_BEST_SCORE', name: 'Відображати в стартових протоколах колонку Кращий результат', value: true },
-        { id: 'SHOW_PROTOCOL_LEVEL_SPORTS', name: 'Відображати в стартових протоколах колонку спортивні розряди', value: true },
+        { id: 'SHOW_PROTOCOL_LEVEL_SPORTS', name: 'Відображати в фінішних протоколах колонку спортивні розряди', value: true },
         { id: 'SHOW_WEATHER', name: 'Виводити в фінішних протоколах опис погоди', value: false },
         { id: 'ENGLISH_DATA', name: 'Дублювати протоколи англійською', value: false },
         { id: 'ENGLISH_PROTOCOLS', name: 'Англійська версія протоколів', value: false },
-        { id: 'SUM_JUNIOR_DATA', name: 'Сумувати суми місць юніорських змаганнь', value: false },
-        { id: 'SHOW_PRINT', name: 'Виводити на друк', value: false },
+        //{ id: 'SUM_JUNIOR_DATA', name: 'Сумувати суми місць юніорських змаганнь', value: false },
+        //{ id: 'SHOW_PRINT', name: 'Виводити на друк', value: false },
       ],
       sportTypesOptions: [
         {
-          id: 'HUNDRED_METERS', name: '100 метрова полоса'
+          id: 'HUNDRED_METER', name: '100 метрова полоса'
         }, 
         {
           id: 'ASSAULT_LADDER', name: 'Штурмова драбина'
@@ -285,7 +285,7 @@ export default {
           id: 'DUELING', name: 'Двоборство'
         },
         {
-          id: 'RETRACEABLE_LADDER', name: 'Висувна драбина'
+          id: 'RETRACTABLE_LADDER', name: 'Висувна драбина'
         },
         {
           id: 'RELAY', name: 'Пожежна естафета'
@@ -415,7 +415,7 @@ export default {
       try {
         const {data} = configId ?
          await this.axios.patch(`private/competitions/${configId}/config`, requestData) :
-         await this.axios.post(`private/competitions`, requestData);
+         await this.axios.post(`private/competitions/config`, requestData);
 
         this.nextReferenceId = !configId && data.competitionReference ? data.competitionReference : null;
         this.snackbarError = '';

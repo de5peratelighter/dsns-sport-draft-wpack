@@ -73,13 +73,6 @@
                     />
                 </td>
                 <td>
-                    <v-simple-checkbox
-                        color="primary"
-                        :value="item.outOfReport"
-                        @input="toggleTeamBoolean(item, 'outOfReport')"
-                    />
-                </td>
-                <td>
                   <v-btn small icon @click="deleteItem(item)">
                     <v-icon>mdi-delete</v-icon>
                   </v-btn>
@@ -136,7 +129,7 @@ export default {
                 { text: 'По жеребу', value: 'num' , width: '20%'},
                 { text: 'Основне змагання', value: 'isMain', width: '10%' },
                 { text: 'Поза конкурсно', value: 'isNonCompetetive', width: '10%' },
-                { text: 'Не для протоколів', value: 'isIgnored', width: '10%' },
+                //{ text: 'Не для протоколів', value: 'isIgnored', width: '10%' },
                 { text: 'Дії', value: 'actions', width: '10%' },
             ],
             teams: [],
@@ -160,7 +153,6 @@ export default {
     },
     methods: {
         isUniqueNumber(num) {
-            console.warn(num, typeof num, this.teams.find(({ lotNumber }) => Number(lotNumber) !== Number(num)))
             return !this.teams.find(({ lotNumber }) => Number(lotNumber) === Number(num)) || 'Номер лоту має бути унікальним'
         },
         openAddItem() {
