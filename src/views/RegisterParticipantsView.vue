@@ -95,10 +95,16 @@
                                 </v-edit-dialog>
                             </td>
                             <td>
-                                {{ item.group }}
+                                {{ item.age }}
                             </td>
                             <td>
-                                {{ item.grade }}
+                                <v-select
+                                    :value="item.participantCategory"
+                                    :items="participantCategoryItems"
+                                    :item-text="'categoryName'"
+                                    :item-value="'categoryId'"
+                                    @change="updateParticipant(item, {participantCategory: $event})"
+                                />
                             </td>
                             <td>
                                 <v-edit-dialog
@@ -173,20 +179,29 @@ export default {
             max100chars: v => v.length <= 100 || 'Input too long!',
             isNumeric: v => !isNaN(v),
             headers: [
-                { text: '№', value: 'num', width: '5%' },
-                //{ text: 'Категорія', value: 'participantCategory', width: '5%' },
-                { text: 'Номер', value: 'participantNumber' , width: '5%'},
-                { text: 'Ініціали', value: 'fullName', width: '20%' },
-                { text: 'Дата народження', value: 'birthday', width: '5%' },
-                { text: 'Група', value: 'group', width: '5%' },
+                { text: '№ п/п', value: 'index', width: '5%' },
+                { text: 'Нагрудний номер', value: 'participantNumber' , width: '5%'},
+                { text: "Ім'я та призвіще", value: 'fullName', width: '15%' },
+                { text: 'Дата народження', value: 'birthday', width: '10%' },
+                { text: 'Вікова категорія', value: 'age', width: '5%' },
                 { text: 'Спортивна уласифікація', value: 'grade', width: '5%' },
                 { text: '100м полоса', value: '', width: '5%' },
                 { text: 'Штурмова драбина', value: '', width: '5%' },
                 { text: 'Двоборство', value: '', width: '5%' },
                 { text: 'Пожежна естафета', value: '', width: '5%' },
                 { text: 'Бойове розгортання', value: '', width: '5%' },
-                //{ text: 'Загальнокомандний', value: '', width: '5%' },
-                //{ text: '', value: 'delete', width: '5%' },
+            ],
+            participantCategoryItems: [
+                {categoryName: 'ЗМС', categoryId: 'ZMC'},
+                {categoryName: 'MCMK', categoryId: 'MCMK'},
+                {categoryName: 'MC', categoryId: 'MC'},
+                {categoryName: 'KMC', categoryId: 'KMC'},
+                {categoryName: 'I', categoryId: 'I'},
+                {categoryName: 'II', categoryId: 'II'},
+                {categoryName: 'III', categoryId: 'III'},
+                {categoryName: 'I-ю', categoryId: 'I_TEEN'},
+                {categoryName: 'II-ю', categoryId: 'II_TEEN'},
+                {categoryName: 'III-ю', categoryId: 'III_TEEN'},
             ],
             birthday: null,
         }
@@ -282,7 +297,7 @@ export default {
             //         // update state
             //         this.$set(this.participants, teamIndex, {...participant, ...data});
             //     });
-        }
+        },
     }
 }
 </script>
