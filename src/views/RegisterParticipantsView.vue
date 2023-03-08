@@ -263,7 +263,9 @@ export default {
             return this.axios.get(`private/competitions/${this.competitionId}/teams`)
                 .then(({ data }) => {
                     this.teams = data;
-                    this.selectedTeam = data[0].teamReference;
+                    if (data.length) {
+                        this.selectedTeam = data[0].teamReference;
+                    }
                 });
         },
         getCompetitionReferences() {
