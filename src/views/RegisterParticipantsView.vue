@@ -109,11 +109,16 @@
                             <td v-for="(sportType, referenceIndex) in sportTypeHeaders" :key="referenceIndex">
                                 <div class="d-flex"> 
                                 <v-edit-dialog
+                                    v-if="sportType.value!== 'COMBAT_DEPLOYMENT'"
                                     large
-                                    @open="openParticipantPosition(item, sportType.value)"
-                                    @save="validateParticipantPositionUpdate(item, sportType.value)"
+                                    @open="openParticipantPosition(item, sportType.value, 'startingPosition')"
+                                    @save="validateParticipantPositionUpdate(item, sportType.value, 'startingPosition')"
                                 >
-                                    <div>Зал: <b>{{ showParticipantPosition(item, sportType.value) }}</b></div>
+                                    <div>
+                                        <template  v-if="sportType.value!== 'RELAY'">
+                                            Зал:
+                                        </template>
+                                         <b>{{ showParticipantPosition(item, sportType.value, 'startingPosition') }}</b></div>
                                     <template #input>
                                     <div class="mt-4 text-h6">
                                         Зал: {{ `${sportType.text} (${item.fullName})` }} 
@@ -121,7 +126,7 @@
                                     <v-text-field
                                         :value="sportTypePos"
                                         :rules="[isNumeric]"
-                                        :label="`Залік ${sportType.text}`"
+                                        :label="sportType.text"
                                         single-line
                                         counter
                                         autofocus
@@ -129,12 +134,21 @@
                                     />
                                     </template>
                                 </v-edit-dialog>
-                                <div class="pl-2">Особ:</div>
                                 <v-simple-checkbox
+                                    v-else
                                     color="primary"
-                                    :value="item.osob || false"
-                                    @input="item.osob = item.osob"
+                                    :value="!!showParticipantPosition(item, sportType.value, 'startingPosition')"
+                                    @input="validateParticipantPositionUpdate(item, sportType.value, 'startingPosition')"
                                 />
+                                <!-- Особ чекбокс -->
+                                <template v-if="!['RELAY','COMBAT_DEPLOYMENT'].includes(sportType.value)">
+                                    <div class="pl-2">Особ:</div>
+                                    <v-simple-checkbox
+                                        color="primary"
+                                        :value="showParticipantPosition(item, sportType.value, 'personal')"
+                                        @input="validateParticipantPositionUpdate(item, sportType.value, 'personal')"
+                                    />
+                                </template>
                             </div>
                             </td>
                         </tr>
@@ -184,6 +198,7 @@ export default {
             participantNumber: '',
             isChanged: false,
             sportTypePos: '',
+            personalValue: false,
             max100chars: v => v.length <= 100 || 'Input too long!',
             isNumeric: v => !isNaN(v),
             participantCategoryItems: [
@@ -227,7 +242,7 @@ export default {
                 COMBAT_DEPLOYMENT: 'Бойове розгортання'
             }
             return this.competitionReferences.map((reference) => {
-                return { text: mapper[reference.sportType], value: reference.sportType,width: '10%'}
+                return { text: mapper[reference.sportType], value: reference.sportType, width: '10%'}
             });
         }
     },
@@ -295,25 +310,28 @@ export default {
                     this.$set(this.participants, participantIndex, {...participant, ...data});
                 });
         },
-        showParticipantPosition(participant, key) {
-            const found = participant.participantStartPositionList.find(({sportType}) => sportType === key);
-            if (found) return found.startingPosition;
-            return 'відс';
+        showParticipantPosition(participant, type, key) {
+            const found = participant.participantStartPositionList.find(({sportType}) => sportType === type);
+            if (found) return found[key];
+            return key === 'startingPosition' ? 'відс' : false;
         },
         openParticipantPosition(participant, key) {
             this.sportTypePos = this.showParticipantPosition(participant, key);
         },
-        validateParticipantPositionUpdate(participant, key) {
+        validateParticipantPositionUpdate(participant, sportType, key) {
             // todo validate
-            return this.updateParticipantPosition(participant, key)
+            return this.updateParticipantPosition(participant, sportType, key)
         },
-        updateParticipantPosition(participant, key) {
+        updateParticipantPosition(participant, sportType, key) {
             participant.participantStartPositionList = participant.participantStartPositionList.map((item) => {
-                if (item.sportType !== key) return item;
-                return {
-                    ...item,
-                    startingPosition: this.sportTypePos
+                if (item.sportType !== sportType) return item;
+                let nextData = {...item};
+                if (key === 'startingPosition') {
+                    nextData.startingPosition = this.sportTypePos;
+                } else {
+                    nextData.personal = !nextData.personal;
                 }
+                return nextData;
             })
             const reqData = { participantStartPositionList: participant.participantStartPositionList };
             return this.updateParticipant(participant, reqData)
