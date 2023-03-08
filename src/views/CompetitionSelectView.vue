@@ -3,9 +3,8 @@
     <div class="competitions-wrapper"> 
       <v-list two-line pa-0 class="pa-0">
         <v-list-item-group
-          v-model="selectedIndexes"
+          v-model="selectedIndex"
           active-class="primary--text"
-          multiple
         >
           <template v-for="(item, index) in competitions">
             <v-list-item :key="item.title" class="competitions-item">
@@ -22,6 +21,7 @@
 
                 <v-list-item-action>
                   <v-list-item-action-text v-text="item.locationName"></v-list-item-action-text>
+                    <v-icon @click.stop.prevent="deleteItem(item)">mdi-delete</v-icon>
                 </v-list-item-action>
               </template>
             </v-list-item>
@@ -38,18 +38,12 @@
       <v-btn color="white" @click="$router.push({name: 'configMain'})">
         Створити
       </v-btn>
-      <div class="mx-2">
-        <v-btn class="mx-2 white--text" color="green" @click="$router.push({
-            name: 'editCompetition', params: {id: chosenItem.competitionReference} 
-          })"
-          :disabled="!chosenItem">
-          Вибрати
-        </v-btn>
-        <v-btn class="mx-2 white--text" color="red darken-1"
-          :disabled="!selectedItems.length">
-          Видалити
-        </v-btn>
-      </div>
+      <v-btn class="white--text" color="green" @click="$router.push({
+          name: 'editCompetition', params: {id: chosenItem.competitionReference} 
+        })"
+        :disabled="!chosenItem">
+        Відкрити
+      </v-btn>
       <v-btn color="white" @click="$router.push({ name: 'main' })">
         Вихід
       </v-btn>
@@ -61,18 +55,13 @@
 export default {
   data: function () {
     return {
-      selectedIndexes: [],
+      selectedIndex: [],
       competitions: [],
     }
   },
   computed: {
-    selectedItems() {
-      const indexes = this.selectedIndexes;
-      return this.competitions.filter((_, index) => indexes.includes(index));
-    },
     chosenItem () {
-      const { length, [0]: selectedItem} = this.selectedItems;
-      return length == 1 ? selectedItem : null;
+      return this.competitions.find((_, index) => index === this.selectedIndex);
     }
   },
   mounted() {
@@ -84,6 +73,10 @@ export default {
         .then(({ data = [] }) => {
           this.competitions = data;
         })
+    },
+    deleteItem(item) {
+      console.warn('item to be deleted', item)
+      return this.axios.delete(`private/competitions/${item.competitionReference}`)
     }
   }
 }
