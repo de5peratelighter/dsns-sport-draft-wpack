@@ -107,15 +107,16 @@
                                 />
                             </td>
                             <td v-for="(sportType, referenceIndex) in sportTypeHeaders" :key="referenceIndex">
+                                <div class="d-flex"> 
                                 <v-edit-dialog
                                     large
                                     @open="openParticipantPosition(item, sportType.value)"
                                     @save="validateParticipantPositionUpdate(item, sportType.value)"
                                 >
-                                    <div>{{ showParticipantPosition(item, sportType.value) }}</div>
+                                    <div>Зал: <b>{{ showParticipantPosition(item, sportType.value) }}</b></div>
                                     <template #input>
                                     <div class="mt-4 text-h6">
-                                        {{ sportType.text }}
+                                        Зал: {{ `${sportType.text} (${item.fullName})` }} 
                                     </div>
                                     <v-text-field
                                         :value="sportTypePos"
@@ -128,6 +129,13 @@
                                     />
                                     </template>
                                 </v-edit-dialog>
+                                <div class="pl-2">Особ:</div>
+                                <v-simple-checkbox
+                                    color="primary"
+                                    :value="item.osob || false"
+                                    @input="item.osob = item.osob"
+                                />
+                            </div>
                             </td>
                         </tr>
                     </template>
@@ -290,11 +298,10 @@ export default {
         showParticipantPosition(participant, key) {
             const found = participant.participantStartPositionList.find(({sportType}) => sportType === key);
             if (found) return found.startingPosition;
-            return '';
+            return 'відс';
         },
         openParticipantPosition(participant, key) {
             this.sportTypePos = this.showParticipantPosition(participant, key);
-            console.warn('participant', participant, key, this.sportTypePos)
         },
         validateParticipantPositionUpdate(participant, key) {
             // todo validate
