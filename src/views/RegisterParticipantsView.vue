@@ -106,25 +106,25 @@
                                     @change="updateParticipant(item, {participantCategory: $event})"
                                 />
                             </td>
-                            <td>
+                            <td v-for="(sportType, referenceIndex) in sportTypeHeaders" :key="referenceIndex">
                                 <v-edit-dialog
                                     large
-                                    @open="openParticipantPosition(item, 'HUNDRED_METER')"
-                                    @save="validateParticipantPositionUpdate(item, 'HUNDRED_METER')"
+                                    @open="openParticipantPosition(item, sportType.value)"
+                                    @save="validateParticipantPositionUpdate(item, sportType.value)"
                                 >
-                                    <div>{{ showParticipantPosition(item, 'HUNDRED_METER') }}</div>
+                                    <div>{{ showParticipantPosition(item, sportType.value) }}</div>
                                     <template #input>
                                     <div class="mt-4 text-h6">
-                                        100м полоса
+                                        {{ sportType.text }}
                                     </div>
                                     <v-text-field
-                                        :value="HUNDRED_METER"
-                                        :rules="[max100chars]"
-                                        label="Призвіще та імя"
+                                        :value="sportTypePos"
+                                        :rules="[isNumeric]"
+                                        :label="`Залік ${sportType.text}`"
                                         single-line
                                         counter
                                         autofocus
-                                        @input="HUNDRED_METER = $event"
+                                        @input="sportTypePos = $event"
                                     />
                                     </template>
                                 </v-edit-dialog>
@@ -175,27 +175,14 @@ export default {
             fullName: '',
             participantNumber: '',
             isChanged: false,
-            HUNDRED_METER: '',
+            sportTypePos: '',
             max100chars: v => v.length <= 100 || 'Input too long!',
             isNumeric: v => !isNaN(v),
-            headers: [
-                { text: '№ п/п', value: 'index', width: '5%' },
-                { text: 'Нагрудний номер', value: 'participantNumber' , width: '5%'},
-                { text: "Ім'я та призвіще", value: 'fullName', width: '15%' },
-                { text: 'Дата народження', value: 'birthday', width: '10%' },
-                { text: 'Вікова категорія', value: 'age', width: '5%' },
-                { text: 'Спортивна уласифікація', value: 'grade', width: '5%' },
-                { text: '100м полоса', value: '', width: '5%' },
-                { text: 'Штурмова драбина', value: '', width: '5%' },
-                { text: 'Двоборство', value: '', width: '5%' },
-                { text: 'Пожежна естафета', value: '', width: '5%' },
-                { text: 'Бойове розгортання', value: '', width: '5%' },
-            ],
             participantCategoryItems: [
-                {categoryName: 'ЗМС', categoryId: 'ZMC'},
-                {categoryName: 'MCMK', categoryId: 'MCMK'},
-                {categoryName: 'MC', categoryId: 'MC'},
-                {categoryName: 'KMC', categoryId: 'KMC'},
+                {categoryName: 'CMS', categoryId: 'CMS'},
+                {categoryName: 'MS', categoryId: 'MS'},
+                {categoryName: 'IMS', categoryId: 'IMS'},
+                {categoryName: 'HMS', categoryId: 'HMS'},
                 {categoryName: 'I', categoryId: 'I'},
                 {categoryName: 'II', categoryId: 'II'},
                 {categoryName: 'III', categoryId: 'III'},
@@ -210,6 +197,31 @@ export default {
         competitionId() {
             return this.$route.params.id;
         },
+        headers() {
+            const defaultHeaders = [
+                { text: '№ п/п', value: 'index', width: '5%' },
+                { text: 'Нагрудний номер', value: 'participantNumber' , width: '5%'},
+                { text: "Ім'я та призвіще", value: 'fullName', width: '15%' },
+                { text: 'Дата народження', value: 'birthday', width: '10%' },
+                { text: 'Вікова категорія', value: 'age', width: '5%' },
+                { text: 'Спортивна уласифікація', value: 'grade', width: '5%' },
+            ];
+            const sportTypeHeaders = this.sportTypeHeaders;
+            return [...defaultHeaders, ...sportTypeHeaders]
+        },
+        sportTypeHeaders() {
+            const mapper = {
+                ASSAULT_LADDER: 'Штурмова драбина',
+                HUNDRED_METER: '100 метрова полоса',
+                DUELING: 'Двоборство',
+                RETRACTABLE_LADDER: 'Висувна драбина',
+                RELAY: 'Пожежна естафета',
+                COMBAT_DEPLOYMENT: 'Бойове розгортання'
+            }
+            return this.competitionReferences.map((reference) => {
+                return { text: mapper[reference.sportType], value: reference.sportType,width: '10%'}
+            });
+        }
     },
     mounted() {
         this.getCompetitionReferences();
@@ -281,22 +293,23 @@ export default {
             return '';
         },
         openParticipantPosition(participant, key) {
-            this[key] = this.showParticipantPosition(participant, key);
-            console.warn('participant', participant, key, this[key])
+            this.sportTypePos = this.showParticipantPosition(participant, key);
+            console.warn('participant', participant, key, this.sportTypePos)
         },
         validateParticipantPositionUpdate(participant, key) {
             // todo validate
             return this.updateParticipantPosition(participant, key)
         },
         updateParticipantPosition(participant, key) {
-            const teamIndex = this.participants.findIndex(({ participantReference }) => participantReference === participant.participantReference);
-            console.warn('update', this.competitionReferences, teamIndex, this[key])
-            // todo assign sportType reference
-            // return this.axios.patch(`private/participants/${participant.participantReference}/competition-type/${this.competitionId}`, reqData)
-            //     .then(({ data }) => {
-            //         // update state
-            //         this.$set(this.participants, teamIndex, {...participant, ...data});
-            //     });
+            participant.participantStartPositionList = participant.participantStartPositionList.map((item) => {
+                if (item.sportType !== key) return item;
+                return {
+                    ...item,
+                    startingPosition: this.sportTypePos
+                }
+            })
+            const reqData = { participantStartPositionList: participant.participantStartPositionList };
+            return this.updateParticipant(participant, reqData)
         },
     }
 }
