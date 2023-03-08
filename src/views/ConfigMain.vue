@@ -26,18 +26,18 @@
       <v-col cols="6">
         <div class="d-flex">
         <v-menu
-          ref="dateMenu"
-          v-model="dateMenu"
+          ref="startDateMenu"
+          v-model="startDateMenu"
           :close-on-content-click="false"
           transition="scale-transition"
           offset-y
           min-width="auto"
-          :return-value.sync="competitionDate"
+          :return-value.sync="startDate"
         >
           <template v-slot:activator="{ on, attrs }">
             <v-text-field
-              v-model="competitionDate"
-              label="Date"
+              v-model="startDate"
+              label="Дата початку змаганнь"
               prepend-icon="mdi-calendar"
               readonly
               v-bind="attrs"
@@ -47,29 +47,27 @@
             ></v-text-field>
           </template>
           <v-date-picker
-            v-model="competitionDate"
+            v-model="startDate"
             :min="(new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)"
-            @change="saveDate"
+            @change="saveStartDate"
             elevation="0"
           ></v-date-picker>
         </v-menu>
 
         <v-menu
-          ref="timeMenu"
-          v-model="timeMenu"
+          ref="endDateMenu"
+          v-model="endDateMenu"
           :close-on-content-click="false"
-          :nudge-right="40"
-          :return-value.sync="time"
           transition="scale-transition"
           offset-y
-          max-width="290px"
-          min-width="290px"
+          min-width="auto"
+          :return-value.sync="endDate"
         >
           <template v-slot:activator="{ on, attrs }">
             <v-text-field
-              v-model="time"
-              label="Time"
-              prepend-icon="mdi-clock-time-four-outline"
+              v-model="endDate"
+              label="Дата закінчення змаганнь"
+              prepend-icon="mdi-calendar"
               readonly
               v-bind="attrs"
               v-on="on"
@@ -77,14 +75,13 @@
               hide-details
             ></v-text-field>
           </template>
-          <v-time-picker
-            v-if="timeMenu"
-            v-model="time"
-            full-width
-            format="24hr"
-            @click:minute="$refs.timeMenu.save(time)"
-          ></v-time-picker>
-      </v-menu>
+          <v-date-picker
+            v-model="endDate"
+            :min="(new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)"
+            @change="saveEndDate"
+            elevation="0"
+          ></v-date-picker>
+        </v-menu>
     </div>
       </v-col>
       <v-col cols="6">
@@ -326,10 +323,10 @@ export default {
       name: '',
       locationName: '',
       selectedGender: '',
-      competitionDate: null,
-      dateMenu: false,
-      time: null,
-      timeMenu: false,
+      startDate: null,
+      endDate: null,
+      startDateMenu: false,
+      endDateMenu: false,
       sportTypes: [],
       parallelItems: [],
       protocolOptionTypes: [],
@@ -368,25 +365,12 @@ export default {
     validateConfig() {
       // @TODO verify all values 
     },
-    /**
-     * {{
-     *  name: string,
-     *  organizerName: string,
-     *  locationName: string,
-     *  gender: ('junes'|'juniors'|'young'|'adults'), 
-     *  sportTypes: ('HUNDRED_METERS'|'ASSAULT_LADDER'|'DUELING'|'RETRACEABLE_LADDER'|'RELAY'|'COMBAT_DEPLOYMENT')[],
-     *  parallelItems: ('TWO'|'THREE'|'FOUR')[],
-     *  otherOptions: string[],
-     *  competitionDate: string,
-     *  protocolOptionTypes: ('show_logos'|'show_competition_icon')[]
-     * }} config
-     */
     assignConfig(config) {
       this.nextReferenceId = null;
       this.name = config.name || '';
       this.organizationName = config.organizationName || '';
-      this.competitionDate = config.competitionDate || null;
-      this.time = config.time || null;
+      this.startDate = config.startDate || null;
+      this.endDate = config.endDate || null;
       this.locationName = config.locationName || null;
       this.ageType = this.genderItems.find(({ id }) => id === config.ageType);
       this.sportTypes = this.sportTypesOptions.filter(({ id }) => (config.sportTypes ||[]).includes(id));
@@ -398,8 +382,8 @@ export default {
       let requestData = {
         name: this.name,
         organizationName: this.organizationName,
-        competitionDate: this.competitionDate,
-        time: this.time,
+        startDate: this.startDate,
+        endDate: this.endDate,
         locationName: this.locationName,
         sportTypes: this.sportTypes.map(({id}) => id),
         parallelItems: this.parallelItems.map(({id}) => id),
@@ -438,8 +422,11 @@ export default {
           this.isConfigFetchFailed = true;
         });
     },
-    saveDate(date) {
-        this.$refs.dateMenu.save(date)
+    saveStartDate(date) {
+      this.$refs.startDateMenu.save(date)
+    },
+    saveEndDate(date) {
+      this.$refs.endDateMenu.save(date)
     },
     unselectCompetition(id) {
       this.sportTypes = this.sportTypes.filter((item) => item.id !== id);
