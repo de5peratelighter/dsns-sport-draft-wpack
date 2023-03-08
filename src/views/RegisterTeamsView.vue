@@ -177,15 +177,19 @@ export default {
         async updateTeamName(team) {
             if (!this.teamName.trim()) return;
             // todo maybe validate name?
-            this.updateTeam(team, {teamName: this.teamName.trim()})
+            this.updateTeam(team, {teamName: this.teamName.trim()}, true)
         },
         async toggleTeamBoolean(team, key) {
             const reqData = { [key]: !team[key] };
             return this.updateTeam(team, reqData)
         },
-        async updateTeam(team, reqData) {
+        async updateTeam(team, reqData, isNameUpdate = false) {
+            const URL = isNameUpdate ? 
+                `private/teams/${team.teamReference}`:
+                `private/teams/${team.teamReference}/competitions/${this.teamId}`;
+
             const teamIndex = this.teams.findIndex(({ teamReference }) => teamReference === team.teamReference);
-            return this.axios.patch(`private/teams/${team.teamReference}/competitions/${this.teamId}`, reqData)
+            return this.axios.patch(URL, reqData)
                 .then(({ data }) => {
                     // update state
                     this.$set(this.teams, teamIndex, {...team, ...data});
