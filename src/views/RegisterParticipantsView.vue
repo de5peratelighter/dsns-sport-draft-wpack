@@ -293,7 +293,7 @@ export default {
             const reqData = {
                 fullName: this.fullName.trim(),
             };
-            return this.axios.post(`private/participants/teams/${this.selectedTeam}`, reqData)
+            return this.axios.post(`private/participants/competition/${this.competitionId}/teams/${this.selectedTeam}`, reqData)
                 .then(({ data }) => {
                     this.participants = [...this.participants, data];
                 });
@@ -315,27 +315,36 @@ export default {
         showParticipantPosition(participant, type, key) {
             const found = participant.participantStartPositionList.find(({sportType}) => sportType === type);
             if (found) return found[key];
-            return key === 'startingPosition' ? 'відс' : false;
+            return key === 'startingPosition' ? ' ' : false;
         },
-        openParticipantPosition(participant, key) {
-            this.sportTypePos = this.showParticipantPosition(participant, key);
+        openParticipantPosition(participant, type, key) {
+            this.sportTypePos = this.showParticipantPosition(participant, type, key);
         },
         validateParticipantPositionUpdate(participant, sportType, key) {
             // todo validate
             return this.updateParticipantPosition(participant, sportType, key)
         },
         updateParticipantPosition(participant, sportType, key) {
-            participant.participantStartPositionList = participant.participantStartPositionList.map((item) => {
-                if (item.sportType !== sportType) return item;
+            let participantStartPositionList = participant.participantStartPositionList;
+            let foundItem = participantStartPositionList.find((item) => item.sportType === sportType);
+            if (foundItem) {
                 let nextData = {...item};
                 if (key === 'startingPosition') {
                     nextData.startingPosition = this.sportTypePos;
                 } else {
                     nextData.personal = !nextData.personal;
                 }
-                return nextData;
-            })
-            const reqData = { participantStartPositionList: participant.participantStartPositionList };
+                foundItem = nextData;
+            } else {
+                let defaultData = { sportType, startingPosition: '',  personal: false,}
+                if (key === 'startingPosition') {
+                    defaultData.startingPosition = this.sportTypePos;
+                } else {
+                    defaultData.personal = !defaultData.personal;
+                }
+                participantStartPositionList = [...participantStartPositionList, defaultData];
+            }
+            const reqData = { participantStartPositionList };
             return this.updateParticipant(participant, reqData)
         },
     }
