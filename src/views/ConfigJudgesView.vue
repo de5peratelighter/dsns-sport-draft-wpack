@@ -1,46 +1,97 @@
 <template>
   <v-container class="config-judges white--text" ma-0 pa-0 fluid>
+    <div v-if="isLoading" class="text-center">
+      <v-progress-circular
+        :size="100"
+        color="white"
+        indeterminate
+      ></v-progress-circular>
+    </div>
+    <template v-else>
     <v-data-table
       :headers="mainConfigurationHeaders"
-      :items="mainConfigurations"
+      :items="coreJudges"
+      item-key="judgeType"
       dense
       disable-sort
       disable-pagination
       hide-default-footer	
     >
+      <template v-slot:[`item.${translationKey}`]="{ item }">
+       {{ judgeTranslations.coreJudgesTypes[item.judgeType] }}
+      </template>
       <template v-slot:[`item.${nameKey}`]="{ item }">
-        <v-text-field v-model="item[nameKey]" dense></v-text-field>
+        <v-text-field v-model="item[nameKey]" hide-details></v-text-field>
       </template>
       <template v-slot:[`item.${initialsKey}`]="{ item }">
-        <v-text-field v-model="item[initialsKey]" dense></v-text-field>
+        <v-text-field v-model="item[initialsKey]" hide-details></v-text-field>
       </template>
     </v-data-table>
     <v-spacer class="my-3" />
     <v-data-table
-      :headers="otherConfigurationHeaders"
-      :items="otherConfigurations"
+      :headers="seniorConfigurationHeaders"
+      :items="competitionJudges"
       dense
       disable-sort
       disable-pagination
       hide-default-footer	
     >
+      <template v-slot:[`item.${translationKey}`]="{ item }">
+       {{ judgeTranslations.competitionJudgesTypes[item.judgeType] }}
+      </template>
       <template v-slot:[`item.${nameKey}`]="{ item }">
-        <v-text-field v-model="item[nameKey]" dense></v-text-field>
+        <v-text-field v-model="item[nameKey]" hide-details></v-text-field>
       </template>
       <template v-slot:[`item.${initialsKey}`]="{ item }">
-        <v-text-field v-model="item[initialsKey]" dense></v-text-field>
+        <v-text-field v-model="item[initialsKey]" hide-details></v-text-field>
+      </template>
+    </v-data-table>
+    <v-spacer class="my-3" />
+    <v-data-table
+      :headers="assistantConfigurationHeaders"
+      :items="competitionAssistJudges"
+      dense
+      disable-sort
+      disable-pagination
+      hide-default-footer	
+    >
+      <template v-slot:[`item.${translationKey}`]="{ item }">
+       {{ judgeTranslations.competitionAssistJudgesTypes[item.judgeType] }}
+      </template>
+      <template v-slot:[`item.${nameKey}`]="{ item }">
+        <v-text-field v-model="item[nameKey]" hide-details></v-text-field>
+      </template>
+      <template v-slot:[`item.${initialsKey}`]="{ item }">
+        <v-text-field v-model="item[initialsKey]" hide-details></v-text-field>
       </template>
     </v-data-table>
 
     <div class="mt-3 d-flex justify-space-between">
-      <v-btn color="light-green white--text" :disabled="isDataInvalid"
-        @click="save">
-        Save
+      <v-btn color="light-green white--text"
+        @click="saveJudges">
+        Зберегти
       </v-btn>
       <v-btn color="white" @click="$router.push({ name: 'editCompetition', params: { id: $route.params.id}})">
         Скасувати
       </v-btn>
     </div>
+    </template>
+    <v-snackbar
+      v-model="showSnackbar"
+      :color="snackbarColor"
+      multi-line
+    >
+      <v-row class="text-center justify-center align-center">
+        <h4 class="text-center mb-0 ml-2" v-if="snackbarError">Помилка! {{  snackbarError  }}</h4>
+        <h4 class="text-center mb-0 ml-2" v-else>{{ 'Зміни збережені !' }}</h4>
+        <v-btn
+          text
+          @click="resetSnackbar()"
+        >
+          Закрити
+        </v-btn>
+      </v-row>
+    </v-snackbar>
   </v-container>
 </template>
 
@@ -48,112 +99,156 @@
 export default {
   data: function () {
     return {
-      nameKey: 'name',
+      nameKey: 'judgeSportTitle',
       initialsKey: 'initials',
-      mainConfigurations: [],
-      otherConfigurations: []
+      translationKey: 'description',
+      isLoading: true,
+
+      coreJudges: [],
+      competitionJudges: [],
+      competitionAssistJudges: [],
+      showSnackbar: false,
+      snackbarColor: 'primary',
+      snackbarError: '',
     }
   },
   computed: {
+    competitionId() {
+      return this.$route.params.id;
+    },
     mainConfigurationHeaders() {
       return [
-        { text: '', value: 'description', width: '20%' },
+        { text: '', value: this.translationKey, width: '20%' },
         { text: 'Спортивне звання', value: this.nameKey, width: '45%' },
         { text: 'Призвіще, ініціали', value: this.initialsKey, width: '35%' },
       ]
     },
-    otherConfigurationHeaders() {
+    seniorConfigurationHeaders() {
       return [
-        { text: 'Старший суддя з виду', value: 'description', width: '20%' },
+        { text: 'Старший суддя з виду', value: this.translationKey, width: '20%' },
         { text: 'Спортивне звання', value: this.nameKey, width: '45%' },
         { text: 'Призвіще, ініціали', value: this.initialsKey, width: '35%' },
       ]
     },
-    isDataInvalid() {
-      const [mainConfigs, otherConfigs] = [this.mainConfigurations, this.otherConfigurations]
-      if (!mainConfigs.length || !otherConfigs.length) return true;
-      const [nameKey, initialsKey] = [this.nameKey, this.initialsKey]
-      return mainConfigs.some((item) => !item?.[nameKey].trim() || !item?.[initialsKey].trim()) ||
-        otherConfigs.some((item) => !item?.[nameKey].trim() || !item?.[initialsKey].trim())
+    assistantConfigurationHeaders() {
+      return [
+        { text: 'Заступник судді з виду', value: this.translationKey, width: '20%' },
+        { text: 'Спортивне звання', value: this.nameKey, width: '45%' },
+        { text: 'Призвіще, ініціали', value: this.initialsKey, width: '35%' },
+      ]
+    },
+    judgeTranslations() {
+      const coreJudgesTypes = {
+        MAIN: 'Головний суддя змаганнь', 
+        MAIN_SECRETARY: 'Головний секретар змаганнь',
+        INSPECTOR: 'Суддя інспектор змаганнь', 
+        STARTER: 'Стартер',
+        ASSISTANCE_STARTER: 'Стартер заст.'
+      };
+      const competitionJudgesTypes = {
+        JUDGE_ASSAULT_LADDER: 'Штурмова драбина', 
+        JUDGE_HUNDRED_METER: '100 метрова полоса',
+        JUDGE_DUELING: 'Двоборство',
+        JUDGE_RETRACTABLE_LADDER: 'Висувна драбина',
+        JUDGE_RELAY: 'Пожежна естафета',
+        JUDGE_COMBAT_DEPLOYMENT: 'Бойове розгортання'
+      };
+      const competitionAssistJudgesTypes = {
+        ASSISTANCE_ASSAULT_LADDER: 'Штурмова драбина', 
+        ASSISTANCE_HUNDRED_METER: '100 метрова полоса',
+        ASSISTANCE_DUELING: 'Двоборство',
+        ASSISTANCE_RETRACTABLE_LADDER: 'Висувна драбина',
+        ASSISTANCE_RELAY: 'Пожежна естафета',
+        ASSISTANCE_COMBAT_DEPLOYMENT: 'Бойове розгортання'
+      };
+      return {
+        coreJudgesTypes,
+        competitionJudgesTypes,
+        competitionAssistJudgesTypes
+      }
     }
   },
-  mounted() {
-    this.fetchJudgesConfigurations();
+  async mounted() {
+    try {
+      await this.getCompetitionReferences();
+      await this.fetchJudgesConfigurations();
+    } catch(error) {
+      this.isLoading = false;
+    }
   },
   methods: {
-   async fetchJudgesConfigurations() {
-      const requestData = {};
-      return Promise.resolve(requestData)
+    assignJudgedConfig(configJudges = []) {
+      const judgesTypes = this.judgeTranslations;
+      const competitionReferences = this.competitionReferences.map(({sportType}) => sportType);
+      const coreJudges = Object.keys(judgesTypes.coreJudgesTypes).map((judgeType) => {
+        const foundConfig = configJudges.find((judge) => judgeType === judge.judgeType);
+        if (foundConfig) return foundConfig;
+        return {
+          judgeType,
+          initials: '',
+          judgeSportTitle: '',
+        }
+      });
+      console.warn('competitionReferences', competitionReferences, Object.keys(judgesTypes.competitionJudgesTypes))
+      const competitionJudges = Object.keys(judgesTypes.competitionJudgesTypes)
+        .filter((judgeType) => competitionReferences.some(v => judgeType.indexOf(v) > -1))
+        .map((judgeType) => {
+          const foundConfig = configJudges.find((judge) => judgeType === judge.judgeType);
+          if (foundConfig) return foundConfig;
+          return {
+            judgeType,
+            initials: '',
+            judgeSportTitle: '',
+          }
+        });
+      const competitionAssistJudges = Object.keys(judgesTypes.competitionAssistJudgesTypes)
+        .filter((judgeType) => competitionReferences.some(v => judgeType.indexOf(v) > -1))
+        .map((judgeType) => {
+          const foundConfig = configJudges.find((judge) => judgeType === judge.judgeType);
+          if (foundConfig) return foundConfig;
+          return {
+            judgeType,
+            initials: '',
+            judgeSportTitle: '',
+          }
+        });
+      this.coreJudges = coreJudges;
+      this.competitionJudges = competitionJudges;
+      this.competitionAssistJudges = competitionAssistJudges;
+    },
+    async fetchJudgesConfigurations() {
+      this.isLoading = true;
+      return this.axios.get(`private/competitions/${this.competitionId}/judge/all`)
         .then(({ data = [] }) => {
-          this.otherConfigurations = [
-            { 
-              "id": 'one_hundred_meters',
-              "description": "100 метрова полоса", 
-              "name": "1",
-              "initials": "11"
-            },
-            { 
-              "id": 'assault_ladder',
-              "description": "Штурмова драбина", 
-              "name": "1",
-              "initials": "11"
-            },
-            { 
-              "id": 'dueling',
-              "description": "Двоборство", 
-              "name": "1",
-              "initials": "11"
-            },
-            { 
-              "id": 'retractable_ladder',
-              "description": "Висувна драбина", 
-              "name": "1",
-              "initials": "11"
-            },
-            { 
-              "id": 'fire_relay',
-              "description": "Пожежна естафета", 
-              "name": "1",
-              "initials": "11"
-            },
-            { 
-              "id": 'deployment',
-              "description": "Бойове розгортання", 
-              "name": "1",
-              "initials": "11"
-            },
-          ];
-          this.mainConfigurations = [
-            { 
-              "id": 'main_judge',
-              "description": "Головний суддя змагань", 
-              "name": "1",
-              "initials": "11"
-            },
-            { 
-              "id": 'main_secretary',
-              "description": "Головний секретар змагань", 
-              "name": "2",
-              "initials": "22"
-            },
-            { 
-              "id": 'judge_inspector',
-              "description": "Суддя інспектор змагань", 
-              "name": "3",
-              "initials": "33"
-            },
-            { 
-            "id": 'starter',
-              "description": "Стартер", 
-              "name": "4",
-              "initials": "44"
-            },
-          ];
+          this.isLoading = false;
+          this.assignJudgedConfig(data);
         })
     },
-    save() {
-      const requestData = { mainConfigurations, otherConfigurations }
-      Promise.resolve(requestData)
+    async getCompetitionReferences() {
+      return this.axios.get(`private/competitions/${this.competitionId}/type`)
+          .then(({ data }) => this.competitionReferences = data);
+    },
+    resetSnackbar() {
+      this.showSnackbar = false;
+      this.snackbarError = '';
+      this.snackbarColor = 'primary';
+    },
+    async saveJudges() {
+      const judges = [...this.coreJudges, ...this.competitionJudges, ...this.competitionAssistJudges]
+      const patchJudges = judges.filter(({ reference }) => reference);
+      const postJudges = judges.filter(({ reference }) => !reference)
+      try {
+        if (postJudges.length) await this.axios.post(`private/competitions/${this.competitionId}/judge/all`, [...postJudges])
+        if (patchJudges.length) await this.axios.patch(`private/competitions/${this.competitionId}/judge/all`, [...patchJudges])
+        this.snackbarError = '';
+        this.snackbarColor ='success';
+        this.showSnackbar = true;
+        await this.fetchJudgesConfigurations();
+      } catch (error) {
+        this.snackbarError = 'TODO PARSE MESSAGE';
+        this.snackbarColor ='error';
+        this.showSnackbar = true;
+      }
     }
   }
 }
