@@ -1,6 +1,13 @@
 <template>
   <v-container class="config-by-type white--text" ma-0 pa-0 fluid>
-    <div class="text-center">
+    <div v-if="isLoading" class="text-center">
+      <v-progress-circular
+        :size="100"
+        color="white"
+        indeterminate
+      ></v-progress-circular>
+    </div>
+    <div v-else class="text-center">
       <v-tabs
         v-model="tab"
         background-color="cyan"
@@ -148,6 +155,7 @@ export default {
       snackbarColor: 'primary',
       snackbarError: '',
       tab: null,
+      isLoading: true,
     }
   },
   computed: {
@@ -187,8 +195,12 @@ export default {
       this.snackbarError = '';
     },
     async getCompetitionReferences() {
+      this.isLoading = true;
       return this.axios.get(`private/competitions/${this.competitionId}/type`)
-          .then(({ data }) => this.competitionReferences = data);
+          .then(({ data }) => this.competitionReferences = data)
+          .finally(() => {
+            this.isLoading = false;
+          })
     },
     async saveConfigurationByType(tab) {
       const copy = JSON.parse(JSON.stringify(tab));
