@@ -85,6 +85,7 @@
         <h4 class="text-center mb-0 ml-2" v-if="snackbarError">Помилка! {{  snackbarError  }}</h4>
         <h4 class="text-center mb-0 ml-2" v-else>{{ 'Зміни збережені !' }}</h4>
         <v-btn
+          class="ml-2"
           text
           @click="resetSnackbar()"
         >
@@ -189,7 +190,6 @@ export default {
           judgeSportTitle: '',
         }
       });
-      console.warn('competitionReferences', competitionReferences, Object.keys(judgesTypes.competitionJudgesTypes))
       const competitionJudges = Object.keys(judgesTypes.competitionJudgesTypes)
         .filter((judgeType) => competitionReferences.some(v => judgeType.indexOf(v) > -1))
         .map((judgeType) => {
