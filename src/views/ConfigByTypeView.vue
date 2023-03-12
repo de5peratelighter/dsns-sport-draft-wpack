@@ -39,6 +39,13 @@
                   dark
                 />
               </v-col>
+              <v-col cols="6" class="py-0">
+                <v-text-field
+                  v-model="tab.weather"
+                  label="Погода"
+                  dark
+                />
+              </v-col>
             </v-row>
             <v-row>
               <v-col cols="6" class="py-0">
@@ -99,17 +106,66 @@
               </v-col>
             </v-row>
             <v-row>
-              <v-col cols="6" class="py-0">
-                <v-text-field
-                  v-model="tab.weather"
-                  label="Погода"
-                  dark
-                />
-              </v-col>
-            </v-row>
-            <v-row>
               <v-col cols="12">
-                DATE & TIME (start+end) TODO ON BACKEND
+                <div class="d-flex">
+                  <v-menu
+                    :ref="`startDateMenu-${tab.reference}`"
+                    v-model="startDateMenu[tab.reference]"
+                    :close-on-content-click="false"
+                    transition="scale-transition"
+                    offset-y
+                    min-width="auto"
+                    :return-value.sync="tab.startDate"
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-text-field
+                        v-model="tab.startDate"
+                        label="Дата початку змаганнь"
+                        prepend-icon="mdi-calendar"
+                        readonly
+                        v-bind="attrs"
+                        v-on="on"
+                        dark
+                        hide-details
+                      ></v-text-field>
+                    </template>
+                    <v-date-picker
+                      v-model="tab.startDate"
+                      :min="(new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)"
+                      elevation="0"
+                      @change="saveStartDate(tab.reference, $event)"
+                    ></v-date-picker>
+                  </v-menu>
+
+                  <v-menu
+                    :ref="`endDateMenu-${tab.reference}`"
+                    v-model="endDateMenu[tab.reference]"
+                    :close-on-content-click="false"
+                    transition="scale-transition"
+                    offset-y
+                    min-width="auto"
+                    :return-value.sync="tab.endDate"
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-text-field
+                        v-model="tab.endDate"
+                        label="Дата закінчення змаганнь"
+                        prepend-icon="mdi-calendar"
+                        readonly
+                        v-bind="attrs"
+                        v-on="on"
+                        dark
+                        hide-details
+                      ></v-text-field>
+                    </template>
+                    <v-date-picker
+                      v-model="tab.endDate"
+                      :min="(new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)"
+                      elevation="0"
+                      @change="saveEndDate(tab.reference, $event)"
+                    ></v-date-picker>
+                  </v-menu>
+                </div>
               </v-col>
             </v-row>
             <div class="mt-3 d-flex justify-center">
@@ -156,6 +212,8 @@ export default {
       snackbarError: '',
       tab: null,
       isLoading: true,
+      startDateMenu: {},
+      endDateMenu: {},
     }
   },
   computed: {
@@ -194,10 +252,23 @@ export default {
       this.snackbarColor = 'primary';
       this.snackbarError = '';
     },
+    saveStartDate(reference, date) {
+      const ref = this.$refs[`startDateMenu-${reference}`];
+      // since we have multiple table and thus references
+      if (ref && ref[0]) ref[0].save(date);
+    },
+    saveEndDate(reference, date) {
+      const ref = this.$refs[`endDateMenu-${reference}`];
+      // since we have multiple table and thus references
+      if (ref && ref[0]) ref[0].save(date);
+    },
     async getCompetitionReferences() {
       this.isLoading = true;
       return this.axios.get(`private/competitions/${this.competitionId}/type`)
-          .then(({ data }) => this.competitionReferences = data)
+          .then(({ data }) => {
+            this.competitionReferences = data;
+            this.assignDateReferences(data);
+          })
           .finally(() => {
             this.isLoading = false;
           })
@@ -207,7 +278,7 @@ export default {
       if (!copy) return;
       const reference = copy.reference;
       delete copy.reference;
-      return this.axios.patch(`private/competitions/${reference}/type`, copy)
+      return this.axios.patch(`private/competitions-types/${reference}`, copy)
         .then(() => {
           this.snackbarError = '';
           this.snackbarColor ='success';
@@ -218,7 +289,17 @@ export default {
           this.snackbarColor ='error';
           this.showSnackbar = true;
         })
-    }
+    },
+    assignDateReferences(references) {
+      const startDateRefs = {};
+      const endDateRefs = {};
+      references.forEach(({reference}) => {
+        startDateRefs[reference] = false
+        endDateRefs[reference] = false
+      });
+      this.startDateMenu = startDateRefs;
+      this.endDateMenu = endDateRefs;
+    },
   }
 }
 </script>

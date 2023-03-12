@@ -358,7 +358,7 @@ export default {
     },
     openSavedCompetition() {
       this.$router.push({
-        name: 'configMain',
+        name: 'editCompetition',
         params: { id: this.nextReferenceId },
       });
     },

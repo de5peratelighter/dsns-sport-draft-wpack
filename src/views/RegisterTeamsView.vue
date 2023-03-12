@@ -2,12 +2,12 @@
     <v-container class="config-by-type white--text" ma-0 pa-0 fluid>
         <v-sheet :color="'rgba(0, 0, 0, 0.35)'" class="pa-3">
             <v-data-table
-            :headers="headers"
-            :items="teams"
-            disable-sort
-            disable-pagination
-            hide-default-footer
-          >
+                :headers="headers"
+                :items="teams"
+                disable-pagination
+                hide-default-footer
+                @update:sort-by="sortTeams"
+            >
             <template #item="{ item, index }">
               <tr>
                 <td>
@@ -125,8 +125,8 @@ export default {
         return {
             headers: [
                 { text: '№ п/п', value: 'id', width: '5%' },
-                { text: 'Назва команди', value: 'teamName', width: '30%' },
-                { text: 'По жеребу', value: 'num' , width: '20%'},
+                { text: 'Назва команди', value: 'teamName', width: '30%', sortable: true },
+                { text: 'По жеребу', value: 'num' , width: '20%', sortable: true },
                 { text: 'Основне змагання', value: 'isMain', width: '10%' },
                 { text: 'Поза конкурсно', value: 'isNonCompetetive', width: '10%' },
                 //{ text: 'Не для протоколів', value: 'isIgnored', width: '10%' },
@@ -141,7 +141,7 @@ export default {
         }
     },
     computed: {
-        teamId() {
+        competitionId() {
             return this.$route.params.id;
         },
         numericRules() {
@@ -163,7 +163,7 @@ export default {
             const data = {
                 teamName: this.teamName.trim()
             };
-            return this.axios.post(`private/competition/${this.teamId}/team`, data)
+            return this.axios.post(`private/competition/${this.competitionId}/team`, data)
                 .then(({ data }) => {
                     this.teams = [...this.teams, data];
                 });
@@ -186,7 +186,7 @@ export default {
         async updateTeam(team, reqData, isNameUpdate = false) {
             const URL = isNameUpdate ? 
                 `private/teams/${team.teamReference}`:
-                `private/teams/${team.teamReference}/competitions/${this.teamId}`;
+                `private/teams/${team.teamReference}/competitions/${this.competitionId}`;
 
             const teamIndex = this.teams.findIndex(({ teamReference }) => teamReference === team.teamReference);
             return this.axios.patch(URL, reqData)
@@ -199,11 +199,16 @@ export default {
                     this.$set(this.teams, teamIndex, team);
                 })
         },
-        async getTeams() {
-            return this.axios.get(`private/competitions/${this.teamId}/teams`)
+        async getTeams(sortType = 'LOT') {
+            return this.axios.get(`private/competitions/${this.competitionId}/teams`, {sortType})
                 .then(({ data }) => {
                     this.teams = data;
                 })
+        },
+        async sortTeams(sortType) {
+            const types = { teamName: 'NAME', num: 'LOT'}
+            if (!types[sortType]) return;
+            return this.getTeams(types[sortType])
         },
         pasteData() {
             navigator.clipboard
