@@ -278,7 +278,7 @@ export default {
       if (!copy) return;
       const reference = copy.reference;
       delete copy.reference;
-      return this.axios.patch(`private/competitions-types/${reference}`, copy)
+      return this.axios.patch(`private/competition-types/${reference}`, copy)
         .then(() => {
           this.snackbarError = '';
           this.snackbarColor ='success';
