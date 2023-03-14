@@ -71,7 +71,7 @@ const routes = [
     component: () => import('../views/RegisterParticipantsView.vue'),
   },
   {
-    path: '/protocols/:id/',
+    path: '/protocols/:id/:type',
     name: 'protocols',
     component: () => import('../views/ProtocolsView.vue'),
   },

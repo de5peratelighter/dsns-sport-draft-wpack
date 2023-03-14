@@ -97,14 +97,41 @@
 export default {
   data: function () {
     return {
+      competitionReferences: [],
+      isLoading: false,
     }
   },
+  mounted() {
+    this.getCompetitionReferences();
+  },
+  methods: {
+    async getCompetitionReferences() {
+      this.isLoading = true;
+      return this.axios.get(`private/competitions/${this.competitionId}/type`)
+          .then(({ data }) => {
+            this.competitionReferences = data;
+          })
+          .finally(() => {
+            this.isLoading = false;
+          })
+    },
+  },
   computed: {
-    id() {
+    competitionId() {
       return this.$route.params.id;
     },
+    competitionTranslations() {
+      return {
+        ASSAULT_LADDER: 'Штурмова драбина', 
+        HUNDRED_METER: '100 метрова полоса',
+        DUELING: 'Двоборство',
+        RETRACTABLE_LADDER: 'Висувна драбина',
+        RELAY: 'Пожежна естафета',
+        COMBAT_DEPLOYMENT: 'Бойове розгортання'
+      }
+    },
     registrationMenuItems() {
-      const params = {id: this.id };
+      const params = {id: this.competitionId };
       return [
           {
             title: 'Команди',
@@ -117,38 +144,25 @@ export default {
       ]
     },
     protocolMenuItems() {
-      const params = {id: this.id };
-        return [
-            {
-              title: '100 метрова полоса',
-              to: { name: 'protocols', params }
-            },
-            {
-              title: 'Штурмова драбина',
-              to: { name: 'protocols', params }
-            },
-            {
-              title: 'Двоборство',
-              to: { name: 'protocols', params }
-            },
-            {
-              title: 'Пожежна естафета',
-              to: { name: 'protocols', params }
-            },
-            {
-              title: 'Бойове розгортання',
-              to: { name: 'protocols', params }
-            },
-            {
+      const params = { id: this.competitionId };
+      const competitionReferences = this.competitionReferences;
+      const translations = this.competitionTranslations;
+
+      return [...competitionReferences.map(({ reference, sportType}) => {
+            return {
+              title: translations[sportType],
+              to: { name: 'protocols', params: { ...params, type: reference }}
+            }
+        }), {
                 title: 'Загальнокомандний',
             },
             {
                 title: 'Загальнокомандний (по етапах)',
-            },
-        ]
+            }
+        ];
     },
     adminMenuItems() {
-        const params = {id: this.id };
+        const params = {id: this.competitionId };
         return [
         {
           title: 'Параметри змаганнь',
