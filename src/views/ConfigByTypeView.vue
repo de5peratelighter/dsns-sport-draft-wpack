@@ -168,11 +168,25 @@
                 </div>
               </v-col>
             </v-row>
-            <div class="mt-3 d-flex justify-center">
-              <v-btn color="light-green white--text"
+            <div class="mt-5 d-flex justify-space-between">
+              <v-btn color="light-green white--text mr-2"
                 @click="saveConfigurationByType(tab)"
               >
                 Зберегти
+              </v-btn>
+              <v-btn 
+                v-if="tab.status === 'INACTIVE'"
+                color="light-green white--text"
+                @click="startCompetition(tab)"
+              >
+                Розпочати змагання
+              </v-btn>
+              <v-btn 
+                v-if="tab.status === 'ACTIVE'"
+                color="primary white--text"
+                @click="goToResults(tab)"
+              >
+                Результати змагання
               </v-btn>
             </div>
           </v-sheet>
@@ -290,6 +304,11 @@ export default {
           this.showSnackbar = true;
         })
     },
+    startCompetition(tab) {
+      const reference = tab.reference;
+      if (!tab.reference) return Promise.reject('Competition doesnt exist');
+      return this.axios.post(`private/competition-types/${reference}/start-competition-type`)
+    },
     assignDateReferences(references) {
       const startDateRefs = {};
       const endDateRefs = {};
@@ -300,6 +319,11 @@ export default {
       this.startDateMenu = startDateRefs;
       this.endDateMenu = endDateRefs;
     },
+    goToResults(tab) {
+      const reference = tab.reference;
+      if (!reference) return Promise.reject('Incorrect result page data')
+      return this.$router.push({name: 'protocols', params: {id: this.competitionId, type: reference }})
+    }
   }
 }
 </script>
