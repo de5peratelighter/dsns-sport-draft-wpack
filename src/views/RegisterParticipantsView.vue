@@ -328,13 +328,18 @@ export default {
             let participantStartPositionList = participant.participantStartPositionList;
             let foundItem = participantStartPositionList.find((item) => item.sportType === sportType);
             if (foundItem) {
-                let nextData = {...item};
+                let nextData = {...foundItem};
                 if (key === 'startingPosition') {
                     nextData.startingPosition = this.sportTypePos;
                 } else {
                     nextData.personal = !nextData.personal;
                 }
-                foundItem = nextData;
+                participantStartPositionList = participantStartPositionList.map((list) => {
+                    if (list.sportType === sportType) {
+                        return nextData;
+                    }
+                    return list;
+                });
             } else {
                 let defaultData = { sportType, startingPosition: '',  personal: false,}
                 if (key === 'startingPosition') {

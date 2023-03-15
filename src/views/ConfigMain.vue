@@ -260,10 +260,10 @@ export default {
       protocolOptions: [
         { id: 'SHOW_LOGOS', name: 'Відображати в протоколах логотипи', value: true },
         { id: 'SHOW_COMPETITION_ICON', name: 'Відображати графічні символи видім змаганнь', value: false },
-        { id: 'SHOW_PROTOCOL_NORMATIVES', name: 'Відображати в стартових протоколах розрядні нормативи', value: true },
+        { id: 'SHOW_PROTOCOL_NORMATIVE', name: 'Відображати в стартових протоколах розрядні нормативи', value: true },
         { id: 'SHOW_PROTOCOL_ACHIEVEMENTS', name: 'Відображати в стартових протоколах вищі досягнення', value: true },
         { id: 'SHOW_PROTOCOL_LEVEL', name: 'Відображати в стартових протоколах колонку Розряд', value: true },
-        { id: 'SHOW_PROCOCOL_BEST_SCORE', name: 'Відображати в стартових протоколах колонку Кращий результат', value: true },
+        { id: 'SHOW_PROTOCOL_BEST_SCORE', name: 'Відображати в стартових протоколах колонку Кращий результат', value: true },
         { id: 'SHOW_PROTOCOL_LEVEL_SPORTS', name: 'Відображати в фінішних протоколах колонку спортивні розряди', value: true },
         { id: 'SHOW_WEATHER', name: 'Виводити в фінішних протоколах опис погоди', value: false },
         { id: 'ENGLISH_DATA', name: 'Дублювати протоколи англійською', value: false },
