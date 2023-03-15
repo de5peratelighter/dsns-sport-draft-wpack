@@ -305,9 +305,14 @@ export default {
         })
     },
     startCompetition(tab) {
-      const reference = tab.reference;
+      const foundIndex = this.competitionReferences.findIndex(({ reference }) => reference === tab.reference)
       if (!tab.reference) return Promise.reject('Competition doesnt exist');
-      return this.axios.post(`private/competition-types/${reference}/start-competition-type`)
+      return this.axios.post(`private/competition-types/${tab.reference}/start-competition-type`)
+        .then(({data}) => {
+          if (foundIndex >= 0) {
+            this.$set(this.competitionReferences, foundIndex, data);
+          }
+        })
     },
     assignDateReferences(references) {
       const startDateRefs = {};
