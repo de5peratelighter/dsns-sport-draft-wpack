@@ -160,7 +160,7 @@
     <v-row class="mt-0">
       <v-col cols="6">
         <v-combobox
-          v-model="selectedGender"
+          v-model="ageType"
           :items="genderItems"
           outlined
           chips
@@ -322,7 +322,7 @@ export default {
       organizationName: '',
       name: '',
       locationName: '',
-      selectedGender: '',
+      ageType: '',
       startDate: null,
       endDate: null,
       startDateMenu: false,
@@ -389,8 +389,8 @@ export default {
         parallelItems: this.parallelItems.map(({id}) => id),
         protocolOptionTypes: this.protocolOptionTypes,
       };
-      if (this.selectedGender) {
-        requestData.ageType = this.selectedGender.id;
+      if (this.ageType) {
+        requestData.ageType = this.ageType.id;
       }
       if (this.time) {
         requestData.time = this.time;
@@ -435,7 +435,7 @@ export default {
       this.parallelItems = this.parallelItems.filter((item) => item.id !== id);
     },
     unselectGender() {
-      this.selectedGender = '';
+      this.ageType = '';
     },
     updateProtocolOptionTypes(id) {
       if (!this.protocolOptions.find((option) => option.id === id)) return;

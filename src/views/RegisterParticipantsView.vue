@@ -330,7 +330,7 @@ export default {
             if (foundItem) {
                 let nextData = {...foundItem};
                 if (key === 'startingPosition') {
-                    nextData.startingPosition = this.sportTypePos;
+                    nextData.startingPosition = this.sportTypePos.trim();
                 } else {
                     nextData.personal = !nextData.personal;
                 }
@@ -343,7 +343,7 @@ export default {
             } else {
                 let defaultData = { sportType, startingPosition: '',  personal: false,}
                 if (key === 'startingPosition') {
-                    defaultData.startingPosition = this.sportTypePos;
+                    defaultData.startingPosition = this.sportTypePos.trim();
                 } else {
                     defaultData.personal = !defaultData.personal;
                 }
