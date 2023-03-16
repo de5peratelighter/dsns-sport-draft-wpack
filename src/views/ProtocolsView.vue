@@ -188,7 +188,14 @@ export default {
       };
       return this.axios.patch(`private/competition-types/races/${raceReference}/save-results`, reqData)
         .then(({data = {}}) => {
-          this.$set(this.participants, foundIndex, {...participant, ...data});
+          // directly saving new properties (since most of other properties returned are null)
+          this.$set(this.participants, foundIndex, {
+            ...participant, 
+            firstResult: data.firstResult,
+            secondResult: data.secondResult,
+            bestResult: data.bestResult,
+            finalResult: data.finalResult
+           });
         })
     }
   }
