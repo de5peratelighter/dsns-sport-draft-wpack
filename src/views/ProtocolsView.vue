@@ -7,7 +7,10 @@
         indeterminate
       ></v-progress-circular>
     </div>
-    <v-row v-else>
+    <template v-else>
+    <h3 class="text-center mb-3">{{ activeCompetitionType ? `Стартовий протокол: ${competitionTranslations[activeCompetitionType.sportType]}` : '' }}</h3>
+    <v-row>
+      <template v-if="activeCompetitionType">
       <v-col cols="7">
         <v-sheet :color="'rgba(0, 0, 0, 0.35)'" class="pa-2 white--text">
           <v-data-table
@@ -20,10 +23,10 @@
             <template #item="{ item }">
               <tr>
                 <td>
-                  {{ item.roadNumber }}
+                  {{ item.trackNumber }}
                 </td>
                 <td>
-                  {{ item.trackNumber }}
+                  {{ item.roadNumber }}
                 </td>
                 <td>
                   {{ item.participantNumber }}
@@ -46,7 +49,7 @@
                     @open="firstResult = item.firstResult"
                     @save="saveResults(item, 'firstResult')"
                   >
-                    <div>{{ item.teamName }}</div>
+                    <div>{{ item.firstResult }}</div>
                     <template #input>
                         <div class="mt-4 text-h6">
                             Перший результат, секунди
@@ -69,7 +72,7 @@
                     @open="secondResult = item.secondResult"
                     @save="saveResults(item, 'secondResult')"
                   >
-                    <div>{{ item.teamName }}</div>
+                    <div>{{ item.secondResult }}</div>
                     <template #input>
                         <div class="mt-4 text-h6">
                             Другий результат, секунди
@@ -100,7 +103,9 @@
             </v-data-table>
           </v-sheet>
         </v-col>
+        </template>
       </v-row>
+      </template>
   </v-container>
 </template>
 
@@ -108,30 +113,15 @@
 export default {
   data: function () {
     return {
+      competitionReferences: [], // has to be fetched so we know what SPORT_TYPE we're actually dealing with (id is taken from route)
       isLoading: true,
       firstResult: 0,
       secondResult: 0,
       isNumeric: v => !isNaN(v) || 'Лише числа',
-      participants: [{
-        "participantBirthday": "2023-03-14",
-        "participantTeamName": "string",
-        "participantCategory": "III_TEEN",
-        "participantFullName": "string",
-        "trackNumber": 0,
-        "roadNumber": 0,
-        "firstResult": 0,
-        "secondResult": 0,
-        "bestResult": 0,
-        "halfFinalResult": 0,
-        "isHalfFinalWinner": true,
-        "finalResult": 0,
-        "isFinalWinner": true,
-        "participantReference": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-        "raceReference": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-      }],
+      participants: [],
       participantHeaders: [
-          { text: '№ забігу', value: 'roadNumber', width: '7.5%' },
           { text: '№ доріжки', value: 'trackNumber', width: '7.5%' },
+          { text: '№ забігу', value: 'roadNumber', width: '7.5%' },
           { text: '№ учасника', value: 'participantNumber' , width: '7.5%' },
           { text: 'Категорія учасника', value: 'participantCategory' , width: '7.5%' },
           { text: 'Призвіще та імя', value: 'participantFullName', width: '15%' },
@@ -149,12 +139,33 @@ export default {
     },
     competitionType() {
       return this.$route.params.type;
-    }
+    },
+    activeCompetitionType() {
+      const competitionType = this.competitionType;
+      return this.competitionReferences.find(({reference}) => reference === competitionType);
+    },
+    competitionTranslations() {
+      return {
+        ASSAULT_LADDER: 'Штурмова драбина', 
+        HUNDRED_METER: '100 метрова полоса',
+        DUELING: 'Двоборство',
+        RETRACTABLE_LADDER: 'Висувна драбина',
+        RELAY: 'Пожежна естафета',
+        COMBAT_DEPLOYMENT: 'Бойове розгортання'
+      }
+    },
   },
   async mounted() {
+    await this.getCompetitionReferences();
     await this.getStartRace();
   },
   methods: {
+    async getCompetitionReferences() {
+      return this.axios.get(`private/competitions/${this.competitionId}/type`)
+          .then(({ data }) => {
+            this.competitionReferences = data;
+          });
+    },
     async getStartRace() {
       this.isLoading = true;
       return this.axios.get(`private/competition-types/${this.competitionType}/start-race-list`)
@@ -170,11 +181,15 @@ export default {
       if (!raceReference) return Promise.reject('Incorrect raceReference for saving');
       const result = this[key].trim();
       if (!result) return;
+      const foundIndex = this.participants.findIndex(({ participantReference }) => participantReference === participant.participantReference)
       const reqData = {
         participantReference: participant.participantReference,
         [key]: result,
       };
-      return this.axios.patch(`private/races/${raceReference}/save-results`, reqData)
+      return this.axios.patch(`private/competition-types/races/${raceReference}/save-results`, reqData)
+        .then(({data = {}}) => {
+          this.$set(this.participants, foundIndex, {...participant, ...data});
+        })
     }
   }
 }
