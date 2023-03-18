@@ -9,12 +9,15 @@
     </div>
     <template v-else>
     <v-row v-if="activeCompetitionType && activeCompetitionType.status === 'INACTIVE'" class="text-center justify-center mt-3">
-      <v-btn 
-        color="light-green white--text"
-        @click="startCompetition(activeCompetitionType)"
-      >
-        Розпочати змагання
-      </v-btn>
+      <div class="d-flex" style="flex-direction: column">
+        <h4 class="text-center mb-4">{{ activeCompetitionType ? `Стартовий протокол: ${competitionTranslations[activeCompetitionType.sportType]}` : '' }}</h4>
+        <v-btn 
+          color="light-green white--text"
+          @click="startCompetition(activeCompetitionType)"
+        >
+          Розпочати змагання
+        </v-btn>
+      </div>
     </v-row>
     <v-row v-else>
       <template v-if="activeCompetitionType">
