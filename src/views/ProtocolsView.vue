@@ -114,6 +114,7 @@
           </v-col>
           <v-col cols="5">
             <v-sheet :color="'rgba(0, 0, 0, 0.35)'" class="pa-2 white--text" style="position: sticky; top: 5px;">
+              <h4 class="text-center">Кращі результати</h4>
               <v-data-table
                 :headers="bestResultsHeaders"
                 :items="bestParticipants"
@@ -138,6 +139,60 @@
                   </tr>
                 </template>
               </v-data-table>
+              <v-row class="mt-1">
+                <v-col cols="6">
+                  <h4 class="text-center">Командна першість по виду
+                     <v-icon dark @click="fetchteamResultsByType">mdi-refresh</v-icon>
+                  </h4>
+                  <v-data-table
+                    :headers="teamResultsByTypeHeaders"
+                    :items="teamResultsByType"
+                    disable-pagination
+                    disable-sort
+                    hide-default-footer
+                  >
+                    <template #item="{ item, index }">
+                      <tr>
+                        <td>
+                          {{ index }}
+                        </td>
+                        <td>
+                          {{ item.teamName }}
+                        </td>
+                        <td>
+                          {{ item.result }}
+                        </td>
+                      </tr>
+                    </template>
+                  </v-data-table>
+                </v-col>
+                <v-col cols="6">
+                  <h4 class="text-center">Загальнокомандна першість
+                     <v-icon dark @click="fetchteamResultsOverall">mdi-refresh</v-icon>
+                  </h4>
+                  <v-data-table
+                    :headers="teamResultsOverallHeaders"
+                    :items="teamResultsOverall"
+                    disable-pagination
+                    disable-sort
+                    hide-default-footer
+                  >
+                    <template #item="{ item, index }">
+                      <tr>
+                        <td>
+                          {{ index }}
+                        </td>
+                        <td>
+                          {{ item.teamName }}
+                        </td>
+                        <td>
+                          {{ item.result }}
+                        </td>
+                      </tr>
+                    </template>
+                  </v-data-table>
+                </v-col>
+              </v-row>
             </v-sheet>
           </v-col>
         </template>
@@ -157,6 +212,8 @@ export default {
       isNumeric: v => !isNaN(v) || 'Лише числа',
       participants: [],
       bestParticipants: [],
+      teamResultsOverall: [],
+      teamResultsByType: [],
       participantHeaders: [
         { text: '№ забігу', value: 'roadNumber', width: '7.5%' },
         { text: '№ доріжки', value: 'trackNumber', width: '7.5%' },
@@ -174,6 +231,16 @@ export default {
         { text: 'Спортсмен', value: 'participantFullName', width: '35%' },
         { text: 'Команда', value: 'participantTeamName', width: '35%' },
         { text: 'Час, сек', value: 'bestResult', width: '20%' },
+      ],
+      teamResultsByTypeHeaders: [
+        { text: '', value: 'index', width: '10%' },
+        { text: 'Команда', value: 'teamName', width: '45%' },
+        { text: 'Час с', value: 'result', width: '45%' },
+      ],
+      teamResultsOverallHeaders: [
+        { text: '', value: 'index', width: '10%' },
+        { text: 'Команда', value: 'teamName', width: '45%' },
+        { text: 'Сума', value: 'result', width: '45%' },
       ]
     }
   },
@@ -241,6 +308,18 @@ export default {
         .catch(() => {
           this.isLoading = false;
         });
+    },
+    async fetchteamResultsByType () {
+      return this.axios.post(`private/teams/competition-types/${this.competitionType}/generate-race-result`)
+        .then(({ data }) => {
+          this.teamResultsByType = data;
+        })
+    },
+    async fetchteamResultsOverall () {
+      return this.axios.post(`private/teams/competitions/${this.competitionId}/generate-team-results`)
+        .then(({ data }) => {
+          this.teamResultsOverall = data;
+        })
     },
     async saveResults(participant, key) {
       const raceReference = participant.raceReference;
