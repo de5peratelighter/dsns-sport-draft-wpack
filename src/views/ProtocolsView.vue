@@ -9,7 +9,16 @@
     </div>
     <template v-else>
     <h3 class="text-center mb-3">{{ activeCompetitionType ? `Стартовий протокол: ${competitionTranslations[activeCompetitionType.sportType]}` : '' }}</h3>
-    <v-row>
+    <v-row v-if="activeCompetitionType && activeCompetitionType.status === 'INACTIVE'" class="text-center justify-center mt-3">
+      <v-btn 
+        
+        color="light-green white--text"
+        @click="startCompetition(activeCompetitionType)"
+      >
+        Розпочати змагання
+      </v-btn>
+    </v-row>
+    <v-row v-else>
       <template v-if="activeCompetitionType">
         <v-col cols="7">
           <v-sheet :color="'rgba(0, 0, 0, 0.35)'" class="pa-2 white--text">
@@ -142,7 +151,7 @@ export default {
   data: function () {
     return {
       competitionReferences: [], // has to be fetched so we know what SPORT_TYPE we're actually dealing with (id is taken from route)
-      isLoading: true,
+      isLoading: false,
       firstResult: 0,
       secondResult: 0,
       isNumeric: v => !isNaN(v) || 'Лише числа',
@@ -192,11 +201,20 @@ export default {
   },
   async mounted() {
     await this.getCompetitionReferences();
-    await this.getStartRace();
-    await this.getRaceResults();
   },
   methods: {
-    async getRaceResults() {
+    async startCompetition(tab) {
+      const foundIndex = this.competitionReferences.findIndex(({ reference }) => reference === tab.reference)
+      if (!tab.reference) return Promise.reject('Competition doesnt exist');
+      return this.axios.post(`private/competition-types/${tab.reference}/start-race-list`)
+        .then(() => {
+          if (foundIndex >= 0) {
+            this.$set(this.competitionReferences, foundIndex, { ...this.activeCompetitionType, status: 'ACTIVE' });
+            this.getStartRace();
+          }
+        })
+    },
+    async getBestResults() {
       return this.axios.get(`private/competition-types/${this.competitionType}/best-race-results`)
         .then(({ data }) => {
           this.bestParticipants = data;
@@ -206,15 +224,21 @@ export default {
       return this.axios.get(`private/competitions/${this.competitionId}/type`)
           .then(({ data }) => {
             this.competitionReferences = data;
+            if (this.activeCompetitionType && this.activeCompetitionType.status === 'ACTIVE') this.getStartRace();
           });
     },
     async getStartRace() {
       this.isLoading = true;
-      return this.axios.get(`private/competition-types/${this.competitionType}/start-race-list`)
+      return this.axios.get(`private/competition-types/${this.competitionType}/race-results`)
         .then(({data}) => {
+          console.warn('wtf', data)
+          this.isLoading = false;
           this.participants = data;
+          if (data.length) {
+            this.getBestResults();
+          }
         })
-        .finally(() => {
+        .catch(() => {
           this.isLoading = false;
         });
     },
@@ -239,7 +263,7 @@ export default {
             finalResult: data.finalResult
            });
            // refetch best results
-           this.getRaceResults();
+           this.getBestResults();
         })
     }
   }

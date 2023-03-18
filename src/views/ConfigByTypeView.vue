@@ -240,13 +240,6 @@
                 Зберегти
               </v-btn>
               <v-btn 
-                v-if="tab.status === 'INACTIVE'"
-                color="light-green white--text"
-                @click="startCompetition(tab)"
-              >
-                Розпочати змагання
-              </v-btn>
-              <v-btn 
                 v-if="tab.status === 'ACTIVE'"
                 color="primary white--text"
                 @click="goToResults(tab)"
