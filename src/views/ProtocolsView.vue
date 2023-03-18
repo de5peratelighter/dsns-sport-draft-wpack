@@ -298,11 +298,10 @@ export default {
       this.isLoading = true;
       return this.axios.get(`private/competition-types/${this.competitionType}/race-results`)
         .then(({data}) => {
-          console.warn('wtf', data)
           this.isLoading = false;
           this.participants = data;
           if (data.length) {
-            this.getBestResults();
+            return Promise.all([this.getBestResults(), this.fetchteamResultsByType(), this.fetchteamResultsOverall()])
           }
         })
         .catch(() => {
