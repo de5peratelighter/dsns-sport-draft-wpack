@@ -206,7 +206,7 @@ export default {
     async startCompetition(tab) {
       const foundIndex = this.competitionReferences.findIndex(({ reference }) => reference === tab.reference)
       if (!tab.reference) return Promise.reject('Competition doesnt exist');
-      return this.axios.post(`private/competition-types/${tab.reference}/start-race-list`)
+      return this.axios.post(`private/competition-types/${tab.reference}/start-competition-type`)
         .then(() => {
           if (foundIndex >= 0) {
             this.$set(this.competitionReferences, foundIndex, { ...this.activeCompetitionType, status: 'ACTIVE' });
@@ -217,7 +217,7 @@ export default {
     async getBestResults() {
       return this.axios.get(`private/competition-types/${this.competitionType}/best-race-results`)
         .then(({ data }) => {
-          this.bestParticipants = data;
+          this.bestParticipants = data.bestResultList;
         })
     },
     async getCompetitionReferences() {
