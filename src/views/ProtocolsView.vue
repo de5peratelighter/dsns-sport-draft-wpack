@@ -23,10 +23,10 @@
               <template #item="{ item }">
                 <tr>
                   <td>
-                    {{ item.trackNumber }}
+                    {{ item.roadNumber }}
                   </td>
                   <td>
-                    {{ item.roadNumber }}
+                    {{ item.trackNumber }}
                   </td>
                   <td>
                     {{ item.participantNumber }}
@@ -149,11 +149,11 @@ export default {
       participants: [],
       bestParticipants: [],
       participantHeaders: [
-        { text: '№ доріжки', value: 'trackNumber', width: '7.5%' },
         { text: '№ забігу', value: 'roadNumber', width: '7.5%' },
+        { text: '№ доріжки', value: 'trackNumber', width: '7.5%' },
         { text: '№ учасника', value: 'participantNumber' , width: '7.5%' },
         { text: 'Категорія учасника', value: 'participantCategory' , width: '7.5%' },
-        { text: 'Призвіще та імя', value: 'participantFullName', width: '15%' },
+        { text: 'Імя та призвіще', value: 'participantFullName', width: '15%' },
         { text: 'Рік народження', value: 'participantBirthday', width: '10%' },
         { text: 'Команда', value: 'participantTeamName', width: '10%' },
         { text: 'Перша спроба', value: 'firstResult', width: '10%' },

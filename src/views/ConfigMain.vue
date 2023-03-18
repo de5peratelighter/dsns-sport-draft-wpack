@@ -313,7 +313,10 @@ export default {
           id: 'YOUNGS', name: 'Молодь (18-23)'
         },
         {
-          id: 'ADULTS', name: 'Дорослі (18+)'
+          id: 'ADULTS_MALE', name: 'Дорослі Чол (18+)'
+        },
+        {
+          id: 'ADULTS_FEMALE', name: 'Дорослі Жін (18+)'
         },
       ],
       isDataInvalid: false,
