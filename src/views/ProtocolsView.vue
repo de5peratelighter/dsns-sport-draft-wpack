@@ -8,10 +8,8 @@
       ></v-progress-circular>
     </div>
     <template v-else>
-    <h3 class="text-center mb-3">{{ activeCompetitionType ? `Стартовий протокол: ${competitionTranslations[activeCompetitionType.sportType]}` : '' }}</h3>
     <v-row v-if="activeCompetitionType && activeCompetitionType.status === 'INACTIVE'" class="text-center justify-center mt-3">
       <v-btn 
-        
         color="light-green white--text"
         @click="startCompetition(activeCompetitionType)"
       >
@@ -22,6 +20,7 @@
       <template v-if="activeCompetitionType">
         <v-col cols="7">
           <v-sheet :color="'rgba(0, 0, 0, 0.35)'" class="pa-2 white--text">
+            <h4 class="text-center">{{ activeCompetitionType ? `Стартовий протокол: ${competitionTranslations[activeCompetitionType.sportType]}` : '' }}</h4>
             <v-data-table
               :headers="participantHeaders"
               :items="participants"
