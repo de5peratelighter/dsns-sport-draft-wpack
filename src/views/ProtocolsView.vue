@@ -298,7 +298,7 @@ export default {
     },
     async getStartRace() {
       this.isLoading = true;
-      return this.axios.get(`private/competition-types/${this.competitionType}/race-results`)
+      return this.axios.get(`private/competition-types/${this.competitionType}/start-race-list`)
         .then(({data}) => {
           this.isLoading = false;
           this.participants = data;
