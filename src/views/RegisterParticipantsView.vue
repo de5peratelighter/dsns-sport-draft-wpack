@@ -275,7 +275,7 @@ export default {
                 });
         },
         fetchTeamParticipantsByRef(ref) {
-            return this.axios.get(`private/teams/${ref}/participant`)
+            return this.axios.get(`private/teams/${ref}/participant/competitions/${this.competitionId}`)
                 .then(({ data = [] }) => {
                     this.participants = data;
                 })
