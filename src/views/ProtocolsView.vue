@@ -8,12 +8,12 @@
       ></v-progress-circular>
     </div>
     <template v-else>
-    <v-row v-if="activeCompetitionType && activeCompetitionType.status === 'INACTIVE'" class="text-center justify-center mt-3">
+    <v-row v-if="activeCompetitionStatus === 'INACTIVE'" class="text-center justify-center mt-3">
       <div class="d-flex" style="flex-direction: column">
         <h4 class="text-center mb-4">{{ activeCompetitionType ? `Стартовий протокол: ${competitionTranslations[activeCompetitionType.sportType]}` : '' }}</h4>
         <v-btn 
           color="light-green white--text"
-          @click="startCompetition(activeCompetitionType)"
+          @click="startCompetition"
         >
           Розпочати змагання
         </v-btn>
@@ -23,7 +23,53 @@
       <template v-if="activeCompetitionType">
         <v-col cols="7">
           <v-sheet :color="'rgba(0, 0, 0, 0.35)'" class="pa-2 white--text">
-            <h4 class="text-center">{{ activeCompetitionType ? `Стартовий протокол: ${competitionTranslations[activeCompetitionType.sportType]}` : '' }}</h4>
+            <h4 class="text-center">{{ activeCompetitionType ? `${competitionTranslations[activeCompetitionType.sportType]}` : '' }}</h4>
+            <v-stepper v-model="stepper" non-linear style="position: sticky; top: 0;">
+              <v-stepper-header>
+                <v-stepper-step
+                  editable
+                  step="1"
+                >
+                  Стартовий протокол
+                </v-stepper-step>
+
+                <v-divider></v-divider>
+
+                <v-stepper-step
+                  :editable="availableHalfFinal"
+                  step="2"
+                >
+                  Пів-фінал
+                  <v-btn 
+                    v-if="availableHalfFinal"
+                    small
+                    color="light-green white--text"
+                    :disabled="activeCompetitionStatus === 'HALF_FINAL' || activeCompetitionStatus === 'FINAL'"
+                    @click.stop.prevent="startHalfFinal"
+                  >
+                    Старт
+                  </v-btn>
+                </v-stepper-step>
+
+                <v-divider></v-divider>
+
+                <v-stepper-step
+                  step="3"
+                  :editable="availableFinal"
+                >
+                  Фінал
+                  <v-btn 
+                    v-if="availableFinal"
+                    small
+                    color="light-green white--text"
+                    :disabled="activeCompetitionStatus === 'FINAL'"
+                    @click.stop.prevent="() => {}"
+                  >
+                    Старт
+                  </v-btn>
+                </v-stepper-step>
+              </v-stepper-header>
+            </v-stepper>
             <v-data-table
               :headers="participantHeaders"
               :items="participants"
@@ -243,7 +289,10 @@ export default {
         { text: '', value: 'index', width: '10%' },
         { text: 'Команда', value: 'teamName', width: '45%' },
         { text: 'Сума', value: 'result', width: '45%' },
-      ]
+      ],
+      availableHalfFinal: false,
+      availableFinal: false,
+      stepper: 1,
     }
   },
   computed: {
@@ -256,6 +305,9 @@ export default {
     activeCompetitionType() {
       const competitionType = this.competitionType;
       return this.competitionReferences.find(({reference}) => reference === competitionType);
+    },
+    activeCompetitionStatus() {
+      return this.activeCompetitionType && this.activeCompetitionType.status;
     },
     competitionTranslations() {
       return {
@@ -272,20 +324,37 @@ export default {
     await this.getCompetitionReferences();
   },
   methods: {
-    async startCompetition(tab) {
-      const foundIndex = this.competitionReferences.findIndex(({ reference }) => reference === tab.reference)
-      if (!tab.reference) return Promise.reject('Competition doesnt exist');
-      return this.axios.post(`private/competition-types/${tab.reference}/start-competition-type`)
+    async startCompetition() {
+      let activeCompetitionType = this.activeCompetitionType;
+      if (!activeCompetitionType.reference) return Promise.reject('Competition doesnt exist');
+
+      const foundIndex = this.competitionReferences.findIndex(({ reference }) => reference === activeCompetitionType.reference)
+      return this.axios.post(`private/competition-types/${activeCompetitionType.reference}/start-competition-type`)
         .then(() => {
           if (foundIndex >= 0) {
-            this.$set(this.competitionReferences, foundIndex, { ...this.activeCompetitionType, status: 'ACTIVE' });
-            this.getStartRace();
+            this.$set(this.competitionReferences, foundIndex, { ...activeCompetitionType, status: 'ACTIVE' });
+            this.getRaceData();
+          }
+        })
+    },
+    startHalfFinal() {
+      let activeCompetitionType = this.activeCompetitionType;
+      if (!activeCompetitionType.reference) return Promise.reject('Competition doesnt exist');
+
+      const foundIndex = this.competitionReferences.findIndex(({ reference }) => reference === activeCompetitionType.reference)
+      return this.axios.post(`private/competition-types/${activeCompetitionType.reference}/start-half-final`)
+        .then(() => {
+          if (foundIndex >= 0) {
+            this.$set(this.competitionReferences, foundIndex, { ...activeCompetitionType, status: 'HALF_FINAL' });
+            this.getRaceData();
           }
         })
     },
     async getBestResults() {
       return this.axios.get(`private/competition-types/${this.competitionType}/best-race-results`)
         .then(({ data }) => {
+          this.availableHalfFinal = data.availableHalfFinal;
+          this.availableFinal = data.availableFinal;
           this.bestParticipants = data.bestResultList;
         })
     },
@@ -293,14 +362,28 @@ export default {
       return this.axios.get(`private/competitions/${this.competitionId}/type`)
           .then(({ data }) => {
             this.competitionReferences = data;
-            if (this.activeCompetitionType && this.activeCompetitionType.status === 'ACTIVE') this.getStartRace();
+            if (this.activeCompetitionType && this.activeCompetitionStatus !== 'INACTIVE') this.getRaceData();
           });
     },
-    async getStartRace() {
+    async getRaceData() {
       this.isLoading = true;
-      return this.axios.get(`private/competition-types/${this.competitionType}/start-race-list`)
+      let URL = null;
+      let status = this.activeCompetitionStatus;
+      let stepper = 0;
+      if (status === 'ACTIVE') {
+        stepper = 1;
+        URL = `private/competition-types/${this.competitionType}/start-race-list`;
+      } else if (status === 'HALF_FINAL') {
+        stepper = 2;
+        URL = `private/competition-types/${this.competitionType}/half-final-race-results`;
+      } else if (status === 'FINAL') {
+        stepper = 3;
+        URL = `private/competition-types/${this.competitionType}/start-race-list`;
+      }
+      return this.axios.get(URL)
         .then(({data}) => {
           this.isLoading = false;
+          this.stepper = stepper;
           this.participants = data;
           if (data.length) {
             return Promise.all([this.getBestResults(), this.fetchteamResultsByType(), this.fetchteamResultsOverall()])
