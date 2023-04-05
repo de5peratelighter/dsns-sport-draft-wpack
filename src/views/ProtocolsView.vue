@@ -1,6 +1,6 @@
 <template>
   <v-container class="protocols-view white--text" ma-0 pa-0 fluid>
-    <div v-if="isLoading" class="text-center">
+    <div v-if="isPageLoading" class="text-center">
       <v-progress-circular
         :size="100"
         color="white"
@@ -24,11 +24,15 @@
         <v-col cols="7">
           <v-sheet :color="'rgba(0, 0, 0, 0.35)'" class="pa-2 white--text">
             <h4 class="text-center">{{ activeCompetitionType ? `${competitionTranslations[activeCompetitionType.sportType]}` : '' }}</h4>
-            <v-stepper v-model="stepper" non-linear style="position: sticky; top: 0;">
+            <v-stepper v-model="stepper" non-linear style="position: sticky; top: 0; z-index: 1">
               <v-stepper-header>
                 <v-stepper-step
                   editable
+                  :color="activeCompetitionStatus === 'ACTIVE' ? 'primary' : 'success'"
+                  :edit-icon="activeCompetitionStatus === 'ACTIVE' ? '$edit' : '$complete'"
+                  :complete="activeCompetitionStatus !== 'ACTIVE'"
                   step="1"
+                  @click="getRaceData('ACTIVE')"
                 >
                   Стартовий протокол
                 </v-stepper-step>
@@ -37,14 +41,17 @@
 
                 <v-stepper-step
                   :editable="availableHalfFinal"
+                  :color="activeCompetitionStatus === 'HALF_FINAL' ? 'primary' : 'success'"
+                  :edit-icon="activeCompetitionStatus === 'HALF_FINAL' ? '$edit' : '$complete'"
+                  :complete="activeCompetitionStatus !== 'HALF_FINAL'"
                   step="2"
                 >
                   Пів-фінал
                   <v-btn 
-                    v-if="availableHalfFinal"
+                    v-if="activeCompetitionStatus === 'ACTIVE'"
                     small
                     color="light-green white--text"
-                    :disabled="activeCompetitionStatus === 'HALF_FINAL' || activeCompetitionStatus === 'FINAL'"
+                    :disabled="availableHalfFinal"
                     @click.stop.prevent="startHalfFinal"
                   >
                     Старт
@@ -56,14 +63,18 @@
                 <v-stepper-step
                   step="3"
                   :editable="availableFinal"
+                  :color="activeCompetitionStatus === 'FINAL' ? 'primary' : 'success'"
+                  :edit-icon="activeCompetitionStatus === 'FINAL' ? '$edit' : '$complete'"
+                  :complete="activeCompetitionStatus !== 'FINAL'"
+                  @click="getRaceData('FINAL')"
                 >
                   Фінал
                   <v-btn 
-                    v-if="availableFinal"
+                    v-if="activeCompetitionStatus === 'HALF_FINAL'"
                     small
                     color="light-green white--text"
-                    :disabled="activeCompetitionStatus === 'FINAL'"
-                    @click.stop.prevent="() => {}"
+                    :disabled="!availableFinal"
+                    @click.stop.prevent="startFinal"
                   >
                     Старт
                   </v-btn>
@@ -73,18 +84,37 @@
             <v-data-table
               :headers="participantHeaders"
               :items="participants"
+              :loading="isLoading"
               disable-pagination
               disable-sort
               hide-default-footer
             >
               <template #item="{ item }">
                 <tr>
-                  <td>
-                    {{ item.roadNumber }}
-                  </td>
-                  <td>
-                    {{ item.trackNumber }}
-                  </td>
+                  <template v-if="stepper == 1">
+                    <td>
+                      {{ item.roadNumber }}
+                    </td>
+                    <td>
+                      {{ item.trackNumber }}
+                    </td>
+                  </template>
+                  <template v-if="stepper == 2">
+                    <td>
+                      {{ item.halfFinalRoadNumber }}
+                    </td>
+                    <td>
+                      {{ item.halfFinalTrackNumber }}
+                    </td>
+                  </template>
+                  <template v-if="stepper == 3">
+                    <td>
+                      {{ item.finalRoadNumber }}
+                    </td>
+                    <td>
+                      {{ item.finalTrackNumber }}
+                    </td>
+                  </template>
                   <td>
                     {{ item.participantNumber }}
                   </td>
@@ -100,55 +130,87 @@
                   <td>
                     {{ item.participantTeamName }}
                   </td>
-                  <td>
-                    <v-edit-dialog
-                      large
-                      @open="firstResult = item.firstResult"
-                      @save="saveResults(item, 'firstResult')"
-                    >
-                      <div>{{ item.firstResult }}</div>
-                      <template #input>
-                          <div class="mt-4 text-h6">
-                              Перший результат, секунди
-                          </div>
-                          <v-text-field
-                              :value="firstResult"
-                              label="Результат"
-                              :rules="[isNumeric]"
-                              single-line
-                              counter
-                              autofocus
-                              @input="firstResult = $event"
-                          ></v-text-field>
+                  <template v-if="stepper == 1">
+                    <td>
+                      <v-text-field
+                        v-if="activeCompetitionStatus === 'ACTIVE'"
+                        :value="item.firstResult"
+                        :success="!!item.firstResult"
+                        :rules="[isNumeric]"
+                        outlined
+                        dense
+                        hide-details
+                        class="no-border"
+                        @focus="firstResult = item.firstResult"
+                        @input="firstResult = $event"
+                        @change="saveResults(item, 'firstResult')"
+                      />
+                      <template v-else>
+                        {{ item.firstResult }}
                       </template>
-                    </v-edit-dialog>
-                  </td>
-                  <td>
-                    <v-edit-dialog
-                      large
-                      @open="secondResult = item.secondResult"
-                      @save="saveResults(item, 'secondResult')"
-                    >
-                      <div>{{ item.secondResult }}</div>
-                      <template #input>
-                          <div class="mt-4 text-h6">
-                              Другий результат, секунди
-                          </div>
-                          <v-text-field
-                              :value="secondResult"
-                              label="Результат"
-                              :rules="[isNumeric]"
-                              single-line
-                              counter
-                              autofocus
-                              @input="secondResult = $event"
-                          ></v-text-field>
+                    </td>
+                    <td>
+                      <v-text-field
+                        v-if="activeCompetitionStatus === 'ACTIVE'"
+                        :value="item.secondResult"
+                        :success="!!item.secondResult"
+                        :rules="[isNumeric]"
+                        outlined
+                        dense
+                        hide-details
+                        class="no-border"
+                        @focus="secondResult = item.secondResult"
+                        @input="secondResult = $event"
+                        @change="saveResults(item, 'secondResult')"
+                      />
+                      <template v-else>
+                        {{ item.secondResult }}
                       </template>
-                    </v-edit-dialog>
-                  </td>
-                  <td>
-                    {{ item.bestResult }}
-                  </td>
+                    </td>
+                    <td>
+                      {{ item.bestResult }}
+                    </td>
+                  </template>
+                  <template v-if="stepper == 2">
+                    <td>
+                      <v-text-field
+                        v-if="activeCompetitionStatus === 'HALF_FINAL'"
+                        :value="item.halfFinalResult"
+                        :success="!!item.halfFinalResult"
+                        :rules="[isNumeric]"
+                        outlined
+                        dense
+                        hide-details
+                        class="no-border"
+                        @focus="halfFinalResult = item.halfFinalResult"
+                        @input="halfFinalResult = $event"
+                        @change="saveResults(item, 'halfFinalResult')"
+                      />
+                      <template v-else>
+                        {{ item.halfFinalResult }}
+                      </template>
+                    </td>
+                  </template>
+                  <template v-if="stepper == 3">
+                    <td>
+                      <v-text-field
+                        v-if="activeCompetitionStatus === 'FINAL'"
+                        :value="item.finalResult"
+                        :success="!!item.finalResult"
+                        :rules="[isNumeric]"
+                        outlined
+                        dense
+                        hide-details
+                        class="no-border"
+                        @focus="finalResult = item.finalResult"
+                        @input="finalResult = $event"
+                        @change="saveResults(item, 'finalResult')"
+                      />
+                      <template v-else>
+                        {{ item.finalResult }}
+                      </template>
+                    </td>
+                  </template>
                 </tr>
               </template>
 
@@ -173,7 +235,7 @@
                 <template #item="{ item, index }">
                   <tr>
                     <td>
-                      {{ index }}
+                      {{ index + 1 }}
                     </td>
                     <td>
                       {{ item.participantFullName }}
@@ -202,7 +264,7 @@
                     <template #item="{ item, index }">
                       <tr>
                         <td>
-                          {{ index }}
+                          {{ index + 1}}
                         </td>
                         <td>
                           {{ item.teamName }}
@@ -228,7 +290,7 @@
                     <template #item="{ item, index }">
                       <tr>
                         <td>
-                          {{ index }}
+                          {{ index + 1}}
                         </td>
                         <td>
                           {{ item.teamName }}
@@ -254,26 +316,17 @@ export default {
   data: function () {
     return {
       competitionReferences: [], // has to be fetched so we know what SPORT_TYPE we're actually dealing with (id is taken from route)
+      isPageLoading: false,
       isLoading: false,
       firstResult: 0,
       secondResult: 0,
+      halfFinalResult: 0,
+      finalResult: 0,
       isNumeric: v => !isNaN(v) || 'Лише числа',
       participants: [],
       bestParticipants: [],
       teamResultsOverall: [],
       teamResultsByType: [],
-      participantHeaders: [
-        { text: '№ забігу', value: 'roadNumber', width: '7.5%' },
-        { text: '№ доріжки', value: 'trackNumber', width: '7.5%' },
-        { text: '№ учасника', value: 'participantNumber' , width: '7.5%' },
-        { text: 'Категорія учасника', value: 'participantCategory' , width: '7.5%' },
-        { text: 'Імя та призвіще', value: 'participantFullName', width: '15%' },
-        { text: 'Рік народження', value: 'participantBirthday', width: '10%' },
-        { text: 'Команда', value: 'participantTeamName', width: '10%' },
-        { text: 'Перша спроба', value: 'firstResult', width: '10%' },
-        { text: 'Друга спроба', value: 'secondResult', width: '10%' },
-        { text: 'Кращий', value: 'bestResult', width: '10%' },
-      ],
       bestResultsHeaders: [
         { text: '', value: 'index', width: '10%' },
         { text: 'Спортсмен', value: 'participantFullName', width: '35%' },
@@ -319,6 +372,55 @@ export default {
         COMBAT_DEPLOYMENT: 'Бойове розгортання'
       }
     },
+    participantHeaders() {
+      const status = this.stepper;
+      const headers = [];
+      if (status == 1) {
+        headers.push(
+          { text: '№ забігу', value: 'roadNumber', width: '7.5%' },
+          { text: '№ доріжки', value: 'trackNumber', width: '7.5%' },
+        )
+      }
+      if (status == 2) {
+        headers.push(
+          { text: '№ забігу', value: 'halfFinalRoadNumber', width: '7.5%' },
+          { text: '№ доріжки', value: 'halfFinalTrackNumber', width: '7.5%' },
+        )
+      }
+      if (status == 3) {
+        headers.push(
+          { text: '№ забігу', value: 'finalRoadNumber', width: '7.5%' },
+          { text: '№ доріжки', value: 'finalTrackNumber', width: '7.5%' },
+        )
+      }
+
+      headers.push(
+        { text: '№ учасника', value: 'participantNumber' , width: '7.5%' },
+        { text: 'Категорія учасника', value: 'participantCategory' , width: '7.5%' },
+        { text: 'Імя та призвіще', value: 'participantFullName', width: '15%' },
+        { text: 'Рік народження', value: 'participantBirthday', width: '10%' },
+        { text: 'Команда', value: 'participantTeamName', width: '10%' }
+      )
+
+      if (status == 1) {
+        headers.push(
+          { text: 'Перша спроба', value: 'firstResult', width: '10%' },
+          { text: 'Друга спроба', value: 'secondResult', width: '10%' },
+          { text: 'Кращий', value: 'bestResult', width: '10%' }
+        )
+      }
+      if (status == 2) {
+        headers.push(
+          { text: 'Результат пів-фіналу', value: 'halfFinalResult', width: '15%' }
+        )
+      }
+      if (status == 3) {
+        headers.push(
+          { text: 'Результат фіналу', value: 'finalResult', width: '15%' }
+        )
+      }
+      return headers;
+    }
   },
   async mounted() {
     await this.getCompetitionReferences();
@@ -343,10 +445,27 @@ export default {
 
       const foundIndex = this.competitionReferences.findIndex(({ reference }) => reference === activeCompetitionType.reference)
       return this.axios.post(`private/competition-types/${activeCompetitionType.reference}/start-half-final`)
-        .then(() => {
+        .then(({ data }) => {
           if (foundIndex >= 0) {
             this.$set(this.competitionReferences, foundIndex, { ...activeCompetitionType, status: 'HALF_FINAL' });
-            this.getRaceData();
+            this.participants = data;
+            this.stepper = 2;
+            Promise.all([this.getBestResults(), this.fetchteamResultsByType(), this.fetchteamResultsOverall()])
+          }
+        })
+    },
+    startFinal() {
+      let activeCompetitionType = this.activeCompetitionType;
+      if (!activeCompetitionType.reference) return Promise.reject('Competition doesnt exist');
+
+      const foundIndex = this.competitionReferences.findIndex(({ reference }) => reference === activeCompetitionType.reference)
+      return this.axios.post(`private/competition-types/${activeCompetitionType.reference}/start-final`)
+        .then(({ data }) => {
+          if (foundIndex >= 0) {
+            this.$set(this.competitionReferences, foundIndex, { ...activeCompetitionType, status: 'FINAL' });
+            this.participants = data;
+            this.stepper = 3;
+            Promise.all([this.getBestResults(), this.fetchteamResultsByType(), this.fetchteamResultsOverall()])
           }
         })
     },
@@ -359,39 +478,42 @@ export default {
         })
     },
     async getCompetitionReferences() {
+      this.isPageLoading = true;
       return this.axios.get(`private/competitions/${this.competitionId}/type`)
           .then(({ data }) => {
             this.competitionReferences = data;
+            this.isPageLoading = false;
             if (this.activeCompetitionType && this.activeCompetitionStatus !== 'INACTIVE') this.getRaceData();
+          })
+          .catch(() => {
+            this.isPageLoading = false;
           });
     },
-    async getRaceData() {
+    async getRaceData(status = this.activeCompetitionStatus) {
       this.isLoading = true;
-      let URL = null;
-      let status = this.activeCompetitionStatus;
       let stepper = 0;
-      if (status === 'ACTIVE') {
-        stepper = 1;
-        URL = `private/competition-types/${this.competitionType}/start-race-list`;
-      } else if (status === 'HALF_FINAL') {
-        stepper = 2;
-        URL = `private/competition-types/${this.competitionType}/half-final-race-results`;
-      } else if (status === 'FINAL') {
-        stepper = 3;
-        URL = `private/competition-types/${this.competitionType}/start-race-list`;
-      }
-      return this.axios.get(URL)
-        .then(({data}) => {
+      let request = null;
+      try {
+        if (status === 'ACTIVE') {
+          stepper = 1;
+          request = await this.axios.get(`private/competition-types/${this.competitionType}/start-race-list`);
+        } else if (status === 'HALF_FINAL') {
+          stepper = 2;
+          request = await this.axios.post(`private/competition-types/${this.competitionType}/start-half-final`);
+        } else if (status === 'FINAL') {
+          stepper = 3;
+          request = await this.axios.post(`private/competition-types/${this.competitionType}/start-final`);
+        }
+        if (!request) return;
           this.isLoading = false;
           this.stepper = stepper;
-          this.participants = data;
-          if (data.length) {
+          this.participants = request.data;
+          if (request.data.length) {
             return Promise.all([this.getBestResults(), this.fetchteamResultsByType(), this.fetchteamResultsOverall()])
           }
-        })
-        .catch(() => {
-          this.isLoading = false;
-        });
+      } catch(error) {
+        this.isLoading = false;
+      }
     },
     async fetchteamResultsByType () {
       return this.axios.post(`private/teams/competition-types/${this.competitionType}/generate-race-result`)
@@ -409,7 +531,11 @@ export default {
       const raceReference = participant.raceReference;
       if (!raceReference) return Promise.reject('Incorrect raceReference for saving');
       const result = this[key].trim();
+      // prevent empty values
       if (!result) return;
+      // prevent saving the same values
+      if (Number(participant[key]) === Number(result)) return;
+
       const foundIndex = this.participants.findIndex(({ participantReference }) => participantReference === participant.participantReference)
       const reqData = {
         participantReference: participant.participantReference,
@@ -423,6 +549,8 @@ export default {
             firstResult: data.firstResult,
             secondResult: data.secondResult,
             bestResult: data.bestResult,
+            finalResult: data.finalResult,
+            halfFinalResult: data.halfFinalResult,
             finalResult: data.finalResult
            });
            // refetch best results

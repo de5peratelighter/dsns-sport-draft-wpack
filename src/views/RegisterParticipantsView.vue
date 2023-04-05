@@ -26,7 +26,7 @@
                     <template #item="{ item, index }">
                         <tr>
                             <td>
-                                {{ index }}
+                                {{ index + 1}}
                             </td>
                             <td>
                                 <v-edit-dialog
