@@ -21,7 +21,7 @@
     </v-row>
     <v-row v-else>
       <template v-if="activeCompetitionType">
-        <v-col cols="7">
+        <v-col cols="7" class="pr-0">
           <v-sheet :color="'rgba(0, 0, 0, 0.35)'" class="pa-2 white--text">
             <h4 class="text-center">{{ activeCompetitionType ? `${competitionTranslations[activeCompetitionType.sportType]}` : '' }}</h4>
             <v-stepper v-model="stepper" non-linear style="position: sticky; top: 0; z-index: 1">
@@ -30,7 +30,7 @@
                   editable
                   :color="activeCompetitionStatus === 'ACTIVE' ? 'primary' : 'success'"
                   :edit-icon="activeCompetitionStatus === 'ACTIVE' ? '$edit' : '$complete'"
-                  :complete="activeCompetitionStatus !== 'ACTIVE'"
+                  :complete="activeCompetitionStatus === 'FINAL' || activeCompetitionStatus === 'HALF_FINAL'"
                   step="1"
                   @click="getRaceData('ACTIVE')"
                 >
@@ -43,15 +43,16 @@
                   :editable="availableHalfFinal"
                   :color="activeCompetitionStatus === 'HALF_FINAL' ? 'primary' : 'success'"
                   :edit-icon="activeCompetitionStatus === 'HALF_FINAL' ? '$edit' : '$complete'"
-                  :complete="activeCompetitionStatus !== 'HALF_FINAL'"
+                  :complete="activeCompetitionStatus === 'FINAL'"
                   step="2"
+                  @click="getRaceData('HALF_FINAL')"
                 >
                   Пів-фінал
                   <v-btn 
                     v-if="activeCompetitionStatus === 'ACTIVE'"
                     small
                     color="light-green white--text"
-                    :disabled="availableHalfFinal"
+                    :disabled="!availableHalfFinal"
                     @click.stop.prevent="startHalfFinal"
                   >
                     Старт
@@ -64,8 +65,6 @@
                   step="3"
                   :editable="availableFinal"
                   :color="activeCompetitionStatus === 'FINAL' ? 'primary' : 'success'"
-                  :edit-icon="activeCompetitionStatus === 'FINAL' ? '$edit' : '$complete'"
-                  :complete="activeCompetitionStatus !== 'FINAL'"
                   @click="getRaceData('FINAL')"
                 >
                   Фінал
@@ -377,46 +376,46 @@ export default {
       const headers = [];
       if (status == 1) {
         headers.push(
-          { text: '№ забігу', value: 'roadNumber', width: '7.5%' },
-          { text: '№ доріжки', value: 'trackNumber', width: '7.5%' },
+          { text: '№ забігу', value: 'roadNumber' },
+          { text: '№ доріжки', value: 'trackNumber'},
         )
       }
       if (status == 2) {
         headers.push(
-          { text: '№ забігу', value: 'halfFinalRoadNumber', width: '7.5%' },
-          { text: '№ доріжки', value: 'halfFinalTrackNumber', width: '7.5%' },
+          { text: '№ забігу', value: 'halfFinalRoadNumber' },
+          { text: '№ доріжки', value: 'halfFinalTrackNumber' },
         )
       }
       if (status == 3) {
         headers.push(
-          { text: '№ забігу', value: 'finalRoadNumber', width: '7.5%' },
-          { text: '№ доріжки', value: 'finalTrackNumber', width: '7.5%' },
+          { text: '№ забігу', value: 'finalRoadNumber' },
+          { text: '№ доріжки', value: 'finalTrackNumber' },
         )
       }
 
       headers.push(
-        { text: '№ учасника', value: 'participantNumber' , width: '7.5%' },
-        { text: 'Категорія учасника', value: 'participantCategory' , width: '7.5%' },
-        { text: 'Імя та призвіще', value: 'participantFullName', width: '15%' },
-        { text: 'Рік народження', value: 'participantBirthday', width: '10%' },
-        { text: 'Команда', value: 'participantTeamName', width: '10%' }
+        { text: '№ учасника', value: 'participantNumber'  },
+        { text: 'Категорія учасника', value: 'participantCategory' },
+        { text: 'Імя та призвіще', value: 'participantFullName'},
+        { text: 'Рік народження', value: 'participantBirthday'},
+        { text: 'Команда', value: 'participantTeamName'}
       )
 
       if (status == 1) {
         headers.push(
-          { text: 'Перша спроба', value: 'firstResult', width: '10%' },
-          { text: 'Друга спроба', value: 'secondResult', width: '10%' },
-          { text: 'Кращий', value: 'bestResult', width: '10%' }
+          { text: 'Перша спроба', value: 'firstResult' },
+          { text: 'Друга спроба', value: 'secondResult'},
+          { text: 'Кращий', value: 'bestResult' }
         )
       }
       if (status == 2) {
         headers.push(
-          { text: 'Результат пів-фіналу', value: 'halfFinalResult', width: '15%' }
+          { text: 'Результат пів-фіналу', value: 'halfFinalResult' }
         )
       }
       if (status == 3) {
         headers.push(
-          { text: 'Результат фіналу', value: 'finalResult', width: '15%' }
+          { text: 'Результат фіналу', value: 'finalResult'}
         )
       }
       return headers;
@@ -499,10 +498,10 @@ export default {
           request = await this.axios.get(`private/competition-types/${this.competitionType}/start-race-list`);
         } else if (status === 'HALF_FINAL') {
           stepper = 2;
-          request = await this.axios.post(`private/competition-types/${this.competitionType}/start-half-final`);
+          request = await this.axios.get(`private/competition-types/${this.competitionType}/half-final-race-results`);
         } else if (status === 'FINAL') {
           stepper = 3;
-          request = await this.axios.post(`private/competition-types/${this.competitionType}/start-final`);
+          request = await this.axios.get(`private/competition-types/${this.competitionType}/final-race-results`);
         }
         if (!request) return;
           this.isLoading = false;
@@ -560,3 +559,9 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+  table .v-input__slot {
+    padding: 5px!important;
+  }
+</style>
