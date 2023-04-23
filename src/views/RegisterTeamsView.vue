@@ -91,24 +91,28 @@
                     >
                         <v-btn dark color="primary" @click="openAddItem">Додати</v-btn>
                         <template #input>
+                        <div class="mt-4 text-h6">
+                            Назва команди
+                        </div>
                         <v-text-field
                             v-model="teamName"
                             :rules="[max25chars]"
                             label="Назва команди"
                             placeholder="Назва команди"
                             single-line
-                        ></v-text-field>
-                        <!-- 
+                        />
+                        <div class="mt-4 text-h6">
+                            Номер по жеребу
+                        </div>
                         <v-text-field
-                            v-model="newItemNum"
+                            v-model="lotNumber"
                             label="По жеребу"
                             placeholder="По жеребу"
                             single-line
-                        ></v-text-field>
-                         -->
+                        />
                         </template>
                     </v-edit-dialog>
-                    <v-btn dark color="primary" class="ml-3" @click="pasteData">
+                    <v-btn v-if="false" dark color="primary" class="ml-3" @click="pasteData">
                         Імпорт з буферу
                         <v-icon>mdi-content-paste</v-icon>
                     </v-btn>
@@ -116,6 +120,15 @@
             </template>
           </v-data-table>
         </v-sheet>
+        <v-alert
+            v-model="showAlert"
+            ref="alertDialog"
+            :type="alertType"
+            dismissible
+            class="alert-message"
+        >
+            {{ alertMessage }}
+        </v-alert>
     </v-container>
 </template>
 
@@ -138,6 +151,10 @@ export default {
             isNumeric: v => !isNaN(v) || 'Лише числа',
             lotNumber: '',
             teamName: '',
+
+            alertType: 'error',
+            showAlert: false,
+            alertMessage: '',
         }
     },
     computed: {
@@ -161,12 +178,18 @@ export default {
         },
         addItem() {
             const data = {
-                teamName: this.teamName.trim()
+                teamName: this.teamName.trim(),
+                lotNumber: Number(this.lotNumber)
             };
             return this.axios.post(`private/competition/${this.competitionId}/team`, data)
                 .then(({ data }) => {
+                    this.teamName = '';
+                    this.lotNumber = '';
                     this.teams = [...this.teams, data];
-                });
+                })
+                .catch((error) => {
+                    this.showError(error);
+                })
         },
         async updateTeamNum(team) {
             const lotNumber = Number(this.lotNumber);
@@ -194,9 +217,10 @@ export default {
                     // update state
                     this.$set(this.teams, teamIndex, {...team, ...data});
                 })
-                .catch(() => {
+                .catch((error) => {
                     // revert state
                     this.$set(this.teams, teamIndex, team);
+                    this.showError(error);
                 })
         },
         async getTeams(sortType = 'LOT') {
@@ -221,6 +245,19 @@ export default {
         deleteItem(item) {
             this.teams = this.teams.filter(({ id }) => id !== item.id);
         },
+        showError(error) {
+            this.alertMessage = error.response && error.response.data.description ? error.response.data.description : error.message;
+            this.showAlert = true;
+        }
     }
 }
 </script>
+<style lang="scss">
+  .alert-message {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+  }
+</style>

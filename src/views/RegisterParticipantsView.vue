@@ -12,6 +12,7 @@
                     :item-text="'teamName'"
                     :item-value="'teamReference'"
                     label="Команда"
+                    hide-details
                 />
             </v-col>
             <v-col cols="12">
@@ -41,7 +42,6 @@
                                     </div>
                                     <v-text-field
                                         :value="participantNumber"
-                                        :rules="[isNumeric]"
                                         label="Номер"
                                         single-line
                                         counter
@@ -165,16 +165,28 @@
                             >
                                 <v-btn dark color="primary" @click="fullname = ''">Додати</v-btn>
                                 <template #input>
+                                <div class="mt-4 text-h6">
+                                    Ініціали учасника
+                                </div>
                                 <v-text-field
                                     v-model="fullName"
                                     :rules="[max100chars]"
-                                    label="Ініціали учасник"
-                                    placeholder="Ініціали учасник"
+                                    label="Ініціали"
+                                    placeholder="Ініціали"
                                     single-line
                                 ></v-text-field>
+                                <div class="mt-4 text-h6">
+                                    Номер учасника
+                                </div>
+                                <v-text-field
+                                    v-model="participantNumber"
+                                    label="Номер"
+                                    placeholder="Номер"
+                                    single-line
+                                />
                                 </template>
                             </v-edit-dialog>
-                            <v-btn dark color="primary" class="ml-3" @click="pasteData">
+                            <v-btn v-if="false" dark color="primary" class="ml-3" @click="pasteData">
                                 Імпорт з буферу
                                 <v-icon>mdi-content-paste</v-icon>
                             </v-btn>
@@ -183,6 +195,15 @@
                 </v-data-table>
             </v-col>
         </v-sheet>
+        <v-alert
+            v-model="showAlert"
+            ref="alertDialog"
+            :type="alertType"
+            dismissible
+            class="alert-message"
+        >
+            {{ alertMessage }}
+        </v-alert>
     </v-container>
 </template>
 
@@ -214,6 +235,10 @@ export default {
                 {categoryName: 'III-ю', categoryId: 'III_TEEN'},
             ],
             birthday: null,
+
+            alertType: 'error',
+            showAlert: false,
+            alertMessage: '',
         }
     },
     computed: {
@@ -292,9 +317,12 @@ export default {
             if (!this.fullName || !this.fullName.trim()) return;
             const reqData = {
                 fullName: this.fullName.trim(),
+                participantNumber: this.participantNumber
             };
             return this.axios.post(`private/participants/competition/${this.competitionId}/teams/${this.selectedTeam}`, reqData)
                 .then(({ data }) => {
+                    this.fullName = '';
+                    this.participantNumber = '';
                     this.participants = [...this.participants, data];
                 });
         },
@@ -310,15 +338,18 @@ export default {
                 .then(({ data }) => {
                     // update state
                     this.$set(this.participants, participantIndex, {...participant, ...data});
-                });
+                })
+                .catch((error) => {
+                    this.showError(error);
+                })
         },
-        showParticipantPosition(participant, type, key) {
+        showParticipantPosition(participant, type, key, defaultValue = '__') {
             const found = participant.participantStartPositionList.find(({sportType}) => sportType === type);
             if (found) return found[key];
-            return key === 'startingPosition' ? ' ' : false;
+            return key === 'startingPosition' ? defaultValue : false;
         },
         openParticipantPosition(participant, type, key) {
-            this.sportTypePos = this.showParticipantPosition(participant, type, key);
+            this.sportTypePos = this.showParticipantPosition(participant, type, key, '');
         },
         validateParticipantPositionUpdate(participant, sportType, key) {
             // todo validate
@@ -352,6 +383,19 @@ export default {
             const reqData = { participantStartPositionList };
             return this.updateParticipant(participant, reqData)
         },
+        showError(error) {
+            this.alertMessage = error.response && error.response.data.description ? error.response.data.description : error.message;
+            this.showAlert = true;
+        }
     }
 }
 </script>
+<style lang="scss">
+  .alert-message {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+  }
+</style>

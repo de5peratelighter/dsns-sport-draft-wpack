@@ -251,25 +251,15 @@
         </v-tab-item>
       </v-tabs-items>
     </div>
-    <v-snackbar
-      v-model="showSnackbar"
-      :color="snackbarColor"
-      multi-line
-    >
-      <v-row class="text-center justify-center align-center">
-        <h3 class="text-center mb-0 ml-2" v-if="snackbarError">Помилка! {{  snackbarError  }}</h3>
-        <h3 class="text-center mb-0 ml-2" v-else>{{ 'Зміни успішно збережені!' }}</h3>
-        <v-row class="text-center justify-center">
-          <v-btn
-            class="ml-3"
-            text
-            @click="resetSnackbar()"
-          >
-            Закрити
-          </v-btn>
-        </v-row>
-      </v-row>
-    </v-snackbar>
+    <v-alert
+        v-model="showAlert"
+        ref="alertDialog"
+        :type="alertType"
+        dismissible
+        class="alert-message"
+      >
+      {{ alertMessage }}
+    </v-alert>
   </v-container>
 </template>
 
@@ -279,15 +269,16 @@ export default {
     return {
       isNumeric: v => !isNaN(v),
       competitionReferences: [],
-      showSnackbar: false,
-      snackbarColor: 'primary',
-      snackbarError: '',
       tab: null,
       isLoading: true,
       startDateMenu: {},
       startTimeMenu: {},
       endDateMenu: {},
       endTimeMenu: {},
+      
+      alertType: 'error',
+      showAlert: false,
+      alertMessage: '',
     }
   },
   computed: {
@@ -321,11 +312,6 @@ export default {
     this.getCompetitionReferences();
   },
   methods: {
-    resetSnackbar() {
-      this.showSnackbar = false;
-      this.snackbarColor = 'primary';
-      this.snackbarError = '';
-    },
     saveStartDate(reference, date) {
       const ref = this.$refs[`startDateMenu-${reference}`];
       // since we have multiple table and thus references
@@ -364,15 +350,11 @@ export default {
       delete copy.reference;
       return this.axios.patch(`private/competition-types/${reference}`, copy)
         .then(() => {
-          this.snackbarError = '';
-          this.snackbarColor ='success';
-          this.showSnackbar = true;
+          this.alertType ='success';
+          this.alertMessage = 'Зміни успішно збережені!';
+          this.showAlert = true;
         })
-        .catch((err) => {
-          this.snackbarError = 'TODO PARSE MESSAGE';
-          this.snackbarColor ='error';
-          this.showSnackbar = true;
-        })
+        .catch((err) => this.showError(err))
     },
     startCompetition(tab) {
       const foundIndex = this.competitionReferences.findIndex(({ reference }) => reference === tab.reference)
@@ -404,7 +386,22 @@ export default {
       const reference = tab.reference;
       if (!reference) return Promise.reject('Incorrect result page data')
       return this.$router.push({name: 'protocols', params: {id: this.competitionId, type: reference }})
+    },
+    showError(error) {
+      this.alertType = 'error';
+      this.alertMessage = error.response && error.response.data.description ? error.response.data.description : error.message;
+      this.showAlert = true;
     }
   }
 }
 </script>
+
+<style lang="scss">
+  .alert-message {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+  }
+</style>

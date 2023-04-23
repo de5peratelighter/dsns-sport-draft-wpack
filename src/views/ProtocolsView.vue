@@ -132,7 +132,6 @@
                   <template v-if="stepper == 1">
                     <td>
                       <v-text-field
-                        v-if="activeCompetitionStatus === 'ACTIVE'"
                         :value="item.firstResult"
                         :success="!!item.firstResult"
                         :rules="[isNumeric]"
@@ -144,13 +143,9 @@
                         @input="firstResult = $event"
                         @change="saveResults(item, 'firstResult')"
                       />
-                      <template v-else>
-                        {{ item.firstResult }}
-                      </template>
                     </td>
                     <td>
                       <v-text-field
-                        v-if="activeCompetitionStatus === 'ACTIVE'"
                         :value="item.secondResult"
                         :success="!!item.secondResult"
                         :rules="[isNumeric]"
@@ -162,9 +157,6 @@
                         @input="secondResult = $event"
                         @change="saveResults(item, 'secondResult')"
                       />
-                      <template v-else>
-                        {{ item.secondResult }}
-                      </template>
                     </td>
                     <td>
                       {{ item.bestResult }}
@@ -173,7 +165,6 @@
                   <template v-if="stepper == 2">
                     <td>
                       <v-text-field
-                        v-if="activeCompetitionStatus === 'HALF_FINAL'"
                         :value="item.halfFinalResult"
                         :success="!!item.halfFinalResult"
                         :rules="[isNumeric]"
@@ -185,9 +176,6 @@
                         @input="halfFinalResult = $event"
                         @change="saveResults(item, 'halfFinalResult')"
                       />
-                      <template v-else>
-                        {{ item.halfFinalResult }}
-                      </template>
                     </td>
                   </template>
                   <template v-if="stepper == 3">
@@ -250,7 +238,7 @@
               </v-data-table>
               <v-row class="mt-1">
                 <v-col cols="6">
-                  <h4 class="text-center">Командна першість по виду
+                  <h4 class="text-center text-no-wrap">Командна першість по виду
                      <v-icon dark @click="fetchteamResultsByType">mdi-refresh</v-icon>
                   </h4>
                   <v-data-table
@@ -276,7 +264,7 @@
                   </v-data-table>
                 </v-col>
                 <v-col cols="6">
-                  <h4 class="text-center">Загальнокомандна першість
+                  <h4 class="text-center text-no-wrap">Загальнокомандна першість
                      <v-icon dark @click="fetchteamResultsOverall">mdi-refresh</v-icon>
                   </h4>
                   <v-data-table
@@ -307,6 +295,15 @@
         </template>
       </v-row>
       </template>
+      <v-alert
+        v-model="showAlert"
+        ref="alertDialog"
+        :type="alertType"
+        dismissible
+        class="alert-message"
+      >
+        {{ alertMessage }}
+      </v-alert>
   </v-container>
 </template>
 
@@ -345,6 +342,10 @@ export default {
       availableHalfFinal: false,
       availableFinal: false,
       stepper: 1,
+      
+      alertType: 'error',
+      showAlert: false,
+      alertMessage: '',
     }
   },
   computed: {
@@ -437,6 +438,7 @@ export default {
             this.getRaceData();
           }
         })
+        .catch((error) => this.showError(error))
     },
     startHalfFinal() {
       let activeCompetitionType = this.activeCompetitionType;
@@ -452,6 +454,7 @@ export default {
             Promise.all([this.getBestResults(), this.fetchteamResultsByType(), this.fetchteamResultsOverall()])
           }
         })
+        .catch((error) => this.showError(error))
     },
     startFinal() {
       let activeCompetitionType = this.activeCompetitionType;
@@ -467,6 +470,7 @@ export default {
             Promise.all([this.getBestResults(), this.fetchteamResultsByType(), this.fetchteamResultsOverall()])
           }
         })
+        .catch((error) => this.showError(error))
     },
     async getBestResults() {
       return this.axios.get(`private/competition-types/${this.competitionType}/best-race-results`)
@@ -555,6 +559,10 @@ export default {
            // refetch best results
            this.getBestResults();
         })
+    },
+    showError(error) {
+      this.alertMessage = error.response && error.response.data.description ? error.response.data.description : error.message;
+      this.showAlert = true;
     }
   }
 }
@@ -563,5 +571,12 @@ export default {
 <style lang="scss">
   table .v-input__slot {
     padding: 5px!important;
+  }
+  .alert-message {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
   }
 </style>
