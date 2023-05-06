@@ -18,6 +18,7 @@
             <v-col cols="12">
                 <v-data-table
                     v-if="selectedTeam"
+                    :loading="areParticipantsLoading"
                     :headers="headers"
                     :items="participants"
                     disable-sort
@@ -30,73 +31,60 @@
                                 {{ index + 1}}
                             </td>
                             <td>
-                                <v-edit-dialog
-                                    large
-                                    @open="participantNumber = item.participantNumber"
-                                    @save="validateParticipantUpdate(item, 'participantNumber')"
-                                >
-                                    <div>{{ item.participantNumber }}</div>
-                                    <template #input>
-                                    <div class="mt-4 text-h6">
-                                        Номер
-                                    </div>
-                                    <v-text-field
-                                        :value="participantNumber"
-                                        label="Номер"
-                                        single-line
-                                        counter
-                                        autofocus
-                                        @input="participantNumber = $event"
-                                    />
-                                    </template>
-                                </v-edit-dialog>
+                                <v-text-field
+                                    :error="activeErrorId === `participantNumber-${index}`"
+                                    :success="activeSuccessId === `participantNumber-${index}`"
+                                    :value="item.participantNumber"
+                                    outlined
+                                    dense
+                                    hide-details
+                                    class="no-border"
+                                    placeholder="Номер"
+                                    @focus="participantNumber = item.participantNumber"
+                                    @input="participantNumber = $event"
+                                    @change="validateParticipantUpdate(item, 'participantNumber', `participantNumber-${index}`)"
+                                />
                             </td>
                             <td>
-                                <v-edit-dialog
-                                    large
-                                    @open="fullName = item.fullName"
-                                    @save="validateParticipantUpdate(item, 'fullName')"
-                                >
-                                    <div>{{ item.fullName }}</div>
-                                    <template #input>
-                                    <div class="mt-4 text-h6">
-                                        Ініціали
-                                    </div>
-                                    <v-text-field
-                                        :value="fullName"
-                                        :rules="[max100chars]"
-                                        label="Призвіще та імя"
-                                        single-line
-                                        counter
-                                        autofocus
-                                        @input="fullName = $event"
-                                    />
-                                    </template>
-                                </v-edit-dialog>
+                                <v-text-field
+                                    :error="activeErrorId === `fullName-${index}`"
+                                    :success="activeSuccessId === `fullName-${index}`"
+                                    :value="item.fullName"
+                                    outlined
+                                    dense
+                                    hide-details
+                                    class="no-border"
+                                    placeholder="Ім'я та призвіще"
+                                    @focus="fullName = item.fullName"
+                                    @input="fullName = $event"
+                                    @change="validateParticipantUpdate(item, 'fullName', `fullName-${index}`)"
+                                />
                             </td>
                             <td>
-                                <v-edit-dialog
-                                    large
-                                    @open="birthday = item.birthday || null"
-                                    @save="validateParticipantUpdate(item, 'birthday')"
-                                >
-                                    <div>{{ item.birthday }}</div>
-                                    <template #input>
-                                        <div class="mt-4 text-h6">
-                                            Дата народження
-                                        </div>   
-                                        <v-date-picker
-                                            v-model="birthday"
-                                            active-picker="YEAR"
-                                            :max="(new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)"
-                                            min="1950-01-01"
-                                        ></v-date-picker>
+                                <v-tooltip left>
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <v-text-field
+                                            :error="activeErrorId === `birthday-${index}`"
+                                            :success="activeSuccessId === `birthday-${index}`"
+                                            :value="item.birthday"
+                                            outlined
+                                            dense
+                                            hide-details
+                                            class="no-border"
+                                            placeholder="yyyy-mm-dd"
+                                            @focus="birthday = item.birthday"
+                                            @input="birthday = $event"
+                                            @change="validateParticipantUpdate(item, 'birthday', `birthday-${index}`)"
+                                            v-bind="attrs"
+                                            v-on="on"
+                                        />
                                     </template>
-                                </v-edit-dialog>
+                                    <span>Формат дати: yyyy-mm-dd </span>
+                                </v-tooltip>
                             </td>
-                            <td>
+                            <!-- <td>
                                 {{ item.age }}
-                            </td>
+                            </td> -->
                             <td>
                                 <v-select
                                     :value="item.participantCategory"
@@ -107,33 +95,22 @@
                                 />
                             </td>
                             <td v-for="(sportType, referenceIndex) in sportTypeHeaders" :key="referenceIndex">
-                                <div class="d-flex"> 
-                                <v-edit-dialog
+                                <div class="d-flex align-center">
+                                <v-text-field
                                     v-if="sportType.value!== 'COMBAT_DEPLOYMENT'"
-                                    large
-                                    @open="openParticipantPosition(item, sportType.value, 'startingPosition')"
-                                    @save="validateParticipantPositionUpdate(item, sportType.value, 'startingPosition')"
-                                >
-                                    <div>
-                                        <template  v-if="sportType.value!== 'RELAY'">
-                                            Зал:
-                                        </template>
-                                         <b>{{ showParticipantPosition(item, sportType.value, 'startingPosition') }}</b></div>
-                                    <template #input>
-                                    <div class="mt-4 text-h6">
-                                        Зал: {{ `${sportType.text} (${item.fullName})` }} 
-                                    </div>
-                                    <v-text-field
-                                        :value="sportTypePos"
-                                        :rules="[isNumeric]"
-                                        :label="sportType.text"
-                                        single-line
-                                        counter
-                                        autofocus
-                                        @input="sportTypePos = $event"
-                                    />
-                                    </template>
-                                </v-edit-dialog>
+                                    :error="activeErrorId === `sportTypePos-${index}-${referenceIndex}`"
+                                    :success="activeSuccessId === `sportTypePos-${index}-${referenceIndex}`"
+                                    :value="showParticipantPosition(item, sportType.value, 'startingPosition')"
+                                    outlined
+                                    dense
+                                    hide-details
+                                    class="no-border"
+                                    placeholder="Позиція"
+                                    @focus="sportTypePos = showParticipantPosition(item, sportType.value, 'startingPosition')"
+                                    @input="sportTypePos = $event"
+                                    @change="validateParticipantPositionUpdate(item, sportType.value, 'startingPosition', `sportTypePos-${index}-${referenceIndex}`)"
+                                />
+                                
                                 <v-simple-checkbox
                                     v-else
                                     color="primary"
@@ -142,12 +119,19 @@
                                 />
                                 <!-- Особ чекбокс -->
                                 <template v-if="!['RELAY','COMBAT_DEPLOYMENT'].includes(sportType.value)">
-                                    <div class="pl-2">Особ:</div>
-                                    <v-simple-checkbox
-                                        color="primary"
-                                        :value="showParticipantPosition(item, sportType.value, 'personal')"
-                                        @input="validateParticipantPositionUpdate(item, sportType.value, 'personal')"
-                                    />
+                                    <v-tooltip left>
+                                        <template v-slot:activator="{ on, attrs }">
+                                            <v-simple-checkbox
+                                                v-on="on" v-bind="attrs"
+                                                color="primary"
+                                                :value="showParticipantPosition(item, sportType.value, 'personal')"
+                                                @input="validateParticipantPositionUpdate(item, sportType.value, 'personal')"
+                                            />
+                                            Ос:
+
+                                        </template>
+                                        Особовий
+                                    </v-tooltip>
                                 </template>
                             </div>
                             </td>
@@ -223,8 +207,8 @@ export default {
             max100chars: v => v.length <= 100 || 'Input too long!',
             isNumeric: v => !isNaN(v),
             participantCategoryItems: [
-                {categoryName: 'CMS', categoryId: 'CMS'},
-                {categoryName: 'MS', categoryId: 'MS'},
+                {categoryName: 'КМС', categoryId: 'CMS'},
+                {categoryName: 'МС', categoryId: 'MS'},
                 {categoryName: 'IMS', categoryId: 'IMS'},
                 {categoryName: 'HMS', categoryId: 'HMS'},
                 {categoryName: 'I', categoryId: 'I'},
@@ -234,11 +218,15 @@ export default {
                 {categoryName: 'II-ю', categoryId: 'II_TEEN'},
                 {categoryName: 'III-ю', categoryId: 'III_TEEN'},
             ],
+            areParticipantsLoading: false,
             birthday: null,
 
             alertType: 'error',
             showAlert: false,
             alertMessage: '',
+
+            activeSuccessId: null,
+            activeErrorId: null
         }
     },
     computed: {
@@ -251,7 +239,7 @@ export default {
                 { text: 'Нагрудний номер', value: 'participantNumber' , width: '5%'},
                 { text: "Ім'я та призвіще", value: 'fullName', width: '15%' },
                 { text: 'Дата народження', value: 'birthday', width: '10%' },
-                { text: 'Вікова категорія', value: 'age', width: '5%' },
+                // { text: 'Вікова категорія', value: 'age', width: '5%' },
                 { text: 'Спортивна уласифікація', value: 'grade', width: '5%' },
             ];
             const sportTypeHeaders = this.sportTypeHeaders;
@@ -300,9 +288,13 @@ export default {
                 });
         },
         fetchTeamParticipantsByRef(ref) {
+            this.areParticipantsLoading = true;
             return this.axios.get(`private/teams/${ref}/participant/competitions/${this.competitionId}`)
                 .then(({ data = [] }) => {
                     this.participants = data;
+                })
+                .finally(() => {
+                    this.areParticipantsLoading = false;
                 })
         },
         pasteData() {
@@ -326,36 +318,39 @@ export default {
                     this.participants = [...this.participants, data];
                 });
         },
-        async validateParticipantUpdate(participant, key) {
+        async validateParticipantUpdate(participant, key, inputTargetId) {
             const value = this[key];
             if (!value) return Promise.reject(`Empty ${key}`)
             const reqData = { [key]: value };
-            return this.updateParticipant(participant, reqData)
+            return this.updateParticipant(participant, reqData, inputTargetId)
         },
-        async updateParticipant(participant, reqData) {
+        async updateParticipant(participant, reqData, inputTargetId) {
+            this.activeErrorId = null;
+            this.activeSuccessId = null;
             const participantIndex = this.participants.findIndex(({ participantReference }) => participantReference === participant.participantReference);
             return this.axios.patch(`private/participants/${participant.participantReference}/competitions/${this.competitionId}`, reqData)
                 .then(({ data }) => {
                     // update state
                     this.$set(this.participants, participantIndex, {...participant, ...data});
+                    this.activeSuccessId = inputTargetId;
                 })
                 .catch((error) => {
                     this.showError(error);
+                    this.activeErrorId = inputTargetId;
                 })
         },
-        showParticipantPosition(participant, type, key, defaultValue = '__') {
+        showParticipantPosition(participant, type, key) {
             const found = participant.participantStartPositionList.find(({sportType}) => sportType === type);
             if (found) return found[key];
-            return key === 'startingPosition' ? defaultValue : false;
         },
         openParticipantPosition(participant, type, key) {
             this.sportTypePos = this.showParticipantPosition(participant, type, key, '');
         },
-        validateParticipantPositionUpdate(participant, sportType, key) {
+        validateParticipantPositionUpdate(participant, sportType, key, inputTargetId) {
             // todo validate
-            return this.updateParticipantPosition(participant, sportType, key)
+            return this.updateParticipantPosition(participant, sportType, key, inputTargetId)
         },
-        updateParticipantPosition(participant, sportType, key) {
+        updateParticipantPosition(participant, sportType, key, inputTargetId) {
             let participantStartPositionList = participant.participantStartPositionList;
             let foundItem = participantStartPositionList.find((item) => item.sportType === sportType);
             if (foundItem) {
@@ -381,7 +376,7 @@ export default {
                 participantStartPositionList = [...participantStartPositionList, defaultData];
             }
             const reqData = { participantStartPositionList };
-            return this.updateParticipant(participant, reqData)
+            return this.updateParticipant(participant, reqData, inputTargetId)
         },
         showError(error) {
             this.alertMessage = error.response && error.response.data.description ? error.response.data.description : error.message;

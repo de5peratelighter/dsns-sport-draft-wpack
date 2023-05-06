@@ -2,6 +2,7 @@
     <v-container class="config-by-type white--text" ma-0 pa-0 fluid>
         <v-sheet :color="'rgba(0, 0, 0, 0.35)'" class="pa-3">
             <v-data-table
+                :loading="areTeamsLoading"
                 :headers="headers"
                 :items="teams"
                 disable-pagination
@@ -14,49 +15,34 @@
                   {{ index + 1 }}
                 </td>
                 <td>
-                    <v-edit-dialog
-                        large
-                        @open="teamName = item.teamName"
-                        @save="updateTeamName(item)"
-                    >
-                        <div>{{ item.teamName }}</div>
-                        <template #input>
-                            <div class="mt-4 text-h6">
-                                Назва команди
-                            </div>
-                            <v-text-field
-                                :value="teamName"
-                                label="Назва команди"
-                                single-line
-                                counter
-                                autofocus
-                                @input="teamName = $event"
-                            ></v-text-field>
-                        </template>
-                    </v-edit-dialog>
+                    <v-text-field
+                        :error="activeErrorId === `name-${index}`"
+                        :success="activeSuccessId === `name-${index}`"
+                        :value="item.teamName"
+                        outlined
+                        dense
+                        hide-details
+                        class="no-border"
+                        placeholder="Назва команди"
+                        @focus="teamName = item.teamName"
+                        @input="teamName = $event"
+                        @change="updateTeamName(item, `name-${index}`)"
+                    />
                 </td>
                 <td>
-                    <v-edit-dialog
-                        large
-                        @open="lotNumber = item.lotNumber"
-                        @save="updateTeamNum(item)"
-                    >
-                        <div>{{ item.lotNumber }}</div>
-                        <template #input>
-                            <div class="mt-4 text-h6">
-                                Номерлоту
-                            </div>
-                            <v-text-field
-                                :value="lotNumber"
-                                :rules="numericRules"
-                                label="Номер лоту"
-                                single-line
-                                counter
-                                autofocus
-                                @input="lotNumber = $event"
-                            ></v-text-field>
-                        </template>
-                    </v-edit-dialog>
+                    <v-text-field
+                        :error="activeErrorId === `num-${index}`"
+                        :success="activeSuccessId === `num-${index}`"
+                        :value="item.lotNumber"
+                        outlined
+                        dense
+                        hide-details
+                        class="no-border"
+                        placeholder="Номер лоту"
+                        @focus="lotNumber = item.lotNumber"
+                        @input="lotNumber = $event"
+                        @change="updateTeamNum(item, `num-${index}`)"
+                    />
                 </td>
                 <td>
                     <v-simple-checkbox
@@ -137,14 +123,15 @@ export default {
     data: function () {
         return {
             headers: [
-                { text: '№ п/п', value: 'id', width: '5%' },
+                { text: '№ п/п', value: 'id', width: '5%', sortable: false },
                 { text: 'Назва команди', value: 'teamName', width: '30%', sortable: true },
                 { text: 'По жеребу', value: 'num' , width: '20%', sortable: true },
-                { text: 'Основне змагання', value: 'isMain', width: '10%' },
-                { text: 'Поза конкурсно', value: 'isNonCompetetive', width: '10%' },
+                { text: 'Основне змагання', value: 'isMain', width: '10%', sortable: false },
+                { text: 'Поза конкурсно', value: 'isNonCompetetive', width: '10%', sortable: false },
                 //{ text: 'Не для протоколів', value: 'isIgnored', width: '10%' },
-                { text: 'Дії', value: 'actions', width: '10%' },
+                { text: 'Дії', value: 'actions', width: '10%', sortable: false },
             ],
+            areTeamsLoading: false,
             teams: [],
             max25chars: v => v.length <= 25 || 'Назва не більше 25 символів!',
             notEmpty: v => !!v || 'Значення пусте',
@@ -155,6 +142,9 @@ export default {
             alertType: 'error',
             showAlert: false,
             alertMessage: '',
+
+            activeSuccessId: null,
+            activeErrorId: null
         }
     },
     computed: {
@@ -191,22 +181,27 @@ export default {
                     this.showError(error);
                 })
         },
-        async updateTeamNum(team) {
+        async updateTeamNum(team, inputTargetId) {
             const lotNumber = Number(this.lotNumber);
             const validationRules = this.numericRules;
-            if (validationRules.some(rule => typeof rule(lotNumber) === 'string')) return;
-            this.updateTeam(team, {lotNumber})
+            if (validationRules.some(rule => typeof rule(lotNumber) === 'string')) {
+                this.activeErrorId = inputTargetId;
+                return;
+            }
+            this.updateTeam(team, {lotNumber}, false, inputTargetId)
         },
-        async updateTeamName(team) {
+        async updateTeamName(team, inputTargetId) {
             if (!this.teamName.trim()) return;
             // todo maybe validate name?
-            this.updateTeam(team, {teamName: this.teamName.trim()}, true)
+            this.updateTeam(team, {teamName: this.teamName.trim()}, true, inputTargetId)
         },
         async toggleTeamBoolean(team, key) {
             const reqData = { [key]: !team[key] };
             return this.updateTeam(team, reqData)
         },
-        async updateTeam(team, reqData, isNameUpdate = false) {
+        async updateTeam(team, reqData, isNameUpdate = false, inputTargetId = null) {
+            this.activeErrorId = null;
+            this.activeSuccessId = null;
             const URL = isNameUpdate ? 
                 `private/teams/${team.teamReference}`:
                 `private/teams/${team.teamReference}/competitions/${this.competitionId}`;
@@ -216,17 +211,23 @@ export default {
                 .then(({ data }) => {
                     // update state
                     this.$set(this.teams, teamIndex, {...team, ...data});
+                    this.activeSuccessId = inputTargetId;
                 })
                 .catch((error) => {
                     // revert state
                     this.$set(this.teams, teamIndex, team);
+                    this.activeErrorId = inputTargetId;
                     this.showError(error);
                 })
         },
         async getTeams(sortType = 'LOT') {
+            this.areTeamsLoading = true;
             return this.axios.get(`private/competitions/${this.competitionId}/teams`, {sortType})
                 .then(({ data }) => {
                     this.teams = data;
+                })
+                .finally(() => {
+                    this.areTeamsLoading = false;
                 })
         },
         async sortTeams(sortType) {

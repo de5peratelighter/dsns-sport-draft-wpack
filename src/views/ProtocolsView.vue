@@ -92,26 +92,26 @@
                 <tr>
                   <template v-if="stepper == 1">
                     <td>
-                      {{ item.roadNumber }}
+                      {{ item.trackNumber }}
                     </td>
                     <td>
-                      {{ item.trackNumber }}
+                      {{ item.roadNumber }}
                     </td>
                   </template>
                   <template v-if="stepper == 2">
                     <td>
-                      {{ item.halfFinalRoadNumber }}
+                      {{ item.halfFinalTrackNumber }}
                     </td>
                     <td>
-                      {{ item.halfFinalTrackNumber }}
+                      {{ item.halfFinalRoadNumber }}
                     </td>
                   </template>
                   <template v-if="stepper == 3">
                     <td>
-                      {{ item.finalRoadNumber }}
+                      {{ item.finalTrackNumber }}
                     </td>
                     <td>
-                      {{ item.finalTrackNumber }}
+                      {{ item.finalRoadNumber }}
                     </td>
                   </template>
                   <td>
