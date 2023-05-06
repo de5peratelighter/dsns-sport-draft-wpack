@@ -261,4 +261,9 @@ export default {
     transform: translate(-50%, -50%);
     margin: 0;
   }
+  table {
+    tr:nth-child(odd) {
+      background: rgba(0,0,0,.03);
+    }
+  }
 </style>

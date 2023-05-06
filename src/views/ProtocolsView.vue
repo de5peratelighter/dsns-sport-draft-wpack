@@ -87,9 +87,11 @@
               disable-pagination
               disable-sort
               hide-default-footer
+              :style="columnWidths"
+              class="protocols-table"
             >
               <template #item="{ item }">
-                <tr>
+                <tr :class="{ 'tr-odd': item.trackNumber % 2 === 0 }">
                   <template v-if="stepper == 1">
                     <td>
                       {{ item.trackNumber }}
@@ -124,10 +126,10 @@
                     {{ item.participantFullName }}
                   </td>
                   <td>
-                    {{ item.participantBirthday }}
+                    {{ item.participantTeamName }}
                   </td>
                   <td>
-                    {{ item.participantTeamName }}
+                    {{ item.participantBirthday ? item.participantBirthday.slice(0,4) : '' }}
                   </td>
                   <template v-if="stepper == 1">
                     <td>
@@ -372,51 +374,57 @@ export default {
         COMBAT_DEPLOYMENT: 'Бойове розгортання'
       }
     },
+    // headers do not support custom width (even though the should according to the API) - so we use manual overrides
+    columnWidths() {
+      const widths = [];
+      this.participantHeaders.forEach((header) => widths.push(header.width));
+      return `grid-template-columns: ${ widths.length ? widths.join(' ') : 'inherit'}`
+    },
     participantHeaders() {
       const status = this.stepper;
       const headers = [];
       if (status == 1) {
         headers.push(
-          { text: '№ забігу', value: 'roadNumber' },
-          { text: '№ доріжки', value: 'trackNumber'},
+          { text: 'Забіг', value: 'roadNumber', width: '60px' },
+          { text: 'Доріж.', value: 'trackNumber', width: '60px' },
         )
       }
       if (status == 2) {
         headers.push(
-          { text: '№ забігу', value: 'halfFinalRoadNumber' },
-          { text: '№ доріжки', value: 'halfFinalTrackNumber' },
+          { text: 'Забіг', value: 'halfFinalRoadNumber', width: '55px' },
+          { text: 'Доріж.', value: 'halfFinalTrackNumber', width: '55px' },
         )
       }
       if (status == 3) {
         headers.push(
-          { text: '№ забігу', value: 'finalRoadNumber' },
-          { text: '№ доріжки', value: 'finalTrackNumber' },
+          { text: 'Забіг', value: 'finalRoadNumber', width: '55px' },
+          { text: 'Доріж.', value: 'finalTrackNumber', width: '55px' },
         )
       }
 
       headers.push(
-        { text: '№ учасника', value: 'participantNumber'  },
-        { text: 'Категорія учасника', value: 'participantCategory' },
-        { text: 'Імя та призвіще', value: 'participantFullName'},
-        { text: 'Рік народження', value: 'participantBirthday'},
-        { text: 'Команда', value: 'participantTeamName'}
+        { text: '№ учас.', value: 'participantNumber', width: '60px' },
+        { text: 'Звання/розряд', value: 'participantCategory', width: '60px'  },
+        { text: 'Імя та призвіще', value: 'participantFullName', width: '1fr' },
+        { text: 'Команда', value: 'participantTeamName', width: '1fr' },
+        { text: 'Рік народж.', value: 'participantBirthday', width: '60px' },
       )
 
       if (status == 1) {
         headers.push(
-          { text: 'Перша спроба', value: 'firstResult' },
-          { text: 'Друга спроба', value: 'secondResult'},
-          { text: 'Кращий', value: 'bestResult' }
+          { text: 'Перша спроба', value: 'firstResult', width: '80px'  },
+          { text: 'Друга спроба', value: 'secondResult', width: '80px' },
+          { text: 'Кращий', value: 'bestResult', width: '80px'  }
         )
       }
       if (status == 2) {
         headers.push(
-          { text: 'Результат пів-фіналу', value: 'halfFinalResult' }
+          { text: 'Результат пів-фіналу', value: 'halfFinalResult', width: '1fr'  }
         )
       }
       if (status == 3) {
         headers.push(
-          { text: 'Результат фіналу', value: 'finalResult'}
+          { text: 'Результат фіналу', value: 'finalResult', width: '1fr' }
         )
       }
       return headers;
@@ -571,6 +579,20 @@ export default {
 <style lang="scss">
   table .v-input__slot {
     padding: 5px!important;
+  }
+  .protocols-table {
+    th, td {
+      padding: 0 5px!important;
+    }
+    .v-data-table__wrapper, table, thead, tbody, tr {
+      grid-template-columns: inherit;
+    }
+    tr {
+      display: grid;
+    }
+    tr.tr-odd {
+      background: rgba(0,0,0,.03);
+    }
   }
   .alert-message {
     position: fixed;
