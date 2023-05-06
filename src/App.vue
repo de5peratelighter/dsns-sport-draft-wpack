@@ -44,6 +44,9 @@ export default {
 </script>
 
 <style lang="scss">
+html {
+  font-size: 18px;
+}
 #app {
   font-weight: normal;
   width: 100%;

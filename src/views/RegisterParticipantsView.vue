@@ -288,6 +288,8 @@ export default {
                 });
         },
         fetchTeamParticipantsByRef(ref) {
+            this.activeSuccessId = null;
+            this.activeErrorId = null;
             this.areParticipantsLoading = true;
             return this.axios.get(`private/teams/${ref}/participant/competitions/${this.competitionId}`)
                 .then(({ data = [] }) => {
