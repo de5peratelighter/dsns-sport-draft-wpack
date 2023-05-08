@@ -8,6 +8,7 @@
                 disable-pagination
                 hide-default-footer
                 @update:sort-by="sortTeams"
+                class="teams-table"
             >
             <template #item="{ item, index }">
               <tr>
@@ -261,9 +262,12 @@ export default {
     transform: translate(-50%, -50%);
     margin: 0;
   }
-  table {
-    tr:nth-child(odd) {
-      background: rgba(0,0,0,.03);
+  .teams-table table {
+    tbody tr:nth-child(odd) {
+      background: rgba(0,0,0,.07);
+    }
+    tbody tr:hover {
+      background-color: rgba(24,103,192, 0.25)!important;
     }
   }
 </style>

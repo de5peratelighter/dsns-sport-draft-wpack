@@ -583,6 +583,8 @@ export default {
   .protocols-table {
     th, td {
       padding: 0 5px!important;
+      display: flex;
+      align-items: center;
     }
     .v-data-table__wrapper, table, thead, tbody, tr {
       grid-template-columns: inherit;
@@ -591,7 +593,10 @@ export default {
       display: grid;
     }
     tr.tr-odd {
-      background: rgba(0,0,0,.03);
+      background: rgba(0,0,0,.07);
+    }
+    tbody tr:hover {
+      background-color: rgba(24,103,192, 0.20)!important;
     }
   }
   .alert-message {

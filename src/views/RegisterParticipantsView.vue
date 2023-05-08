@@ -24,6 +24,7 @@
                     disable-sort
                     disable-pagination
                     hide-default-footer
+                    class="participants-table"
                 >
                     <template #item="{ item, index }">
                         <tr>
@@ -71,7 +72,7 @@
                                             dense
                                             hide-details
                                             class="no-border"
-                                            placeholder="yyyy-mm-dd"
+                                            placeholder="dd/mm/yyy"
                                             @focus="birthday = item.birthday"
                                             @input="birthday = $event"
                                             @change="validateParticipantUpdate(item, 'birthday', `birthday-${index}`)"
@@ -79,7 +80,7 @@
                                             v-on="on"
                                         />
                                     </template>
-                                    <span>Формат дати: yyyy-mm-dd </span>
+                                    <span>Формат дати: dd/mm/yyy </span>
                                 </v-tooltip>
                             </td>
                             <!-- <td>
@@ -124,8 +125,8 @@
                                     @save="saveOtherOptions(item, sportType.value)"
                                 >
                                     <div style="display: flex">
-                                        <v-icon> {{ showParticipantPosition(item, sportType.value, 'personal') ? 'mdi-account-multiple-minus' : 'mdi-account-multiple' }}</v-icon>
-                                        <v-icon> {{ showParticipantPosition(item, sportType.value, 'issue') ? 'mdi-medical-bag' : 'mdi-plus' }}</v-icon>
+                                        <v-icon :color="showParticipantPosition(item, sportType.value, 'personal') ? 'red' : 'gray'">mdi-account-multiple</v-icon>
+                                        <v-icon :color="showParticipantPosition(item, sportType.value, 'issue') ? 'red' : 'gray'">mdi-plus</v-icon>
                                     </div> 
                                     <template #input>
                                     <div class="mt-4 text-h6">
@@ -229,8 +230,8 @@ export default {
             participantCategoryItems: [
                 {categoryName: 'КМС', categoryId: 'CMS'},
                 {categoryName: 'МС', categoryId: 'MS'},
-                {categoryName: 'IMS', categoryId: 'IMS'},
-                {categoryName: 'HMS', categoryId: 'HMS'},
+                {categoryName: 'МСМК', categoryId: 'IMS'},
+                {categoryName: 'ЗМС', categoryId: 'HMS'},
                 {categoryName: 'I', categoryId: 'I'},
                 {categoryName: 'II', categoryId: 'II'},
                 {categoryName: 'III', categoryId: 'III'},
@@ -432,6 +433,9 @@ export default {
                         item.issue = this.editDisqualified;
                         item.personal = this.editPersonalResult;
                     }
+                    if (this.editDisqualified) {
+                        item.startingPosition = null;
+                    }
                     return item;
                 })
             };
@@ -448,12 +452,15 @@ export default {
     transform: translate(-50%, -50%);
     margin: 0;
   }
-  table {
-    tr:nth-child(odd) {
-      background: rgba(0,0,0,.03);
-    }
+  .participants-table table {
     td {
         padding: 0 10px;
+    }
+    tbody tr:nth-child(odd) {
+      background: rgba(0,0,0,.07);
+    }
+    tbody tr:hover {
+      background-color: rgba(24,103,192, 0.25)!important;
     }
   }
 </style>
