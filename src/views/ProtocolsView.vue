@@ -136,7 +136,6 @@
                       <v-text-field
                         :value="item.firstResult"
                         :success="!!item.firstResult"
-                        :rules="[isNumeric]"
                         outlined
                         dense
                         hide-details
@@ -541,16 +540,19 @@ export default {
     async saveResults(participant, key) {
       const raceReference = participant.raceReference;
       if (!raceReference) return Promise.reject('Incorrect raceReference for saving');
-      const result = this[key].trim();
+      let result = this[key].trim().replaceAll(',','.');
       // prevent empty values
-      if (!result) return;
+      if (isNaN(result)) return;
       // prevent saving the same values
       if (Number(participant[key]) === Number(result)) return;
+      // formatting dot
+      if (!result.includes('.')) result = result + '.00';
+      if (result.split('.')[1].length < 2) result = result + '0';
 
       const foundIndex = this.participants.findIndex(({ participantReference }) => participantReference === participant.participantReference)
       const reqData = {
         participantReference: participant.participantReference,
-        [key]: result,
+        [key]: result
       };
       return this.axios.patch(`private/competition-types/races/${raceReference}/save-results`, reqData)
         .then(({data = {}}) => {
@@ -566,6 +568,10 @@ export default {
            });
            // refetch best results
            this.getBestResults();
+        })
+        .catch((error) => {
+          this.$set(this.participants, foundIndex, participant);
+          this.showError(error);
         })
     },
     showError(error) {

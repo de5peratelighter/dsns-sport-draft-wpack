@@ -424,22 +424,32 @@ export default {
             }
         },
         saveOtherOptions(participant, sportType) {
-            let participantStartPositionList = participant.participantStartPositionList;
-            const copy = JSON.parse(JSON.stringify(participantStartPositionList));
-            const reqData = { 
-                participantStartPositionList: copy.map((item) => {
-                    if (item.sportType === sportType) {
-                        item.description = this.editIssueReason;
-                        item.issue = this.editDisqualified;
-                        item.personal = this.editPersonalResult;
+            let participantStartPositionList = JSON.parse(JSON.stringify(participant.participantStartPositionList));
+            let foundItem = participantStartPositionList.find((item) => item.sportType === sportType);
+
+            const nextData = { description: this.editIssueReason, issue: this.editDisqualified, personal: this.editPersonalResult };
+            if (this.editDisqualified) nextData.startingPosition = null
+
+            if (foundItem) {
+                participantStartPositionList = participantStartPositionList.map((list) => {
+                    if (list.sportType === sportType) {
+                        return {...list, ...nextData}
                     }
-                    if (this.editDisqualified) {
-                        item.startingPosition = null;
-                    }
-                    return item;
-                })
-            };
-            return this.updateParticipant(participant, reqData)
+                    return list;
+                });
+            } else {
+                let defaultData = { 
+                    sportType, 
+                    startingPosition: '',  
+                    personal: false, 
+                    issue: false, 
+                    description: null,
+                    ...nextData
+                 };
+                participantStartPositionList = [...participantStartPositionList, defaultData];
+            }
+
+            return this.updateParticipant(participant, { participantStartPositionList })
         }
     }
 }
