@@ -37,6 +37,7 @@
                   Стартовий протокол
                 </v-stepper-step>
 
+                <template v-if="activeCompetitionType.sportType !== 'DUELING'">
                 <v-divider></v-divider>
 
                 <v-stepper-step
@@ -78,6 +79,7 @@
                     Старт
                   </v-btn>
                 </v-stepper-step>
+                </template>
               </v-stepper-header>
             </v-stepper>
             <v-data-table
@@ -132,6 +134,10 @@
                     {{ item.participantBirthday ? item.participantBirthday.slice(0,4) : '' }}
                   </td>
                   <template v-if="stepper == 1">
+                    <template v-if="activeCompetitionType.sportType === 'DUELING'">
+                      <td>{{ item.duelingResult }}</td>
+                    </template>
+                    <template v-else>
                     <td>
                       <v-text-field
                         :value="item.firstResult"
@@ -162,6 +168,7 @@
                     <td>
                       {{ item.bestResult }}
                     </td>
+                    </template>
                   </template>
                   <template v-if="stepper == 2">
                     <td>
@@ -410,11 +417,15 @@ export default {
       )
 
       if (status == 1) {
-        headers.push(
-          { text: 'Перша спроба', value: 'firstResult', width: '80px'  },
-          { text: 'Друга спроба', value: 'secondResult', width: '80px' },
-          { text: 'Кращий', value: 'bestResult', width: '80px'  }
-        )
+        if (this.activeCompetitionType.sportType === 'DUELING') {
+          headers.push({ text: 'Кращий', value: 'duelingResult', width: '100px'  })
+        } else {
+          headers.push(
+            { text: 'Перша спроба', value: 'firstResult', width: '80px'  },
+            { text: 'Друга спроба', value: 'secondResult', width: '80px' },
+            { text: 'Кращий', value: 'bestResult', width: '80px'  }
+          )
+        }
       }
       if (status == 2) {
         headers.push(
@@ -504,7 +515,10 @@ export default {
       let stepper = 0;
       let request = null;
       try {
-        if (status === 'ACTIVE') {
+        if (this.activeCompetitionType.sportType === 'DUELING') {
+          stepper = 1;
+          request = await this.axios.get(`private/competition-types/${this.competitionType}/dueling-results`);
+        } else if (status === 'ACTIVE') {
           stepper = 1;
           request = await this.axios.get(`private/competition-types/${this.competitionType}/start-race-list`);
         } else if (status === 'HALF_FINAL') {
