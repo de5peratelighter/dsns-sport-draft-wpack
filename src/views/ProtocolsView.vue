@@ -95,12 +95,14 @@
               <template #item="{ item }">
                 <tr :class="{ 'tr-odd': item.trackNumber % 2 === 0 }">
                   <template v-if="stepper == 1">
-                    <td>
-                      {{ item.trackNumber }}
-                    </td>
-                    <td>
-                      {{ item.roadNumber }}
-                    </td>
+                    <tempalte v-if="activeCompetitionType.sportType !== 'DUELING'">
+                      <td>
+                        {{ item.trackNumber }}
+                      </td>
+                      <td>
+                        {{ item.roadNumber }}
+                      </td>
+                    </tempalte>
                   </template>
                   <template v-if="stepper == 2">
                     <td>
@@ -135,6 +137,8 @@
                   </td>
                   <template v-if="stepper == 1">
                     <template v-if="activeCompetitionType.sportType === 'DUELING'">
+                      <td>{{ item.hundredMeterResult }}</td>
+                      <td>{{ item.assaultLadderResult }}</td>
                       <td>{{ item.duelingResult }}</td>
                     </template>
                     <template v-else>
@@ -389,11 +393,14 @@ export default {
     participantHeaders() {
       const status = this.stepper;
       const headers = [];
+      const isDueling = this.activeCompetitionType.sportType === 'DUELING';
       if (status == 1) {
+        if (!isDueling) {
         headers.push(
           { text: 'Забіг', value: 'roadNumber', width: '60px' },
           { text: 'Доріж.', value: 'trackNumber', width: '60px' },
         )
+        }
       }
       if (status == 2) {
         headers.push(
@@ -417,8 +424,12 @@ export default {
       )
 
       if (status == 1) {
-        if (this.activeCompetitionType.sportType === 'DUELING') {
-          headers.push({ text: 'Кращий', value: 'duelingResult', width: '100px'  })
+        if (isDueling) {
+          headers.push(
+            { text: this.competitionTranslations.HUNDRED_METER, value: 'hundredMeterResult', width: '80px'  },
+            { text: this.competitionTranslations.ASSAULT_LADDER, value: 'assaultLadderResult', width: '80px'  },
+            { text: 'Сума', value: 'duelingResult', width: '80px'  }
+          )
         } else {
           headers.push(
             { text: 'Перша спроба', value: 'firstResult', width: '80px'  },
