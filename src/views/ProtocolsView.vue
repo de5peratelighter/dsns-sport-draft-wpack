@@ -62,7 +62,7 @@
                   @click="getRaceData('HALF_FINAL')"
                 >
                   <span :class="{'text-decoration-underline': stepper === 2}">
-                    Стартовий протокол
+                    Пів-фінал
                   </span>
                   <v-btn 
                     v-if="activeCompetitionStatus === 'ACTIVE'"
@@ -141,7 +141,7 @@
                     {{ item.participantNumber }}
                   </td>
                   <td>
-                    {{ item.participantCategory }}
+                    {{ participantCategoryTranslations[item.participantCategory] }}
                   </td>
                   <td>
                     {{ item.participantFullName }}
@@ -166,25 +166,62 @@
                         outlined
                         dense
                         hide-details
-                        class="no-border"
+                        :class="['no-border', {'border-yellow': item.firstResultShifted}]"
                         @focus="firstResult = item.firstResult"
-                        @input="firstResult = $event"
-                        @change="saveResults(item, 'firstResult')"
-                      />
+                        @input="validateValueResult($event, 'firstResult')"
+                        @change="saveResults(item, 'firstResult', 'firstDisqualificationType')"
+                      >
+                        <template v-if="item.firstResult == '0'" v-slot:append>
+                          <v-menu style="top: -12px" offset-y>
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-icon left v-bind="attrs" v-on="on">mdi-comment-alert</v-icon>
+                            </template>
+                            <v-list>
+                              <v-list-item
+                                v-for="(menuItem, i) in zeroValueOptions"
+                                :key="i"
+                                @click="saveResults(item, 'firstResult', 'firstDisqualificationType', menuItem.value)"
+                              >
+                                <v-list-item-title :class="{'red--text': item.firstDisqualificationType === menuItem.value}">
+                                  {{ menuItem.text }}
+                                </v-list-item-title>
+                              </v-list-item>
+                            </v-list>
+                          </v-menu>
+                        </template>
+                      </v-text-field>
                     </td>
                     <td>
                       <v-text-field
                         :value="item.secondResult"
                         :success="!!item.secondResult"
-                        :rules="[isNumeric]"
                         outlined
                         dense
                         hide-details
-                        class="no-border"
+                        :class="['no-border protocols-value-input', {'border-yellow': item.secondResultShifted}]"
                         @focus="secondResult = item.secondResult"
-                        @input="secondResult = $event"
-                        @change="saveResults(item, 'secondResult')"
-                      />
+                        @input="validateValueResult($event, 'secondResult')"
+                        @change="saveResults(item, 'secondResult', 'secondDisqualificationType')"
+                      >
+                        <template v-if="item.secondResult == '0'" v-slot:append>
+                          <v-menu style="top: -12px" offset-y>
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-icon left v-bind="attrs" v-on="on">mdi-comment-alert</v-icon>
+                            </template>
+                            <v-list>
+                              <v-list-item
+                                v-for="(menuItem, i) in zeroValueOptions"
+                                :key="i"
+                                @click="saveResults(item, 'secondResult', 'secondDisqualificationType', menuItem.value)"
+                              >
+                                <v-list-item-title :class="{'red--text': item.secondDisqualificationType === menuItem.value}">
+                                  {{ menuItem.text }}
+                                </v-list-item-title>
+                              </v-list-item>
+                            </v-list>
+                          </v-menu>
+                        </template>
+                      </v-text-field>
                     </td>
                     <td>
                       {{ item.bestResult }}
@@ -196,15 +233,34 @@
                       <v-text-field
                         :value="item.halfFinalResult"
                         :success="!!item.halfFinalResult"
-                        :rules="[isNumeric]"
                         outlined
                         dense
                         hide-details
-                        class="no-border"
+                        :class="['no-border protocols-value-input', {'border-yellow': item.helfFinalResultShifted}]"
+                        :suffix="item.halfFinalResultShifted ? plusValueOffset : null"
                         @focus="halfFinalResult = item.halfFinalResult"
-                        @input="halfFinalResult = $event"
-                        @change="saveResults(item, 'halfFinalResult')"
-                      />
+                        @input="validateValueResult($event, 'halfFinalResult')"
+                        @change="saveResults(item, 'halfFinalResult', 'halfFinalDisqualificationType')"
+                      >
+                        <template v-if="item.halfFinalResult == '0'" v-slot:append>
+                          <v-menu style="top: -12px" offset-y>
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-icon left v-bind="attrs" v-on="on">mdi-comment-alert</v-icon>
+                            </template>
+                            <v-list>
+                              <v-list-item
+                                v-for="(menuItem, i) in zeroValueOptions"
+                                :key="i"
+                                @click="saveResults(item, 'halfFinalResult', 'halfFinalDisqualificationType', menuItem.value)"
+                              >
+                                <v-list-item-title :class="{'red--text': item.halfFinalDisqualificationType === menuItem.value}">
+                                  {{ menuItem.text }}
+                                </v-list-item-title>
+                              </v-list-item>
+                            </v-list>
+                          </v-menu>
+                        </template>
+                      </v-text-field>
                     </td>
                   </template>
                   <template v-if="stepper == 3">
@@ -213,15 +269,34 @@
                         v-if="activeCompetitionStatus === 'FINAL'"
                         :value="item.finalResult"
                         :success="!!item.finalResult"
-                        :rules="[isNumeric]"
                         outlined
                         dense
                         hide-details
-                        class="no-border"
+                        :class="['no-border protocols-value-input', {'border-yellow': item.finalResultShifted}]"
+                        :suffix="item.finalResultShifted ? plusValueOffset : null"
                         @focus="finalResult = item.finalResult"
-                        @input="finalResult = $event"
-                        @change="saveResults(item, 'finalResult')"
-                      />
+                        @input="validateValueResult($event, 'finalResult')"
+                        @change="saveResults(item, 'finalResult', 'finalDisqualificationType')"
+                      >
+                        <template v-if="item.finalResult == '0'" v-slot:append>
+                          <v-menu style="top: -12px" offset-y>
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-icon left v-bind="attrs" v-on="on">mdi-comment-alert</v-icon>
+                            </template>
+                            <v-list>
+                              <v-list-item
+                                v-for="(menuItem, i) in zeroValueOptions"
+                                :key="i"
+                                @click="saveResults(item, 'finalResult', 'finalDisqualificationType', menuItem.value)"
+                              >
+                                <v-list-item-title :class="{'red--text': item.finalDisqualificationType === menuItem.value}">
+                                  {{ menuItem.text }}
+                                </v-list-item-title>
+                              </v-list-item>
+                            </v-list>
+                          </v-menu>
+                        </template>
+                      </v-text-field>
                       <template v-else>
                         {{ item.finalResult }}
                       </template>
@@ -344,11 +419,6 @@ export default {
       competitionReferences: [], // has to be fetched so we know what SPORT_TYPE we're actually dealing with (id is taken from route)
       isPageLoading: false,
       isLoading: false,
-      firstResult: 0,
-      secondResult: 0,
-      halfFinalResult: 0,
-      finalResult: 0,
-      isNumeric: v => !isNaN(v) || 'Лише числа',
       participants: [],
       bestParticipants: [],
       teamResultsOverall: [],
@@ -376,6 +446,17 @@ export default {
       alertType: 'error',
       showAlert: false,
       alertMessage: '',
+      isPlusEditTriggered: false,
+
+      firstResult: 0,
+      secondResult: 0,
+      halfFinalResult: 0,
+      finalResult: 0,
+
+      firstResultShifted: false,
+      secondResultShifted: false,
+      halfFinalResultShifted: false,
+      finalResultShifted: false
     }
   },
   computed: {
@@ -400,6 +481,20 @@ export default {
         RETRACTABLE_LADDER: 'Висувна драбина',
         RELAY: 'Пожежна естафета',
         COMBAT_DEPLOYMENT: 'Бойове розгортання'
+      }
+    },
+    participantCategoryTranslations() {
+      return {
+        CMS: 'КМС', 
+        MS: 'МС',
+        IMS: 'МСМК',
+        HMS: 'ЗМС',
+        I: 'I',
+        II: 'II',
+        III: 'III',
+        I_TEEN: 'I-ю',
+        II_TEEN: 'II-ю',
+        III_TEEN: 'III-ю',
       }
     },
     // headers do not support custom width (even though the should according to the API) - so we use manual overrides
@@ -475,10 +570,69 @@ export default {
         )
       }
       return headers;
-    }
+    },
+    plusValueOffset() {
+      if (!this.activeCompetitionType) return '';
+      const activeType = this.activeCompetitionType.sportType;
+      if (['ASSAULT_LADDER', 'RETRACTABLE_LADDER'].includes(activeType)) return '0.15';
+      return '0.24';
+    },
+    zeroValueOptions() {
+      if (!this.activeCompetitionType) return [];
+      const activeType = this.activeCompetitionType.sportType;
+      let typeSpecializedOptions = [];
+      if (activeType === 'HUNDRED_METER') {
+        typeSpecializedOptions = [{
+            text: 'Розгалуження',
+            value: 'BRANCHING'
+          },
+          {
+            text: 'Ствол на фініші',
+            value: 'BARREL_FINISH_LINE'
+          }]
+      } else if (activeType === 'ASSAULT_LADDER') {
+        typeSpecializedOptions = [{
+            text: 'Фінішний майданчик',
+            value: 'FINISH_PLACE'
+          }]
+      } else if (activeType === 'RELAY') {
+        typeSpecializedOptions = [{
+            text: 'Фінішний майданчик',
+            value: 'TRANSMISSION_ZONE'
+          }, {
+            text: 'Деко',
+            value: 'DECO'
+          }]
+      } else if (activeType === 'COMBAT_DEPLOYMENT') {
+        typeSpecializedOptions = [{
+            text: 'Обмежувальна лінія',
+            value: 'LIMITING_LINE'
+          },
+          {
+            text: 'Розрив рукава',
+            value: 'SLEEFE_TEAR'
+          }]
+      }
+      return [
+        {
+          text: 'Фальш старт',
+          value: 'FALSE_START'
+        },
+        ...typeSpecializedOptions,
+        {
+          text: 'Інше',
+          value: 'ANOTHER'
+        },
+      ];
+    },
   },
-  async mounted() {
-    await this.getCompetitionReferences();
+  watch: {
+    competitionType: {
+      handler(v) {
+        if (v) this.getCompetitionReferences();
+      },
+      immediate: true
+    }
   },
   methods: {
     async startCompetition() {
@@ -589,23 +743,34 @@ export default {
           this.teamResultsOverall = data;
         })
     },
-    async saveResults(participant, key) {
+    async saveResults(participant, key, disqualifiedKey = null, disqualifiedValue = null) {
       const raceReference = participant.raceReference;
       if (!raceReference) return Promise.reject('Incorrect raceReference for saving');
-      let result = this[key].trim().replaceAll(',','.');
+       
+      let result = key in this ? `${this[key]}`.trim().replaceAll(',','.') : '';
       // prevent empty values
       if (isNaN(result)) return;
-      // prevent saving the same values
-      if (Number(participant[key]) === Number(result)) return;
-      // formatting dot
-      if (!result.includes('.')) result = result + '.00';
-      if (result.split('.')[1].length < 2) result = result + '0';
+
+      if (result === '0') {
+        disqualifiedValue = disqualifiedValue ? disqualifiedValue : 'ANOTHER';
+      } else {
+        // prevent saving the same values
+        if (Number(participant[key]) === Number(result)) return;
+        // formatting dot
+        if (!result.includes('.')) result = result + '.00';
+        if (result.split('.')[1].length < 2) result = result + '0'; 
+      }
 
       const foundIndex = this.participants.findIndex(({ participantReference }) => participantReference === participant.participantReference)
-      const reqData = {
+      const shiftedKey = this.shiftedValueKey(key);
+
+      let reqData = {
         participantReference: participant.participantReference,
-        [key]: result
+        [key]: result,
+        [disqualifiedKey]: disqualifiedValue
       };
+      if (shiftedKey) reqData[shiftedKey] = this[shiftedKey];
+
       return this.axios.patch(`private/competition-types/races/${raceReference}/save-results`, reqData)
         .then(({data = {}}) => {
           // directly saving new properties (since most of other properties returned are null)
@@ -616,7 +781,11 @@ export default {
             bestResult: data.bestResult,
             finalResult: data.finalResult,
             halfFinalResult: data.halfFinalResult,
-            finalResult: data.finalResult
+            finalResult: data.finalResult,
+            finalDisqualificationType: data.finalDisqualificationType,
+            halfFinalDisqualificationType: data.halfFinalDisqualificationType,
+            firstDisqualificationType: data.firstDisqualificationType,
+            secondDisqualificationType: data.secondDisqualificationType
            });
            // refetch best results
            this.getBestResults();
@@ -629,6 +798,23 @@ export default {
     showError(error) {
       this.alertMessage = error.response && error.response.data.description ? error.response.data.description : error.message;
       this.showAlert = true;
+    },
+    validateValueResult(value, key) {
+      if (key in this) {
+        const shiftedKey = this.shiftedValueKey(key);
+        
+        if (value.includes('+')) {
+          this[key] = `${Number(value.replace('+', '')) + Number(this.plusValueOffset)}`;
+          if (shiftedKey) this[shiftedKey] = true;
+        } else {
+          this[key] = value;
+          if (shiftedKey) this[shiftedKey] = false;
+        }
+      }
+    },
+    shiftedValueKey(key) {
+      const shiftedKey = key+'Shifted';
+      if (shiftedKey in this) return shiftedKey;
     }
   }
 }
@@ -637,6 +823,17 @@ export default {
 <style lang="scss">
   table .v-input__slot {
     padding: 5px!important;
+  }
+  .protocols-value-input  {
+    .v-input__append-outer{
+      margin-left: 0!important;
+      button {
+        margin-right: 0!important;
+      }
+    }
+    .v-input__append-inner {
+      margin-top: 5px!important;
+    }
   }
   .protocols-table {
     th, td {
@@ -663,5 +860,8 @@ export default {
     left: 50%;
     transform: translate(-50%, -50%);
     margin: 0;
+  }
+  .v-application div.border-yellow {
+    color: orange!important;
   }
 </style>

@@ -1,13 +1,13 @@
 <template>
   <v-app-bar app flat absolute tile
     color="transparent" 
-    :height="'100px'" 
+    :height="'90px'" 
     class="app-header white--text font-weight-bold"
   >
-    <AdminHeader v-if="isEditCompetition" />
+    <AdminHeader v-if="isEditCompetition || isProtocols" />
     <MainHeader v-if="isMainRoute" />
 
-    <BreadCrumbs />
+    <BreadCrumbs v-if="!isProtocols" />
   </v-app-bar>
 </template>
 
@@ -27,6 +27,9 @@ export default {
     },
     isMainRoute() {
       return this.$route.name === 'main'
+    },
+    isProtocols() {
+      return this.$route.name === 'protocols'
     },
   },
 }

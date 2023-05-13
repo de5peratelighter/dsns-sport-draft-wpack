@@ -13,7 +13,7 @@
     </template>
 
     <v-main>
-      <v-container fluid class="pa-4 fill-height"> 
+      <v-container fluid class="px-4 py-2 fill-height"> 
         <router-view />
       </v-container>
     </v-main>

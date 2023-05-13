@@ -66,7 +66,6 @@
         <v-menu
           offset-y
           open-on-hover
-          :close-on-content-click="false"
           >
           <template v-slot:activator="{ on, attrs }">
             <v-btn text color="white" v-bind="attrs"
@@ -78,6 +77,7 @@
             <v-list-item
               v-for="(item, i) in protocolMenuItems"
               :key="i"
+              :disabled="item.to && $route.params.type ? $route.params.type === item.to.params.type : false"
               @click="$router.push(item.to)"
             >
               <v-list-item-content>
