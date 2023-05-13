@@ -11,7 +11,18 @@
     <v-row v-if="activeCompetitionStatus === 'INACTIVE'" class="text-center justify-center mt-3">
       <div class="d-flex" style="flex-direction: column">
         <h4 class="text-center mb-4">{{ activeCompetitionType ? `Стартовий протокол: ${competitionTranslations[activeCompetitionType.sportType]}` : '' }}</h4>
+        <template v-if="isDueling">
+            <div>{{  competitionTranslations.ASSAULT_LADDER }} та {{ competitionTranslations.HUNDRED_METER }} наразі не завершені</div>
+              <v-btn
+                  color="light-green white--text"
+                  :disabled="!isDuelingReadyfToBeStarted"
+                  @click="startCompetition"
+              >
+                Розпочати змагання
+              </v-btn>
+        </template>
         <v-btn 
+          v-else
           color="light-green white--text"
           @click="startCompetition"
         >
@@ -34,10 +45,12 @@
                   step="1"
                   @click="getRaceData('ACTIVE')"
                 >
-                  Стартовий протокол
+                  <span :class="{'text-decoration-underline': stepper === 1}">
+                    Стартовий протокол
+                  </span>
                 </v-stepper-step>
 
-                <template v-if="activeCompetitionType.sportType !== 'DUELING'">
+                <template v-if="!isDueling">
                 <v-divider></v-divider>
 
                 <v-stepper-step
@@ -48,7 +61,9 @@
                   step="2"
                   @click="getRaceData('HALF_FINAL')"
                 >
-                  Пів-фінал
+                  <span :class="{'text-decoration-underline': stepper === 2}">
+                    Стартовий протокол
+                  </span>
                   <v-btn 
                     v-if="activeCompetitionStatus === 'ACTIVE'"
                     small
@@ -68,7 +83,9 @@
                   :color="activeCompetitionStatus === 'FINAL' ? 'primary' : 'success'"
                   @click="getRaceData('FINAL')"
                 >
-                  Фінал
+                  <span :class="{'text-decoration-underline': stepper === 3}">
+                    Фінал
+                  </span>
                   <v-btn 
                     v-if="activeCompetitionStatus === 'HALF_FINAL'"
                     small
@@ -93,16 +110,16 @@
               class="protocols-table"
             >
               <template #item="{ item }">
-                <tr :class="{ 'tr-odd': item.trackNumber % 2 === 0 }">
+                <tr :class="{ 'tr-odd': item[stepper == 1 ? 'trackNumber' : stepper == 2 ? 'halfFinalTrackNumber' : 'finalTrackNumber'] % 2 === 0 }">
                   <template v-if="stepper == 1">
-                    <tempalte v-if="activeCompetitionType.sportType !== 'DUELING'">
+                    <template v-if="!isDueling">
                       <td>
                         {{ item.trackNumber }}
                       </td>
                       <td>
                         {{ item.roadNumber }}
                       </td>
-                    </tempalte>
+                    </template>
                   </template>
                   <template v-if="stepper == 2">
                     <td>
@@ -136,7 +153,7 @@
                     {{ item.participantBirthday ? item.participantBirthday.slice(0,4) : '' }}
                   </td>
                   <template v-if="stepper == 1">
-                    <template v-if="activeCompetitionType.sportType === 'DUELING'">
+                    <template v-if="isDueling">
                       <td>{{ item.hundredMeterResult }}</td>
                       <td>{{ item.assaultLadderResult }}</td>
                       <td>{{ item.duelingResult }}</td>
@@ -238,6 +255,7 @@
                     </td>
                     <td>
                       {{ item.participantFullName }}
+                      <v-icon v-if="item.personal" color="red">mdi-account-multiple</v-icon>
                     </td>
                     <td>
                       {{ item.participantTeamName }}
@@ -390,10 +408,18 @@ export default {
       this.participantHeaders.forEach((header) => widths.push(header.width));
       return `grid-template-columns: ${ widths.length ? widths.join(' ') : 'inherit'}`
     },
+    isDueling() {
+      return this.activeCompetitionType.sportType === 'DUELING'
+    },
+    isDuelingReadyfToBeStarted() {
+      const relatedCompetitions = this.competitionReferences.filter(({ sportType }) => ['ASSAULT_LADDER', 'HUNDRED_METER'].includes(sportType))
+      console.warn('HERE',relatedCompetitions)
+      return this.isDueling && relatedCompetitions.length && relatedCompetitions.every(({status}) => status === 'FINAL')
+    },
     participantHeaders() {
       const status = this.stepper;
       const headers = [];
-      const isDueling = this.activeCompetitionType.sportType === 'DUELING';
+      const isDueling = this.isDueling;
       if (status == 1) {
         if (!isDueling) {
         headers.push(
@@ -426,7 +452,7 @@ export default {
       if (status == 1) {
         if (isDueling) {
           headers.push(
-            { text: this.competitionTranslations.HUNDRED_METER, value: 'hundredMeterResult', width: '80px'  },
+            { text: '100-м смуга', value: 'hundredMeterResult', width: '80px'  },
             { text: this.competitionTranslations.ASSAULT_LADDER, value: 'assaultLadderResult', width: '80px'  },
             { text: 'Сума', value: 'duelingResult', width: '80px'  }
           )
@@ -523,10 +549,11 @@ export default {
     },
     async getRaceData(status = this.activeCompetitionStatus) {
       this.isLoading = true;
+      this.participants = [];
       let stepper = 0;
       let request = null;
       try {
-        if (this.activeCompetitionType.sportType === 'DUELING') {
+        if (this.isDueling) {
           stepper = 1;
           request = await this.axios.get(`private/competition-types/${this.competitionType}/dueling-results`);
         } else if (status === 'ACTIVE') {
