@@ -119,41 +119,21 @@
                                     @input="validateParticipantPositionUpdate(item, sportType.value, 'startingPosition')"
                                 />
                                 
-                                <v-edit-dialog
-                                    large
-                                    @open="openOtherOptions(item, sportType.value)"
-                                    @save="saveOtherOptions(item, sportType.value)"
-                                >
-                                    <div style="display: flex">
-                                        <v-icon :color="showParticipantPosition(item, sportType.value, 'personal') ? 'red' : 'gray'">mdi-account-multiple</v-icon>
-                                        <v-icon :color="showParticipantPosition(item, sportType.value, 'issue') ? 'red' : 'gray'">mdi-plus</v-icon>
-                                    </div> 
-                                    <template #input>
-                                    <div class="mt-4 text-h6">
-                                        {{ item.fullName + ' : ' + sportType.text}}
-                                    </div>
-                                    <div class="my-2" style="display:flex">
-                                        <v-simple-checkbox
-                                            color="primary"
-                                            v-model="editPersonalResult"
-                                        />
+                                <!-- Особ чекбокс -->
+                                <template v-if="!['RELAY','COMBAT_DEPLOYMENT'].includes(sportType.value)">
+                                    <v-tooltip top>
+                                        <template v-slot:activator="{ on, attrs }">
+                                            <v-simple-checkbox
+                                                v-on="on" v-bind="attrs"
+                                                color="primary"
+                                                :value="showParticipantPosition(item, sportType.value, 'personal')"
+                                                @input="validateParticipantPositionUpdate(item, sportType.value, 'personal')"
+                                            />
+                                            Ос:
+                                        </template>
                                         Особовий результат
-                                    </div>
-                                    <div class="my-2" style="display:flex">
-                                        <v-simple-checkbox
-                                            color="primary"
-                                            v-model="editDisqualified"
-                                        />
-                                        Дискваліфікований
-                                    </div>
-                                    <v-text-field
-                                        v-if="editDisqualified"
-                                        v-model="editIssueReason"
-                                        label="Причина дискваліфікації"
-                                        outlined
-                                    ></v-text-field>
-                                    </template>
-                                </v-edit-dialog>
+                                    </v-tooltip>
+                                </template>
                             </div>
                             </td>
                         </tr>
@@ -394,7 +374,7 @@ export default {
                     return list;
                 });
             } else {
-                let defaultData = { sportType, startingPosition: '',  personal: false, issue: false, description: null }
+                let defaultData = { sportType, startingPosition: '',  personal: false }
                 if (key === 'startingPosition') {
                     defaultData.startingPosition = this.sportTypePos.trim();
                 } else {
@@ -422,34 +402,6 @@ export default {
                 this.editDisqualified = false;
                 this.editIssueReason = null;
             }
-        },
-        saveOtherOptions(participant, sportType) {
-            let participantStartPositionList = JSON.parse(JSON.stringify(participant.participantStartPositionList));
-            let foundItem = participantStartPositionList.find((item) => item.sportType === sportType);
-
-            const nextData = { description: this.editIssueReason, issue: this.editDisqualified, personal: this.editPersonalResult };
-            if (this.editDisqualified) nextData.startingPosition = null
-
-            if (foundItem) {
-                participantStartPositionList = participantStartPositionList.map((list) => {
-                    if (list.sportType === sportType) {
-                        return {...list, ...nextData}
-                    }
-                    return list;
-                });
-            } else {
-                let defaultData = { 
-                    sportType, 
-                    startingPosition: '',  
-                    personal: false, 
-                    issue: false, 
-                    description: null,
-                    ...nextData
-                 };
-                participantStartPositionList = [...participantStartPositionList, defaultData];
-            }
-
-            return this.updateParticipant(participant, { participantStartPositionList })
         }
     }
 }
