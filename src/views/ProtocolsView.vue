@@ -785,7 +785,11 @@ export default {
             finalDisqualificationType: data.finalDisqualificationType,
             halfFinalDisqualificationType: data.halfFinalDisqualificationType,
             firstDisqualificationType: data.firstDisqualificationType,
-            secondDisqualificationType: data.secondDisqualificationType
+            secondDisqualificationType: data.secondDisqualificationType,
+            finalResultShifted: data.finalResultShifted,
+            halFinalResultShifted: data.halFinalResultShifted,
+            firstResultShifted: data.firstResultShifted,
+            secondResultShifted: data.secondResultShifted
            });
            // refetch best results
            this.getBestResults();
@@ -862,6 +866,6 @@ export default {
     margin: 0;
   }
   .v-application div.border-yellow {
-    color: orange!important;
+    color: darkorange!important;
   }
 </style>
