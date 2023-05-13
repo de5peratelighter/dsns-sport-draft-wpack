@@ -236,7 +236,7 @@
                         outlined
                         dense
                         hide-details
-                        :class="['no-border protocols-value-input', {'border-yellow': item.helfFinalResultShifted}]"
+                        :class="['no-border protocols-value-input', {'border-yellow': item.halfFinalResultShifted}]"
                         :suffix="item.halfFinalResultShifted ? plusValueOffset : null"
                         @focus="halfFinalResult = item.halfFinalResult"
                         @input="validateValueResult($event, 'halfFinalResult')"
