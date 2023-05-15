@@ -109,8 +109,10 @@
               :style="columnWidths"
               class="protocols-table"
             >
-              <template #item="{ item }">
-                <tr :class="{ 'tr-odd': item[stepper == 1 ? 'trackNumber' : stepper == 2 ? 'halfFinalTrackNumber' : 'finalTrackNumber'] % 2 === 0 }">
+              <template #item="{ item, index }">
+                <tr :class="{ 'tr-height-extended': isRelay, 'tr-odd': isRelay ? index % 2 : item[stepper == 1 ? 'trackNumber' : stepper == 2 ? 'halfFinalTrackNumber' : 'finalTrackNumber'] % 2 === 0 }"
+                  :style="{'height': isRelay ? 'auto' : 'initial'}"
+                >
                   <template v-if="stepper == 1">
                     <template v-if="!isDueling">
                       <td>
@@ -145,17 +147,26 @@
                       {{ participantCategoryTranslations[item.participantCategory] }}
                     </td>
                     <td>
+                      {{ item.participantBirthday ? item.participantBirthday.slice(0,4) : '' }}
+                    </td>
+                  </template>
+                  <template v-else>
+                    <td style="display:grid;grid-column: 3/6;">
+                      <div v-for="(subitem,subItemIndex) in item.teamParticipants" :key="subItemIndex" class="protocols-sub-item">
+                        <div>{{ subitem.birthday ? subitem.birthday.slice(0,4) : '' }}</div>
+                        <div>{{ participantCategoryTranslations[subitem.participantCategory] }}</div>
+                        <div>{{ subitem.fullName }}</div>
+                      </div>
+                    </td>
+                  </template>
+                  <template v-if="!isRelay">
+                    <td>
                       {{ item.participantFullName }}
                     </td>
                   </template>
                   <td>
                     {{ isRelay ? item.teamName : item.participantTeamName }}
                   </td>
-                  <template v-if="!isRelay">
-                    <td>
-                      {{ item.participantBirthday ? item.participantBirthday.slice(0,4) : '' }}
-                    </td>
-                  </template>
                   <template v-if="stepper == 1">
                     <template v-if="isDueling">
                       <td>{{ item.hundredMeterResult }}</td>
@@ -567,21 +578,22 @@ export default {
         )
       }
 
-      if (!isRelay) {
+      if (isRelay) {
+        headers.push(
+          { text: 'Звання/розряд', value: 'participantCategory', width: '60px'  },
+          { text: 'Рік народж.', value: 'participantBirthday', width: '60px' }
+        );
+      } else {
         headers.push(
           { text: '№ учас.', value: 'participantNumber', width: '60px' },
           { text: 'Звання/розряд', value: 'participantCategory', width: '60px'  },
-          { text: 'Імя та призвіще', value: 'participantFullName', width: '1fr' },
-        );
+          { text: 'Рік народж.', value: 'participantBirthday', width: '60px' },
+        )
       }
       headers.push(
+        { text: 'Імя та призвіще', value: 'participantFullName', width: '1fr' },
         { text: 'Команда', value: 'participantTeamName', width: '1fr' },
       )
-      if (!isRelay) {
-        headers.push(
-          { text: 'Рік народж.', value: 'participantBirthday', width: '60px' },
-        );
-      }
       if (status == 1) {
         if (isDueling) {
           headers.push(
@@ -902,8 +914,20 @@ export default {
     tr.tr-odd {
       background: rgba(0,0,0,.07);
     }
+    tr.tr-height-extended {
+      padding: 0 5px;
+      td {
+        padding: 10px 0!important;
+        align-items: baseline!important;
+        height: inherit!important;
+      }
+    }
     tbody tr:hover {
       background-color: rgba(24,103,192, 0.20)!important;
+    }
+    .protocols-sub-item {
+      display: grid;
+      grid-template-columns: 60px 60px 1fr;
     }
   }
   .alert-message {
