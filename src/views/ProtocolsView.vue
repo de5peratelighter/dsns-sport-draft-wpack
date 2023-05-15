@@ -50,7 +50,7 @@
                   </span>
                 </v-stepper-step>
 
-                <template v-if="!isDueling">
+                <template v-if="!isDueling && !isRelay">
                 <v-divider></v-divider>
 
                 <v-stepper-step
@@ -117,7 +117,7 @@
                         {{ item.trackNumber }}
                       </td>
                       <td>
-                        {{ item.roadNumber }}
+                        {{ isRelay ? item.raceNumber : item.roadNumber }}
                       </td>
                     </template>
                   </template>
@@ -137,21 +137,25 @@
                       {{ item.finalRoadNumber }}
                     </td>
                   </template>
+                  <template v-if="!isRelay">
+                    <td>
+                      {{ item.participantNumber }}
+                    </td>
+                    <td>
+                      {{ participantCategoryTranslations[item.participantCategory] }}
+                    </td>
+                    <td>
+                      {{ item.participantFullName }}
+                    </td>
+                  </template>
                   <td>
-                    {{ item.participantNumber }}
+                    {{ isRelay ? item.teamName : item.participantTeamName }}
                   </td>
-                  <td>
-                    {{ participantCategoryTranslations[item.participantCategory] }}
-                  </td>
-                  <td>
-                    {{ item.participantFullName }}
-                  </td>
-                  <td>
-                    {{ item.participantTeamName }}
-                  </td>
-                  <td>
-                    {{ item.participantBirthday ? item.participantBirthday.slice(0,4) : '' }}
-                  </td>
+                  <template v-if="!isRelay">
+                    <td>
+                      {{ item.participantBirthday ? item.participantBirthday.slice(0,4) : '' }}
+                    </td>
+                  </template>
                   <template v-if="stepper == 1">
                     <template v-if="isDueling">
                       <td>{{ item.hundredMeterResult }}</td>
@@ -159,73 +163,90 @@
                       <td>{{ item.duelingResult }}</td>
                     </template>
                     <template v-else>
-                    <td>
-                      <v-text-field
-                        :value="item.firstResult"
-                        :success="!!item.firstResult"
-                        outlined
-                        dense
-                        hide-details
-                        :class="['no-border', {'border-yellow': item.firstResultShifted}]"
-                        @focus="firstResult = item.firstResult"
-                        @input="validateValueResult($event, 'firstResult')"
-                        @change="saveResults(item, 'firstResult', 'firstDisqualificationType')"
-                      >
-                        <template v-if="item.firstResult == '0'" v-slot:append>
-                          <v-menu style="top: -12px" offset-y>
-                            <template v-slot:activator="{ on, attrs }">
-                                <v-icon left v-bind="attrs" v-on="on">mdi-comment-alert</v-icon>
+                      <template v-if="isRelay">
+                        <td>
+                          <v-text-field
+                            :value="item.bestResultTeam"
+                            :success="!!item.bestResultTeam"
+                            outlined
+                            dense
+                            hide-details
+                            class="no-border"
+                            @focus="bestResultTeam = item.bestResultTeam"
+                            @input="validateValueResult($event, 'bestResultTeam')"
+                            @change="saveResults(item, 'bestResultTeam')"
+                          />
+                        </td>
+                      </template>
+                      <template v-else>
+                        <td>
+                          <v-text-field
+                            :value="item.firstResult"
+                            :success="!!item.firstResult"
+                            outlined
+                            dense
+                            hide-details
+                            :class="['no-border', {'border-yellow': item.firstResultShifted}]"
+                            @focus="firstResult = item.firstResult"
+                            @input="validateValueResult($event, 'firstResult')"
+                            @change="saveResults(item, 'firstResult', 'firstDisqualificationType')"
+                          >
+                            <template v-if="item.firstResult == '0'" v-slot:append>
+                              <v-menu style="top: -12px" offset-y>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-icon left v-bind="attrs" v-on="on">mdi-comment-alert</v-icon>
+                                </template>
+                                <v-list>
+                                  <v-list-item
+                                    v-for="(menuItem, i) in zeroValueOptions"
+                                    :key="i"
+                                    @click="saveResults(item, 'firstResult', 'firstDisqualificationType', menuItem.value)"
+                                  >
+                                    <v-list-item-title :class="{'red--text': item.firstDisqualificationType === menuItem.value}">
+                                      {{ menuItem.text }}
+                                    </v-list-item-title>
+                                  </v-list-item>
+                                </v-list>
+                              </v-menu>
                             </template>
-                            <v-list>
-                              <v-list-item
-                                v-for="(menuItem, i) in zeroValueOptions"
-                                :key="i"
-                                @click="saveResults(item, 'firstResult', 'firstDisqualificationType', menuItem.value)"
-                              >
-                                <v-list-item-title :class="{'red--text': item.firstDisqualificationType === menuItem.value}">
-                                  {{ menuItem.text }}
-                                </v-list-item-title>
-                              </v-list-item>
-                            </v-list>
-                          </v-menu>
-                        </template>
-                      </v-text-field>
-                    </td>
-                    <td>
-                      <v-text-field
-                        :value="item.secondResult"
-                        :success="!!item.secondResult"
-                        outlined
-                        dense
-                        hide-details
-                        :class="['no-border protocols-value-input', {'border-yellow': item.secondResultShifted}]"
-                        @focus="secondResult = item.secondResult"
-                        @input="validateValueResult($event, 'secondResult')"
-                        @change="saveResults(item, 'secondResult', 'secondDisqualificationType')"
-                      >
-                        <template v-if="item.secondResult == '0'" v-slot:append>
-                          <v-menu style="top: -12px" offset-y>
-                            <template v-slot:activator="{ on, attrs }">
-                                <v-icon left v-bind="attrs" v-on="on">mdi-comment-alert</v-icon>
+                          </v-text-field>
+                        </td>
+                        <td>
+                          <v-text-field
+                            :value="item.secondResult"
+                            :success="!!item.secondResult"
+                            outlined
+                            dense
+                            hide-details
+                            :class="['no-border protocols-value-input', {'border-yellow': item.secondResultShifted}]"
+                            @focus="secondResult = item.secondResult"
+                            @input="validateValueResult($event, 'secondResult')"
+                            @change="saveResults(item, 'secondResult', 'secondDisqualificationType')"
+                          >
+                            <template v-if="item.secondResult == '0'" v-slot:append>
+                              <v-menu style="top: -12px" offset-y>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-icon left v-bind="attrs" v-on="on">mdi-comment-alert</v-icon>
+                                </template>
+                                <v-list>
+                                  <v-list-item
+                                    v-for="(menuItem, i) in zeroValueOptions"
+                                    :key="i"
+                                    @click="saveResults(item, 'secondResult', 'secondDisqualificationType', menuItem.value)"
+                                  >
+                                    <v-list-item-title :class="{'red--text': item.secondDisqualificationType === menuItem.value}">
+                                      {{ menuItem.text }}
+                                    </v-list-item-title>
+                                  </v-list-item>
+                                </v-list>
+                              </v-menu>
                             </template>
-                            <v-list>
-                              <v-list-item
-                                v-for="(menuItem, i) in zeroValueOptions"
-                                :key="i"
-                                @click="saveResults(item, 'secondResult', 'secondDisqualificationType', menuItem.value)"
-                              >
-                                <v-list-item-title :class="{'red--text': item.secondDisqualificationType === menuItem.value}">
-                                  {{ menuItem.text }}
-                                </v-list-item-title>
-                              </v-list-item>
-                            </v-list>
-                          </v-menu>
-                        </template>
-                      </v-text-field>
-                    </td>
-                    <td>
-                      {{ item.bestResult }}
-                    </td>
+                          </v-text-field>
+                        </td>
+                        <td>
+                          {{ item.bestResult }}
+                        </td>
+                      </template>
                     </template>
                   </template>
                   <template v-if="stepper == 2">
@@ -315,32 +336,34 @@
           </v-col>
           <v-col cols="5">
             <v-sheet :color="'rgba(0, 0, 0, 0.35)'" class="pa-2 white--text" style="position: sticky; top: 5px;">
-              <h4 class="text-center">Кращі результати</h4>
-              <v-data-table
-                :headers="bestResultsHeaders"
-                :items="bestParticipants"
-                disable-pagination
-                disable-sort
-                hide-default-footer
-              >
-                <template #item="{ item, index }">
-                  <tr>
-                    <td>
-                      {{ index + 1 }}
-                    </td>
-                    <td>
-                      {{ item.participantFullName }}
-                      <v-icon v-if="item.personal" color="red">mdi-account-multiple</v-icon>
-                    </td>
-                    <td>
-                      {{ item.participantTeamName }}
-                    </td>
-                    <td>
-                      {{ item.bestResult }}
-                    </td>
-                  </tr>
-                </template>
-              </v-data-table>
+              <template v-if="!isRelay">
+                <h4 class="text-center">Кращі результати</h4>
+                <v-data-table
+                  :headers="bestResultsHeaders"
+                  :items="bestParticipants"
+                  disable-pagination
+                  disable-sort
+                  hide-default-footer
+                >
+                  <template #item="{ item, index }">
+                    <tr>
+                      <td>
+                        {{ index + 1 }}
+                      </td>
+                      <td>
+                        {{ item.participantFullName }}
+                        <v-icon v-if="item.personal" color="red">mdi-account-multiple</v-icon>
+                      </td>
+                      <td>
+                        {{ item.participantTeamName }}
+                      </td>
+                      <td>
+                        {{ item.bestResult }}
+                      </td>
+                    </tr>
+                  </template>
+                </v-data-table>
+              </template>
               <v-row class="mt-1">
                 <v-col cols="6">
                   <h4 class="text-center text-no-wrap">Командна першість по виду
@@ -506,6 +529,9 @@ export default {
     isDueling() {
       return this.activeCompetitionType.sportType === 'DUELING'
     },
+    isRelay() {
+      return this.activeCompetitionType.sportType === 'RELAY'
+    },
     isDuelingReadyfToBeStarted() {
       const relatedCompetitions = this.competitionReferences.filter(({ sportType }) => ['ASSAULT_LADDER', 'HUNDRED_METER'].includes(sportType))
       console.warn('HERE',relatedCompetitions)
@@ -514,13 +540,18 @@ export default {
     participantHeaders() {
       const status = this.stepper;
       const headers = [];
-      const isDueling = this.isDueling;
+      const [isRelay, isDueling] = [this.isRelay, this.isDueling];
       if (status == 1) {
-        if (!isDueling) {
-        headers.push(
-          { text: 'Забіг', value: 'roadNumber', width: '60px' },
-          { text: 'Доріж.', value: 'trackNumber', width: '60px' },
-        )
+        if (isRelay) {
+          headers.push(
+            { text: 'Забіг', value: 'raceNumber', width: '60px' },
+            { text: 'Доріж.', value: 'trackNumber', width: '60px' },
+          )
+        } else if (!isDueling) {
+          headers.push(
+            { text: 'Забіг', value: 'roadNumber', width: '60px' },
+            { text: 'Доріж.', value: 'trackNumber', width: '60px' },
+          )
         }
       }
       if (status == 2) {
@@ -536,20 +567,31 @@ export default {
         )
       }
 
+      if (!isRelay) {
+        headers.push(
+          { text: '№ учас.', value: 'participantNumber', width: '60px' },
+          { text: 'Звання/розряд', value: 'participantCategory', width: '60px'  },
+          { text: 'Імя та призвіще', value: 'participantFullName', width: '1fr' },
+        );
+      }
       headers.push(
-        { text: '№ учас.', value: 'participantNumber', width: '60px' },
-        { text: 'Звання/розряд', value: 'participantCategory', width: '60px'  },
-        { text: 'Імя та призвіще', value: 'participantFullName', width: '1fr' },
         { text: 'Команда', value: 'participantTeamName', width: '1fr' },
-        { text: 'Рік народж.', value: 'participantBirthday', width: '60px' },
       )
-
+      if (!isRelay) {
+        headers.push(
+          { text: 'Рік народж.', value: 'participantBirthday', width: '60px' },
+        );
+      }
       if (status == 1) {
         if (isDueling) {
           headers.push(
             { text: '100-м смуга', value: 'hundredMeterResult', width: '80px'  },
             { text: this.competitionTranslations.ASSAULT_LADDER, value: 'assaultLadderResult', width: '80px'  },
             { text: 'Сума', value: 'duelingResult', width: '80px'  }
+          )
+        } else if(isRelay) {
+          headers.push(
+            { text: 'Результати', value: 'bestResultTeam', width: '100px'  },
           )
         } else {
           headers.push(
@@ -710,6 +752,9 @@ export default {
         if (this.isDueling) {
           stepper = 1;
           request = await this.axios.get(`private/competition-types/${this.competitionType}/dueling-results`);
+        } else if (this.isRelay) {
+          stepper = 1;
+          request = await this.axios.get(`private/competition-types/${this.competitionType}/start-team-race-list`);
         } else if (status === 'ACTIVE') {
           stepper = 1;
           request = await this.axios.get(`private/competition-types/${this.competitionType}/start-race-list`);
@@ -744,7 +789,9 @@ export default {
         })
     },
     async saveResults(participant, key, disqualifiedKey = null, disqualifiedValue = null) {
-      const raceReference = participant.raceReference;
+      const isRelay = this.isRelay;
+      
+      const raceReference = isRelay ? participant.reference : participant.raceReference;
       if (!raceReference) return Promise.reject('Incorrect raceReference for saving');
        
       let result = key in this ? `${this[key]}`.trim().replaceAll(',','.') : '';
@@ -761,17 +808,17 @@ export default {
         if (result.split('.')[1].length < 2) result = result + '0'; 
       }
 
-      const foundIndex = this.participants.findIndex(({ participantReference }) => participantReference === participant.participantReference)
+      const foundIndex = this.participants.findIndex((item) => item[isRelay ? 'reference' : 'participantReference'] === participant[isRelay ? 'reference' : 'participantReference'])
       const shiftedKey = this.shiftedValueKey(key);
 
       let reqData = {
-        participantReference: participant.participantReference,
         [key]: result,
-        [disqualifiedKey]: disqualifiedValue
       };
       if (shiftedKey) reqData[shiftedKey] = this[shiftedKey];
+      if (!isRelay) reqData[disqualifiedKey] = disqualifiedValue;
+      if (!isRelay) reqData.participantReference = participant.participantReference;
 
-      return this.axios.patch(`private/competition-types/races/${raceReference}/save-results`, reqData)
+      return this.axios.patch(`private/competition-types/${isRelay ? 'team-races' : 'races'}/${raceReference}/save-results`, reqData)
         .then(({data = {}}) => {
           // directly saving new properties (since most of other properties returned are null)
           this.$set(this.participants, foundIndex, {
@@ -787,9 +834,10 @@ export default {
             firstDisqualificationType: data.firstDisqualificationType,
             secondDisqualificationType: data.secondDisqualificationType,
             finalResultShifted: data.finalResultShifted,
-            halFinalResultShifted: data.halFinalResultShifted,
+            halfFinalResultShifted: data.halfFinalResultShifted,
             firstResultShifted: data.firstResultShifted,
-            secondResultShifted: data.secondResultShifted
+            secondResultShifted: data.secondResultShifted,
+            bestResultTeam: data.bestResultTeam
            });
            // refetch best results
            this.getBestResults();

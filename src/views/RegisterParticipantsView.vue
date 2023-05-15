@@ -98,7 +98,22 @@
                             <td v-for="(sportType, referenceIndex) in sportTypeHeaders" :key="referenceIndex">
                                 <div class="d-flex align-center">
                                 <v-text-field
-                                    v-if="sportType.value!== 'COMBAT_DEPLOYMENT'"
+                                    v-if="sportType.value === 'RELAY'"
+                                    :error="activeErrorId === `sportTypePos-${index}-${referenceIndex}`"
+                                    :success="activeSuccessId === `sportTypePos-${index}-${referenceIndex}`"
+                                    :value="showParticipantPosition(item, sportType.value, 'startingPosition')"
+                                    :rules="[isRelayValue]"
+                                    outlined
+                                    dense
+                                    hide-details
+                                    class="no-border"
+                                    placeholder="Формат: d/d"
+                                    @focus="sportTypePos = showParticipantPosition(item, sportType.value, 'startingPosition')"
+                                    @input="sportTypePos = $event"
+                                    @change="validateParticipantPositionUpdate(item, sportType.value, 'startingPosition', `sportTypePos-${index}-${referenceIndex}`)"
+                                />
+                                <v-text-field
+                                    v-else-if="sportType.value!== 'COMBAT_DEPLOYMENT'"
                                     :error="activeErrorId === `sportTypePos-${index}-${referenceIndex}`"
                                     :success="activeSuccessId === `sportTypePos-${index}-${referenceIndex}`"
                                     :value="showParticipantPosition(item, sportType.value, 'startingPosition')"
@@ -207,6 +222,10 @@ export default {
             personalValue: false,
             max100chars: v => v.length <= 100 || 'Input too long!',
             isNumeric: v => !isNaN(v),
+            isRelayValue: v => {
+                const reg = /\d\/\d/g;
+                return !!v && !!v.match(reg) || 'Формат число/число';
+            },
             participantCategoryItems: [
                 {categoryName: 'КМС', categoryId: 'CMS'},
                 {categoryName: 'МС', categoryId: 'MS'},
