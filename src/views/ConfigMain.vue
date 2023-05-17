@@ -273,7 +273,7 @@ export default {
       ],
       sportTypesOptions: [
         {
-          id: 'HUNDRED_METER', name: '100 метрова полоса'
+          id: 'HUNDRED_METER', name: '100 метрова смуга'
         }, 
         {
           id: 'ASSAULT_LADDER', name: 'Штурмова драбина'

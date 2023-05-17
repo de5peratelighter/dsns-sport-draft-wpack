@@ -134,7 +134,7 @@ export default {
       newItemTime: '',
       competitionItems: [
         {
-          value: 'one_hundred_meters', text: '100 метрова полоса'
+          value: 'one_hundred_meters', text: '100 метрова смуга'
         }, 
         {
           value: 'assault_ladder', text: 'Штурмова драбина'

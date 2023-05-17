@@ -153,8 +153,8 @@
                   <template v-else>
                     <td style="display:grid;grid-column: 3/6;">
                       <div v-for="(subitem,subItemIndex) in item.teamParticipants" :key="subItemIndex" class="protocols-sub-item">
-                        <div>{{ subitem.birthday ? subitem.birthday.slice(0,4) : '' }}</div>
                         <div>{{ participantCategoryTranslations[subitem.participantCategory] }}</div>
+                        <div>{{ subitem.birthday ? subitem.birthday.slice(0,4) : '' }}</div>
                         <div>{{ subitem.fullName }}</div>
                       </div>
                     </td>
@@ -179,14 +179,34 @@
                           <v-text-field
                             :value="item.bestResultTeam"
                             :success="!!item.bestResultTeam"
+                            :suffix="item.relayResultShifted ? plusValueOffset : null"
                             outlined
                             dense
                             hide-details
-                            class="no-border"
+                            :class="['no-border', {'border-yellow': item.relayResultShifted}]"
                             @focus="bestResultTeam = item.bestResultTeam"
                             @input="validateValueResult($event, 'bestResultTeam')"
-                            @change="saveResults(item, 'bestResultTeam')"
-                          />
+                            @change="saveResults(item, 'bestResultTeam', 'relayDisqualificationType')"
+                          >
+                            <template v-if="item.bestResultTeam == '0'" v-slot:append>
+                              <v-menu style="top: -12px" offset-y>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-icon left v-bind="attrs" v-on="on">mdi-comment-alert</v-icon>
+                                </template>
+                                <v-list>
+                                  <v-list-item
+                                    v-for="(menuItem, i) in zeroValueOptions"
+                                    :key="i"
+                                    @click="saveResults(item, 'bestResultTeam', 'relayDisqualificationType', menuItem.value)"
+                                  >
+                                    <v-list-item-title :class="{'red--text': item.relayDisqualificationType === menuItem.value}">
+                                      {{ menuItem.text }}
+                                    </v-list-item-title>
+                                  </v-list-item>
+                                </v-list>
+                              </v-menu>
+                            </template>
+                          </v-text-field>
                         </td>
                       </template>
                       <template v-else>
@@ -490,7 +510,8 @@ export default {
       firstResultShifted: false,
       secondResultShifted: false,
       halfFinalResultShifted: false,
-      finalResultShifted: false
+      finalResultShifted: false,
+      relayResultShifted: false
     }
   },
   computed: {
@@ -510,7 +531,7 @@ export default {
     competitionTranslations() {
       return {
         ASSAULT_LADDER: 'Штурмова драбина', 
-        HUNDRED_METER: '100 метрова полоса',
+        HUNDRED_METER: '100 метрова смуга',
         DUELING: 'Двоборство',
         RETRACTABLE_LADDER: 'Висувна драбина',
         RELAY: 'Пожежна естафета',
@@ -766,7 +787,7 @@ export default {
           request = await this.axios.get(`private/competition-types/${this.competitionType}/dueling-results`);
         } else if (this.isRelay) {
           stepper = 1;
-          request = await this.axios.get(`private/competition-types/${this.competitionType}/start-team-race-list`);
+          request = await this.axios.get(`private/competition-types/${this.competitionType}/start-team-race-list?sort=bestResultTeam,ASC`);
         } else if (status === 'ACTIVE') {
           stepper = 1;
           request = await this.axios.get(`private/competition-types/${this.competitionType}/start-race-list`);
@@ -789,7 +810,7 @@ export default {
       }
     },
     async fetchteamResultsByType () {
-      return this.axios.post(`private/teams/competition-types/${this.competitionType}/generate-race-result`)
+      return this.axios.post(`private/teams/competition-types/${this.competitionType}/generate-race-result${this.isRelay ? '&sort=bestResultTeam,ASC': ''}`)
         .then(({ data }) => {
           this.teamResultsByType = data;
         })
@@ -821,13 +842,13 @@ export default {
       }
 
       const foundIndex = this.participants.findIndex((item) => item[isRelay ? 'reference' : 'participantReference'] === participant[isRelay ? 'reference' : 'participantReference'])
-      const shiftedKey = this.shiftedValueKey(key);
+      const shiftedKey = this.shiftedValueKey(this.isRelay ? 'relayResult' : key);
 
       let reqData = {
         [key]: result,
+        [disqualifiedKey]: disqualifiedValue
       };
       if (shiftedKey) reqData[shiftedKey] = this[shiftedKey];
-      if (!isRelay) reqData[disqualifiedKey] = disqualifiedValue;
       if (!isRelay) reqData.participantReference = participant.participantReference;
 
       return this.axios.patch(`private/competition-types/${isRelay ? 'team-races' : 'races'}/${raceReference}/save-results`, reqData)
@@ -849,7 +870,9 @@ export default {
             halfFinalResultShifted: data.halfFinalResultShifted,
             firstResultShifted: data.firstResultShifted,
             secondResultShifted: data.secondResultShifted,
-            bestResultTeam: data.bestResultTeam
+            bestResultTeam: data.bestResultTeam,
+            relayDisqualificationType: data.relayDisqualificationType,
+            relayResultShifted: data.relayResultShifted
            });
            // refetch best results
            this.getBestResults();
@@ -865,7 +888,7 @@ export default {
     },
     validateValueResult(value, key) {
       if (key in this) {
-        const shiftedKey = this.shiftedValueKey(key);
+        const shiftedKey = this.shiftedValueKey(this.isRelay ? 'relayResult' : key);
         
         if (value.includes('+')) {
           this[key] = `${Number(value.replace('+', '')) + Number(this.plusValueOffset)}`;

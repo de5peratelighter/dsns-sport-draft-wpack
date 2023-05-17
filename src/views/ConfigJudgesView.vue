@@ -148,7 +148,7 @@ export default {
       };
       const competitionJudgesTypes = {
         JUDGE_ASSAULT_LADDER: 'Штурмова драбина', 
-        JUDGE_HUNDRED_METER: '100 метрова полоса',
+        JUDGE_HUNDRED_METER: '100 метрова смуга',
         JUDGE_DUELING: 'Двоборство',
         JUDGE_RETRACTABLE_LADDER: 'Висувна драбина',
         JUDGE_RELAY: 'Пожежна естафета',
@@ -156,7 +156,7 @@ export default {
       };
       const competitionAssistJudgesTypes = {
         ASSISTANCE_ASSAULT_LADDER: 'Штурмова драбина', 
-        ASSISTANCE_HUNDRED_METER: '100 метрова полоса',
+        ASSISTANCE_HUNDRED_METER: '100 метрова смуга',
         ASSISTANCE_DUELING: 'Двоборство',
         ASSISTANCE_RETRACTABLE_LADDER: 'Висувна драбина',
         ASSISTANCE_RELAY: 'Пожежна естафета',

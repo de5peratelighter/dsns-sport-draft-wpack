@@ -123,7 +123,7 @@ export default {
     competitionTranslations() {
       return {
         ASSAULT_LADDER: 'Штурмова драбина', 
-        HUNDRED_METER: '100 метрова полоса',
+        HUNDRED_METER: '100 метрова смуга',
         DUELING: 'Двоборство',
         RETRACTABLE_LADDER: 'Висувна драбина',
         RELAY: 'Пожежна естафета',

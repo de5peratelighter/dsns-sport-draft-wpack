@@ -98,7 +98,7 @@
                             <td v-for="(sportType, referenceIndex) in sportTypeHeaders" :key="referenceIndex">
                                 <div class="d-flex align-center">
                                 <v-text-field
-                                    v-if="sportType.value === 'RELAY'"
+                                    v-if="sportType.value === 'RELAY' || sportType.value === 'COMBAT_DEPLOYMENT'"
                                     :error="activeErrorId === `sportTypePos-${index}-${referenceIndex}`"
                                     :success="activeSuccessId === `sportTypePos-${index}-${referenceIndex}`"
                                     :value="showParticipantPosition(item, sportType.value, 'startingPosition')"
@@ -113,7 +113,7 @@
                                     @change="validateParticipantPositionUpdate(item, sportType.value, 'startingPosition', `sportTypePos-${index}-${referenceIndex}`)"
                                 />
                                 <v-text-field
-                                    v-else-if="sportType.value!== 'COMBAT_DEPLOYMENT'"
+                                    v-else
                                     :error="activeErrorId === `sportTypePos-${index}-${referenceIndex}`"
                                     :success="activeSuccessId === `sportTypePos-${index}-${referenceIndex}`"
                                     :value="showParticipantPosition(item, sportType.value, 'startingPosition')"
@@ -125,13 +125,6 @@
                                     @focus="sportTypePos = showParticipantPosition(item, sportType.value, 'startingPosition')"
                                     @input="sportTypePos = $event"
                                     @change="validateParticipantPositionUpdate(item, sportType.value, 'startingPosition', `sportTypePos-${index}-${referenceIndex}`)"
-                                />
-                                
-                                <v-simple-checkbox
-                                    v-else
-                                    color="primary"
-                                    :value="!!showParticipantPosition(item, sportType.value, 'startingPosition')"
-                                    @input="validateParticipantPositionUpdate(item, sportType.value, 'startingPosition')"
                                 />
                                 
                                 <!-- Особ чекбокс -->
@@ -272,7 +265,7 @@ export default {
         sportTypeHeaders() {
             const mapper = {
                 ASSAULT_LADDER: 'Штурмова драбина',
-                HUNDRED_METER: '100 метрова полоса',
+                HUNDRED_METER: '100 метрова смуга',
                 DUELING: 'Двоборство',
                 RETRACTABLE_LADDER: 'Висувна драбина',
                 RELAY: 'Пожежна естафета',
