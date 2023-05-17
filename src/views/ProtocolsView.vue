@@ -664,6 +664,10 @@ export default {
           {
             text: 'Ствол на фініші',
             value: 'BARREL_FINISH_LINE'
+          },
+          {
+            text: 'Не зєднані рукава між собою',
+            value: 'NO_BRANCHING'
           }]
       } else if (activeType === 'ASSAULT_LADDER') {
         typeSpecializedOptions = [{
@@ -677,6 +681,14 @@ export default {
           }, {
             text: 'Деко',
             value: 'DECO'
+          },
+          {
+            text: 'Розгалуження',
+            value: 'BRANCHING'
+          },
+          {
+            text: 'Не зєднані рукава між собою',
+            value: 'NO_BRANCHING'
           }]
       } else if (activeType === 'COMBAT_DEPLOYMENT') {
         typeSpecializedOptions = [{
@@ -686,6 +698,10 @@ export default {
           {
             text: 'Розрив рукава',
             value: 'SLEEFE_TEAR'
+          },
+          {
+            text: 'Не зднана сітка',
+            value: 'NOT_CONNECTED_GRID'
           }]
       }
       return [
