@@ -209,6 +209,75 @@
                           </v-text-field>
                         </td>
                       </template>
+                      <template v-else-if="isCombatDeployment">
+                        <td>
+                          <v-text-field
+                            :value="item.firstTeamResult"
+                            :success="!!item.firstTeamResult"
+                            outlined
+                            dense
+                            hide-details
+                            :class="['no-border', {'border-yellow': item.firstTeamResultShifted}]"
+                            @focus="firstTeamResult = item.firstTeamResult"
+                            @input="validateValueResult($event, 'firstTeamResult')"
+                            @change="saveResults(item, 'firstTeamResult', 'firstDisqualificationType')"
+                          >
+                            <template v-if="item.firstTeamResult == '0'" v-slot:append>
+                              <v-menu style="top: -12px" offset-y>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-icon left v-bind="attrs" v-on="on">mdi-comment-alert</v-icon>
+                                </template>
+                                <v-list>
+                                  <v-list-item
+                                    v-for="(menuItem, i) in zeroValueOptions"
+                                    :key="i"
+                                    @click="saveResults(item, 'firstTeamResult', 'firstDisqualificationType', menuItem.value)"
+                                  >
+                                    <v-list-item-title :class="{'red--text': item.firstDisqualificationType === menuItem.value}">
+                                      {{ menuItem.text }}
+                                    </v-list-item-title>
+                                  </v-list-item>
+                                </v-list>
+                              </v-menu>
+                            </template>
+                          </v-text-field>
+                        </td>
+                        <td>
+                          <v-text-field
+                            :value="item.secondTeamResult"
+                            :success="!!item.secondTeamResult"
+                            outlined
+                            dense
+                            hide-details
+                            :class="['no-border', {'border-yellow': item.secondTeamResultShifted}]"
+                            @focus="secondTeamResult = item.secondTeamResult"
+                            @input="validateValueResult($event, 'secondTeamResult')"
+                            @change="saveResults(item, 'secondTeamResult', 'secondDisqualificationType')"
+                          >
+                            <template v-if="item.secondTeamResult == '0'" v-slot:append>
+                              <v-menu style="top: -12px" offset-y>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-icon left v-bind="attrs" v-on="on">mdi-comment-alert</v-icon>
+                                </template>
+                                <v-list>
+                                  <v-list-item
+                                    v-for="(menuItem, i) in zeroValueOptions"
+                                    :key="i"
+                                    @click="saveResults(item, 'secondTeamResult', 'secondDisqualificationType', menuItem.value)"
+                                  >
+                                    <v-list-item-title :class="{'red--text': item.secondDisqualificationType === menuItem.value}">
+                                      {{ menuItem.text }}
+                                    </v-list-item-title>
+                                  </v-list-item>
+                                </v-list>
+                              </v-menu>
+                            </template>
+                          </v-text-field>
+                        </td>
+                        <td>
+                          {{ item.bestResultTeam }}
+                        </td>
+                      </template>
                       <template v-else>
                         <td>
                           <v-text-field
@@ -506,12 +575,16 @@ export default {
       secondResult: 0,
       halfFinalResult: 0,
       finalResult: 0,
+      firstTeamResult: 0,
+      secondTeamResult: 0,
 
       firstResultShifted: false,
       secondResultShifted: false,
       halfFinalResultShifted: false,
       finalResultShifted: false,
-      relayResultShifted: false
+      relayResultShifted: false,
+      secondTeamResultShifted: false,
+      firstTeamResultShifted: false,
     }
   },
   computed: {
@@ -841,6 +914,7 @@ export default {
         })
     },
     async saveResults(participant, key, disqualifiedKey = null, disqualifiedValue = null) {
+      console.warn(participant)
       const [isRelay, isCombatDeployment] = [this.isRelay, this.isCombatDeployment];
       
       const raceReference = isRelay || isCombatDeployment ? participant.reference : participant.raceReference;
@@ -871,7 +945,7 @@ export default {
       if (shiftedKey) reqData[shiftedKey] = this[shiftedKey];
       if (!isRelay) reqData.participantReference = participant.participantReference;
 
-      return this.axios.patch(`private/competition-types/${isRelay ? 'team-races' : 'races'}/${raceReference}/save-results`, reqData)
+      return this.axios.patch(`private/competition-types/${isRelay || isCombatDeployment ? 'team-races' : 'races'}/${raceReference}/save-results`, reqData)
         .then(({data = {}}) => {
           // directly saving new properties (since most of other properties returned are null)
           this.$set(this.participants, foundIndex, {
@@ -891,6 +965,10 @@ export default {
             firstResultShifted: data.firstResultShifted,
             secondResultShifted: data.secondResultShifted,
             bestResultTeam: data.bestResultTeam,
+            firstTeamResult: data.firstTeamResult,
+            bestResultTeam: data.bestResultTeam,
+            firstTeamResultShifted: data.firstTeamResultShifted,
+            secondTeamResulShiftedt: data.secondTeamResultShifted,
             relayDisqualificationType: data.relayDisqualificationType,
             relayResultShifted: data.relayResultShifted
            });
