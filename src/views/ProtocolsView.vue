@@ -50,7 +50,7 @@
                   </span>
                 </v-stepper-step>
 
-                <template v-if="!isDueling && !isRelay">
+                <template v-if="!isDueling && !isRelay && !isCombatDeployment">
                 <v-divider></v-divider>
 
                 <v-stepper-step
@@ -110,8 +110,8 @@
               class="protocols-table"
             >
               <template #item="{ item, index }">
-                <tr :class="{ 'tr-height-extended': isRelay, 'tr-odd': isRelay ? index % 2 : item[stepper == 1 ? 'trackNumber' : stepper == 2 ? 'halfFinalTrackNumber' : 'finalTrackNumber'] % 2 === 0 }"
-                  :style="{'height': isRelay ? 'auto' : 'initial'}"
+                <tr :class="{ 'tr-height-extended': isRelay || isCombatDeployment, 'tr-odd': isRelay || isCombatDeployment ? index % 2 : item[stepper == 1 ? 'trackNumber' : stepper == 2 ? 'halfFinalTrackNumber' : 'finalTrackNumber'] % 2 === 0 }"
+                  :style="{'height': isRelay || isCombatDeployment ? 'auto' : 'initial'}"
                 >
                   <template v-if="stepper == 1">
                     <template v-if="!isDueling">
@@ -119,7 +119,7 @@
                         {{ item.trackNumber }}
                       </td>
                       <td>
-                        {{ isRelay ? item.raceNumber : item.roadNumber }}
+                        {{ isRelay || isCombatDeployment ? item.raceNumber : item.roadNumber }}
                       </td>
                     </template>
                   </template>
@@ -139,7 +139,16 @@
                       {{ item.finalRoadNumber }}
                     </td>
                   </template>
-                  <template v-if="!isRelay">
+                  <template v-if="isRelay || isCombatDeployment">
+                    <td style="display:grid;grid-column: 3/6;">
+                      <div v-for="(subitem,subItemIndex) in item.teamParticipants" :key="subItemIndex" class="protocols-sub-item">
+                        <div>{{ participantCategoryTranslations[subitem.participantCategory] }}</div>
+                        <div>{{ subitem.birthday ? subitem.birthday.slice(0,4) : '' }}</div>
+                        <div>{{ subitem.fullName }}</div>
+                      </div>
+                    </td>
+                  </template>
+                  <template v-else>
                     <td>
                       {{ item.participantNumber }}
                     </td>
@@ -150,22 +159,13 @@
                       {{ item.participantBirthday ? item.participantBirthday.slice(0,4) : '' }}
                     </td>
                   </template>
-                  <template v-else>
-                    <td style="display:grid;grid-column: 3/6;">
-                      <div v-for="(subitem,subItemIndex) in item.teamParticipants" :key="subItemIndex" class="protocols-sub-item">
-                        <div>{{ participantCategoryTranslations[subitem.participantCategory] }}</div>
-                        <div>{{ subitem.birthday ? subitem.birthday.slice(0,4) : '' }}</div>
-                        <div>{{ subitem.fullName }}</div>
-                      </div>
-                    </td>
-                  </template>
-                  <template v-if="!isRelay">
+                  <template v-if="!isRelay && !isCombatDeployment">
                     <td>
                       {{ item.participantFullName }}
                     </td>
                   </template>
                   <td>
-                    {{ isRelay ? item.teamName : item.participantTeamName }}
+                    {{ isRelay || isCombatDeployment ? item.teamName : item.participantTeamName }}
                   </td>
                   <template v-if="stepper == 1">
                     <template v-if="isDueling">
@@ -367,7 +367,7 @@
           </v-col>
           <v-col cols="5">
             <v-sheet :color="'rgba(0, 0, 0, 0.35)'" class="pa-2 white--text" style="position: sticky; top: 5px;">
-              <template v-if="!isRelay">
+              <template v-if="!isRelay && !isCombatDeployment">
                 <h4 class="text-center">Кращі результати</h4>
                 <v-data-table
                   :headers="bestResultsHeaders"
@@ -564,6 +564,9 @@ export default {
     isRelay() {
       return this.activeCompetitionType.sportType === 'RELAY'
     },
+    isCombatDeployment() {
+      return this.activeCompetitionType.sportType === 'COMBAT_DEPLOYMENT';
+    },
     isDuelingReadyfToBeStarted() {
       const relatedCompetitions = this.competitionReferences.filter(({ sportType }) => ['ASSAULT_LADDER', 'HUNDRED_METER'].includes(sportType))
       console.warn('HERE',relatedCompetitions)
@@ -572,9 +575,9 @@ export default {
     participantHeaders() {
       const status = this.stepper;
       const headers = [];
-      const [isRelay, isDueling] = [this.isRelay, this.isDueling];
+      const [isRelay, isDueling, isCombatDeployment] = [this.isRelay, this.isDueling, this.isCombatDeployment];
       if (status == 1) {
-        if (isRelay) {
+        if (isRelay || isCombatDeployment) {
           headers.push(
             { text: 'Забіг', value: 'raceNumber', width: '60px' },
             { text: 'Доріж.', value: 'trackNumber', width: '60px' },
@@ -599,7 +602,7 @@ export default {
         )
       }
 
-      if (isRelay) {
+      if (isRelay || isCombatDeployment) {
         headers.push(
           { text: 'Звання/розряд', value: 'participantCategory', width: '60px'  },
           { text: 'Рік народж.', value: 'participantBirthday', width: '60px' }
@@ -801,7 +804,7 @@ export default {
         if (this.isDueling) {
           stepper = 1;
           request = await this.axios.get(`private/competition-types/${this.competitionType}/dueling-results`);
-        } else if (this.isRelay) {
+        } else if (this.isRelay || this.isCombatDeployment) {
           stepper = 1;
           request = await this.axios.get(`private/competition-types/${this.competitionType}/start-team-race-list?sort=bestResultTeam,ASC`);
         } else if (status === 'ACTIVE') {
@@ -838,9 +841,9 @@ export default {
         })
     },
     async saveResults(participant, key, disqualifiedKey = null, disqualifiedValue = null) {
-      const isRelay = this.isRelay;
+      const [isRelay, isCombatDeployment] = [this.isRelay, this.isCombatDeployment];
       
-      const raceReference = isRelay ? participant.reference : participant.raceReference;
+      const raceReference = isRelay || isCombatDeployment ? participant.reference : participant.raceReference;
       if (!raceReference) return Promise.reject('Incorrect raceReference for saving');
        
       let result = key in this ? `${this[key]}`.trim().replaceAll(',','.') : '';
@@ -857,8 +860,9 @@ export default {
         if (result.split('.')[1].length < 2) result = result + '0'; 
       }
 
-      const foundIndex = this.participants.findIndex((item) => item[isRelay ? 'reference' : 'participantReference'] === participant[isRelay ? 'reference' : 'participantReference'])
-      const shiftedKey = this.shiftedValueKey(this.isRelay ? 'relayResult' : key);
+      const foundIndex = this.participants
+        .findIndex((item) => item[isRelay || isCombatDeployment ? 'reference' : 'participantReference'] === participant[isRelay || isCombatDeployment ? 'reference' : 'participantReference'])
+      const shiftedKey = this.shiftedValueKey(isRelay ? 'relayResult' : key);
 
       let reqData = {
         [key]: result,
