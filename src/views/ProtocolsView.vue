@@ -274,7 +274,7 @@
                             </template>
                           </v-text-field>
                         </td>
-                        <td>
+                        <td style="line-height: 40px;">
                           {{ item.bestResultTeam }}
                         </td>
                       </template>
@@ -470,6 +470,29 @@
                      <v-icon dark @click="fetchteamResultsByType">mdi-refresh</v-icon>
                   </h4>
                   <v-data-table
+                    v-if="isRelay || isCombatDeployment"
+                    :headers="sortedTeamResultsByTypeHeaders"
+                    :items="sortedTeamResultsByType"
+                    disable-pagination
+                    disable-sort
+                    hide-default-footer
+                  >
+                    <template #item="{ item, index }">
+                      <tr>
+                        <td>
+                          {{ index + 1}}
+                        </td>
+                        <td>
+                          {{ item.teamName }}
+                        </td>
+                        <td>
+                          {{ item.bestResult }}
+                        </td>
+                      </tr>
+                    </template>
+                  </v-data-table>
+                  <v-data-table
+                    v-else
                     :headers="teamResultsByTypeHeaders"
                     :items="teamResultsByType"
                     disable-pagination
@@ -546,11 +569,17 @@ export default {
       bestParticipants: [],
       teamResultsOverall: [],
       teamResultsByType: [],
+      sortedTeamResultsByType: [],
       bestResultsHeaders: [
         { text: '', value: 'index', width: '10%' },
         { text: 'Спортсмен', value: 'participantFullName', width: '35%' },
         { text: 'Команда', value: 'participantTeamName', width: '35%' },
         { text: 'Час, сек', value: 'bestResult', width: '20%' },
+      ],
+      sortedTeamResultsByTypeHeaders: [
+        { text: '', value: 'index', width: '10%' },
+        { text: 'Команда', value: 'teamName', width: '45%' },
+        { text: 'Час с', value: 'bestResultTeam', width: '45%' },
       ],
       teamResultsByTypeHeaders: [
         { text: '', value: 'index', width: '10%' },
@@ -642,7 +671,6 @@ export default {
     },
     isDuelingReadyfToBeStarted() {
       const relatedCompetitions = this.competitionReferences.filter(({ sportType }) => ['ASSAULT_LADDER', 'HUNDRED_METER'].includes(sportType))
-      console.warn('HERE',relatedCompetitions)
       return this.isDueling && relatedCompetitions.length && relatedCompetitions.every(({status}) => status === 'FINAL')
     },
     participantHeaders() {
@@ -873,13 +901,14 @@ export default {
       this.participants = [];
       let stepper = 0;
       let request = null;
+      // ?sort=bestResultTeam,ASC
       try {
         if (this.isDueling) {
           stepper = 1;
           request = await this.axios.get(`private/competition-types/${this.competitionType}/dueling-results`);
         } else if (this.isRelay || this.isCombatDeployment) {
           stepper = 1;
-          request = await this.axios.get(`private/competition-types/${this.competitionType}/start-team-race-list?sort=bestResultTeam,ASC`);
+          request = await this.axios.get(`private/competition-types/${this.competitionType}/start-team-race-list`);
         } else if (status === 'ACTIVE') {
           stepper = 1;
           request = await this.axios.get(`private/competition-types/${this.competitionType}/start-race-list`);
@@ -902,7 +931,13 @@ export default {
       }
     },
     async fetchteamResultsByType () {
-      return this.axios.post(`private/teams/competition-types/${this.competitionType}/generate-race-result${this.isRelay ? '&sort=bestResultTeam,ASC': ''}`)
+      if (this.isRelay || this.isCombatDeployment) {
+        return this.axios.get(`private/competition-types/${this.competitionType}/start-team-race-list?sort=bestResultTeam,ASC`)
+          .then(({ data }) => {
+            this.sortedTeamResultsByType = data;
+          })
+      }
+      return this.axios.post(`private/teams/competition-types/${this.competitionType}/generate-race-result`)
         .then(({ data }) => {
           this.teamResultsByType = data;
         })
@@ -914,9 +949,9 @@ export default {
         })
     },
     async saveResults(participant, key, disqualifiedKey = null, disqualifiedValue = null) {
-      console.warn(participant)
       const [isRelay, isCombatDeployment] = [this.isRelay, this.isCombatDeployment];
       
+      console.warn('participant', participant)
       const raceReference = isRelay || isCombatDeployment ? participant.reference : participant.raceReference;
       if (!raceReference) return Promise.reject('Incorrect raceReference for saving');
        
@@ -943,7 +978,11 @@ export default {
         [disqualifiedKey]: disqualifiedValue
       };
       if (shiftedKey) reqData[shiftedKey] = this[shiftedKey];
-      if (!isRelay) reqData.participantReference = participant.participantReference;
+      if (isRelay || isCombatDeployment) {
+        reqData.raceReference = raceReference;
+      } else {
+        reqData.participantReference = participant.participantReference;
+      }
 
       return this.axios.patch(`private/competition-types/${isRelay || isCombatDeployment ? 'team-races' : 'races'}/${raceReference}/save-results`, reqData)
         .then(({data = {}}) => {
@@ -966,7 +1005,7 @@ export default {
             secondResultShifted: data.secondResultShifted,
             bestResultTeam: data.bestResultTeam,
             firstTeamResult: data.firstTeamResult,
-            bestResultTeam: data.bestResultTeam,
+            secondTeamResult: data.secondTeamResult,
             firstTeamResultShifted: data.firstTeamResultShifted,
             secondTeamResulShiftedt: data.secondTeamResultShifted,
             relayDisqualificationType: data.relayDisqualificationType,
@@ -1036,9 +1075,8 @@ export default {
       background: rgba(0,0,0,.07);
     }
     tr.tr-height-extended {
-      padding: 0 5px;
       td {
-        padding: 10px 0!important;
+        padding: 10px 5px!important;
         align-items: baseline!important;
         height: inherit!important;
       }
