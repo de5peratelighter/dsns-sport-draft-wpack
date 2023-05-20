@@ -48,8 +48,8 @@
                   <span :class="{'text-decoration-underline': stepper === 1}">
                     Стартовий протокол
                   </span>
+                  <v-icon left class="protocols-print-icon" @click.stop.prevent="printProtocol('START_CSV', 'Стартовий протокол')">mdi-printer</v-icon>
                 </v-stepper-step>
-
                 <template v-if="!isDueling && !isRelay && !isCombatDeployment">
                 <v-divider></v-divider>
 
@@ -73,6 +73,7 @@
                   >
                     Старт
                   </v-btn>
+                  <v-icon left class="protocols-print-icon" @click.stop.prevent="printProtocol('START_HALF_FINAL_CSV', 'Пів-фінал протокол')">mdi-printer</v-icon>
                 </v-stepper-step>
 
                 <v-divider></v-divider>
@@ -95,6 +96,7 @@
                   >
                     Старт
                   </v-btn>
+                  <v-icon left class="protocols-print-icon" @click.stop.prevent="printProtocol('START_FINAL_CSV', 'Фінал протокол')">mdi-printer</v-icon>
                 </v-stepper-step>
                 </template>
               </v-stepper-header>
@@ -486,7 +488,7 @@
                           {{ item.teamName }}
                         </td>
                         <td>
-                          {{ item.bestResult }}
+                          {{ item.bestResultTeam }}
                         </td>
                       </tr>
                     </template>
@@ -948,6 +950,23 @@ export default {
           this.teamResultsOverall = data;
         })
     },
+    async printProtocol(type = 'START_CSV', suffixName) {
+      return this.axios.get(`private/competition-types/${this.competitionType}/csv/download?csvType=${type}`)
+        .then((res) => {
+          const data = res.data;
+          const blob = new Blob([data], {type: 'text/csv;charset=utf-8'});
+          const fileName = `${this.competitionTranslations[this.activeCompetitionType.sportType]}`
+          if (!blob) return;
+          const a = document.createElement('a');
+          a.download = fileName + ' - ' + suffixName + '.csv';
+          a.href = URL.createObjectURL(blob);
+          document.body.prepend(a);
+          a.style.position = 'absolute';
+          a.style.left = '-9999px'
+          a.click();
+          a.remove()
+        })
+    },
     async saveResults(participant, key, disqualifiedKey = null, disqualifiedValue = null) {
       const [isRelay, isCombatDeployment] = [this.isRelay, this.isCombatDeployment];
       
@@ -1047,6 +1066,12 @@ export default {
 <style lang="scss">
   table .v-input__slot {
     padding: 5px!important;
+  }
+  .protocols-print-icon {
+    cursor: pointer;
+    margin: 0!important;
+    height: 25px;
+    margin-top: 25px;
   }
   .protocols-value-input  {
     .v-input__append-outer{
