@@ -72,7 +72,7 @@
                                             dense
                                             hide-details
                                             class="no-border"
-                                            placeholder="dd/mm/yyy"
+                                            placeholder="dd.mm.yyy"
                                             @focus="birthday = item.birthday"
                                             @input="birthday = $event"
                                             @change="validateParticipantUpdate(item, 'birthday', `birthday-${index}`)"
@@ -80,7 +80,7 @@
                                             v-on="on"
                                         />
                                     </template>
-                                    <span>Формат дати: dd/mm/yyy </span>
+                                    <span>Формат дати: dd.mm.yyy </span>
                                 </v-tooltip>
                             </td>
                             <!-- <td>

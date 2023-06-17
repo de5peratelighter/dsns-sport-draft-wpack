@@ -34,42 +34,88 @@
       <template v-if="activeCompetitionType">
         <v-col cols="7" class="pr-0">
           <v-sheet :color="'rgba(0, 0, 0, 0.35)'" class="pa-2 white--text">
-            <div class="d-flex justify-center mb-2"> 
-            <h4 class="text-center">
-              {{ activeCompetitionType ? `${competitionTranslations[activeCompetitionType.sportType]}` : '' }}
-            </h4>
-            <v-menu>
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                  color="primary"
-                  dark
-                  small
-                  v-bind="attrs" v-on="on"
-                  class="ml-2"
-                >
-                  Друк
-                  <v-icon
-                    dark
-                    right
-                  >
-                  mdi-printer
-                  </v-icon>
-                </v-btn>
-                  
-              </template>
-              <v-list>
-                <v-list-item
-                  v-for="(menuItem, i) in printOptions"
-                  :key="i"
-                  @click="printProtocol(menuItem)"
-                >
-                  <v-list-item-title>
-                    {{ menuItem.text }}
-                  </v-list-item-title>
-                </v-list-item>
-              </v-list>
-            </v-menu>
-            </div>
+            <v-expansion-panels accordion>
+              <v-expansion-panel>
+                <v-expansion-panel-header style="padding: 0 15px;">
+                  <h4 class="text-center">
+                    {{ activeCompetitionType ? `${competitionTranslations[activeCompetitionType.sportType]}` : '' }}
+                  <v-menu>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-btn
+                        color="primary"
+                        dark
+                        small
+                        v-bind="attrs" v-on="on"
+                        class="ml-2"
+                      >
+                        Друк
+                        <v-icon
+                          dark
+                          right
+                        >
+                        mdi-printer
+                        </v-icon>
+                      </v-btn>
+                        
+                    </template>
+                    <v-list>
+                      <v-list-item
+                        v-for="(menuItem, i) in printOptions"
+                        :key="i"
+                        @click="printProtocol(menuItem)"
+                      >
+                        <v-list-item-title>
+                          {{ menuItem.text }}
+                        </v-list-item-title>
+                      </v-list-item>
+                    </v-list>
+                  </v-menu>
+                </h4>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content style="pointer-events: none">
+                  <div class="d-flex justify-space-between align-center"> 
+                    <div class="mr-1">Легенда:</div>
+                    <v-text-field
+                      :value="'Збережений результат'"
+                      success
+                      outlined
+                      dense
+                      hide-details
+                      class="no-border mr-1"
+                    />
+                    <v-text-field
+                      :value="'Результат з руч. хронометражем'"
+                      outlined
+                      dense
+                      hide-details
+                      suffix="0.24"
+                      class="border-yellow mr-1"
+                      style="border: 1px solid darkorange"
+                    />
+                    <v-text-field
+                      value="Дискваліфікований"
+                      outlined
+                      dense
+                      hide-details
+                    >
+                      <template v-slot:append>
+                        <v-menu style="top: -12px" offset-y>
+                          <template v-slot:activator="{ on, attrs }">
+                              <v-icon left v-bind="attrs" v-on="on">mdi-comment-alert</v-icon>
+                          </template>
+                          <v-list>
+                            <v-list-item>
+                              <v-list-item-title class="red--text" />
+                            </v-list-item>
+                          </v-list>
+                        </v-menu>
+                      </template>
+                    </v-text-field>
+                  </div>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+            </v-expansion-panels> 
+            
             <v-stepper v-model="stepper" non-linear style="position: sticky; top: 0; z-index: 1">
               <v-stepper-header>
                 <v-stepper-step
@@ -82,6 +128,7 @@
                 >
                   <span :class="{'text-decoration-underline': stepper === 1}">
                     Стартовий протокол
+                    <v-icon left class="ml-1" color="red" @click.stop.prevent="restoreCompetition('INACTIVE')">mdi-history</v-icon>
                   </span>
                 </v-stepper-step>
                 <template v-if="!isDueling && !isRelay && !isCombatDeployment">
@@ -97,6 +144,7 @@
                 >
                   <span :class="{'text-decoration-underline': stepper === 2}">
                     Пів-фінал
+                    <v-icon v-if="activeCompetitionStatus === 'HALF_FINAL'" left class="ml-1" color="red" @click.stop.prevent="restoreCompetition('ACTIVE')">mdi-history</v-icon>
                   </span>
                   <v-btn 
                     v-if="activeCompetitionStatus === 'ACTIVE'"
@@ -119,6 +167,7 @@
                 >
                   <span :class="{'text-decoration-underline': stepper === 3}">
                     Фінал
+                    <v-icon v-if="activeCompetitionStatus === 'FINAL'" left class="ml-1" color="red" @click.stop.prevent="restoreCompetition('HALF_FINAL')">mdi-history</v-icon>
                   </span>
                   <v-btn 
                     v-if="activeCompetitionStatus === 'HALF_FINAL'"
@@ -194,9 +243,21 @@
                     </td>
                   </template>
                   <template v-if="!isRelay && !isCombatDeployment">
-                    <td>
-                      {{ item.participantFullName }}
-                    </td>
+                      <template v-if="item.personal">
+                        <v-tooltip left>
+                          <template v-slot:activator="{ on, attrs }">
+                            <td class="red--text" v-on="on" v-bind="attrs">
+                              {{ item.participantFullName }}
+                            </td>
+                          </template>
+                          Особовий результат
+                      </v-tooltip>
+                      </template>
+                      <template v-else>
+                        <td>
+                          {{ item.participantFullName }}
+                        </td>
+                      </template>
                   </template>
                   <td>
                     {{ isRelay || isCombatDeployment ? item.teamName : item.participantTeamName }}
@@ -478,6 +539,7 @@
                   disable-pagination
                   disable-sort
                   hide-default-footer
+                  class="protocols-best-results"
                 >
                   <template #item="{ item, index }">
                     <tr>
@@ -510,6 +572,7 @@
                     disable-pagination
                     disable-sort
                     hide-default-footer
+                    class="protocols-best-type"
                   >
                     <template #item="{ item, index }">
                       <tr>
@@ -532,6 +595,7 @@
                     disable-pagination
                     disable-sort
                     hide-default-footer
+                    class="protocols-best-type"
                   >
                     <template #item="{ item, index }">
                       <tr>
@@ -558,6 +622,7 @@
                     disable-pagination
                     disable-sort
                     hide-default-footer
+                    class="protocols-best-team"
                   >
                     <template #item="{ item, index }">
                       <tr>
@@ -580,6 +645,35 @@
         </template>
       </v-row>
       </template>
+      <v-dialog
+        v-model="confirmRestoreDialog"
+        max-width="600"
+      >
+      <v-card ma-2>
+        <v-card-title>
+          {{ confirmRestoreDialogMessage }}
+        </v-card-title>
+
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            text
+            color="primary"
+            @click="confirmRestoreDialog = false, confirmRestoreDialogType = null"
+          >
+            Скасувати
+          </v-btn>
+
+          <v-btn
+            color="red darken-1"
+            text
+            @click="undoCompetition"
+          >
+            Підтвердити
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
       <v-alert
         v-model="showAlert"
         ref="alertDialog"
@@ -648,6 +742,9 @@ export default {
       relayResultShifted: false,
       secondTeamResultShifted: false,
       firstTeamResultShifted: false,
+      confirmRestoreDialog: false,
+      confirmRestoreDialogMessage: 'Повернутись на попередній етап змаганнь?',
+      confirmRestoreDialogType: null,
     }
   },
   computed: {
@@ -1008,6 +1105,13 @@ export default {
           this.teamResultsOverall = data;
         })
     },
+    async undoCompetition () {
+      if (!this.confirmRestoreDialogType) return;
+      return this.axios.post(`private/competition-types/${this.competitionType}/undo-competition-type?competitionTypeStatus=${this.confirmRestoreDialogType}`)
+        .then((response) => {
+          window.location.reload();
+        });
+    },
     async printProtocol(option) {
       return this.axios.get(`private/competition-types/${this.competitionType}/csv/download?csvType=${option.value}`)
         .then((res) => {
@@ -1117,6 +1221,19 @@ export default {
     shiftedValueKey(key) {
       const shiftedKey = key+'Shifted';
       if (shiftedKey in this) return shiftedKey;
+    },
+    restoreCompetition(step) {
+      this.confirmRestoreDialog = true;
+      if (step === 'HALF_FINAL') {
+        this.confirmRestoreDialogMessage = 'Повернутись на етап пів-фіналу?';
+        this.confirmRestoreDialogType = 'HALF_FINAL';
+      } else if (step === 'ACTIVE') {
+        this.confirmRestoreDialogMessage = 'Повернутись на етап старту змаганнь?';
+        this.confirmRestoreDialogType = 'ACTIVE';
+      } else if (step === 'INACTIVE') {
+        this.confirmRestoreDialogMessage = 'Скасувати усі результати та повернутись на етап планування змагання?';
+        this.confirmRestoreDialogType = 'INACTIVE';
+      }
     }
   }
 }
@@ -1182,5 +1299,16 @@ export default {
   }
   .v-application div.border-yellow {
     color: darkorange!important;
+  }
+  .protocols-best-results, .protocols-best-type, .protocols-best-team {
+    thead {
+      position: sticky;
+      top: 0;
+      background: #fff;
+    }
+    .v-data-table__wrapper {
+      max-height: 520px;
+      overflow: auto;
+    }
   }
 </style>
