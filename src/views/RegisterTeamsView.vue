@@ -60,7 +60,7 @@
                     />
                 </td>
                 <td>
-                  <v-btn small icon @click="deleteItem(item)">
+                  <v-btn small icon @click="deleteItem(item)" :disabled="isDeletedInProgress">
                     <v-icon>mdi-delete</v-icon>
                   </v-btn>
                 </td>
@@ -81,9 +81,15 @@
                         <div class="mt-4 text-h6">
                             Назва команди
                         </div>
-                        <v-text-field
+                        <v-autocomplete
                             v-model="teamName"
                             :rules="[max25chars]"
+                            :items="teamSearchItems"
+                            :loading="teamSearchLoading"
+                            :search-input.sync="teamSearchText"
+                            item-text="teamName"
+                            item-value="teamName"
+                            cache-items
                             label="Назва команди"
                             placeholder="Назва команди"
                             single-line
@@ -142,10 +148,15 @@ export default {
 
             alertType: 'error',
             showAlert: false,
+            isDeletedInProgress: false,
             alertMessage: '',
 
             activeSuccessId: null,
-            activeErrorId: null
+            activeErrorId: null,
+
+            teamSearchText: null,
+            teamSearchItems: [],
+            teamSearchLoading: false,
         }
     },
     computed: {
@@ -159,7 +170,22 @@ export default {
     mounted() {
         this.getTeams();
     },
+    watch: {
+        teamSearchText(nextValue, prevValue) {
+            nextValue && nextValue !== prevValue && this.invokeTeamsSearch(nextValue)
+        }
+    },
     methods: {
+        invokeTeamsSearch(search) {
+            this.teamSearchLoading = true;
+            return this.axios.get(`private/teams?search=${search}`)
+                .then(({ data }) => {
+                    this.teamSearchItems = data;
+                })
+                .finally(() => {
+                    this.teamSearchLoading = false;
+                })
+        },
         isUniqueNumber(num) {
             return !this.teams.find(({ lotNumber }) => Number(lotNumber) === Number(num)) || 'Номер лоту має бути унікальним'
         },
@@ -244,8 +270,15 @@ export default {
                     console.warn('PASTED', clipText)
                 });
         },
-        deleteItem(item) {
-            this.teams = this.teams.filter(({ id }) => id !== item.id);
+        async deleteItem(item) {
+            this.isDeletedInProgress = true;
+            return this.axios.delete(`private/teams/${item.teamReference}/competitions/${this.competitionId}`)
+                .then(() => {
+                    this.teams = this.teams.filter(({ teamReference }) => teamReference !== item.teamReference);
+                })
+                .finally(() => {
+                    this.isDeletedInProgress = false;
+                })
         },
         showError(error) {
             this.alertMessage = error.response && error.response.data.description ? error.response.data.description : error.message;
