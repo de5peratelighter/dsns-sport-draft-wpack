@@ -1,19 +1,50 @@
 <template>
   <v-container class="competition-edit-container white--text" ma-0 pa-0 fluid>
     <div class="text-center">
-      Competition edit page, ID: {{ $route.params.id || ''}}
-
-      <div>Фото сюжет</div>
+      <div>У консолі є змінна <strong class="orange--text">window.pages</strong> що відповідає за вміст doc-файлу, <br/> при зміні даниху ній - зміниться вмістиме файлу при наступному скачуванню</div>
+      <v-btn color="white" @click="downloadMockedFile">
+        Отримати тестовий Doc-file
+      </v-btn>
     </div>
   </v-container>
 </template>
 
 <script>
+import { Document, Packer } from "docx";
+import { DATA_TO_DOC_PAGES } from '../protocols/defaultUtils';
+import { tableData as pages } from '../protocols/mockedPages';
+
 export default {
   data: function () {
     return {
-      competitionData: null
+      competitionData: null,
+      doc: null,
     }
   },
+  mounted() {
+    window.pages = pages;
+    //this.downloadMockedFile();
+  },
+  methods: {
+    downloadMockedFile() {
+      this.doc = new Document({
+        sections: [
+            {
+              children: DATA_TO_DOC_PAGES(window.pages),
+            },
+          ],
+      });
+      // Used to export the file into a .docx file
+      Packer.toBlob(this.doc).then(blob => {
+        const url = URL.createObjectURL(blob);
+        const downloadLink = document.createElement("a");
+        downloadLink.href = url;
+        downloadLink.download = "DocumentWithPageBreak.docx";
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+      });
+    }
+  }
 }
 </script>
