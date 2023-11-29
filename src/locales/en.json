@@ -1,3 +1,29 @@
 {
-  "message": "hello i18n !!"
+  "shared": {
+    "weather": "Weather",
+    "onlineLive": "Online broadcast",
+    "bestResults": "Best results",
+    "bestByType": "Best by type",
+    "teamBestByType": "Best teams by type",
+    "teamOverallBest": "Overall best team results",
+    "selectCompetitionTitle": "Select competition or create a new one",
+    "selectCompetitionCreate": "Create",
+    "selectCompetitionEdit": "Edit",
+    "selectCompetitionLeave": "Go back",
+    "navMenuCompetitionChange": "Change competition",
+    "navMenuConfiguration": "Configuration",
+    "navMenuRegister": "Register",
+    "navMenuProtocols": "Protocols",
+    "navMenuLeave": "Exit",
+    "navSubMenuTeams": "Teams",
+    "navSubMenuParticipants": "Participants"
+  },
+  "const": {
+    "ASSAULT_LADDER": "Assault ladder", 
+    "HUNDRED_METER": "Hundred meters",
+    "DUELING": "Dueling",
+    "RETRACTALE_LADDER": "Retracable ladder",
+    "RELAY": "Relay",
+    "COMBAT_DEPLOYMENT": "Combat deployment"
+  }
 }

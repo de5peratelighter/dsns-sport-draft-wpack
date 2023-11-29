@@ -36,16 +36,16 @@
     </div>
     <div class="competitions-buttons mt-3 d-flex justify-space-between">
       <v-btn color="white" @click="$router.push({name: 'configMain'})">
-        Створити
+        {{ $t('shared.selectCompetitionCreate') }}
       </v-btn>
       <v-btn class="white--text" color="green" @click="$router.push({
           name: 'editCompetition', params: {id: chosenItem.competitionReference} 
         })"
         :disabled="!chosenItem">
-        Відкрити
+        {{ $t('shared.selectCompetitionEdit') }}
       </v-btn>
       <v-btn color="white" @click="$router.push({ name: 'main' })">
-        Вихід
+        {{ $t('shared.selectCompetitionLeave') }}
       </v-btn>
     </div>
   </v-container>

@@ -38,7 +38,13 @@ export default {
     },
   },
   mounted () {
-    console.warn('YO')
+    this.readLanguage();
+  },
+  methods: {
+    readLanguage() {
+      let lang = localStorage.getItem('dsns-competitions-lang');
+      if (lang) this.$i18n.locale = lang;
+    }
   }
 }
 </script>

@@ -17,7 +17,7 @@
         <template v-if="isSelectCompetitionRoute">
           <v-row class="justify-center">
             <div class="d-flex justify-center">
-              Виберіть змагання із вже існуючих або створіть нове
+              {{ $t('shared.selectCompetitionTitle') }}
             </div>
           </v-row>
         </template>

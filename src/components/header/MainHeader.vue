@@ -8,9 +8,7 @@
                 <v-icon color="white" large>mdi-account</v-icon>
               </v-btn>
               
-              <v-menu
-              offset-y
-              >
+              <v-menu offset-y>
               <template v-slot:activator="{ on, attrs }">
                 <v-app-bar-nav-icon 
                   x-large
@@ -61,7 +59,27 @@
           </div> 
         </v-col>
         <v-col cols="2">
-          <div class="d-flex align-center fill-height text-center justify-center">Weather here</div>
+          <div class="d-flex align-center text-center justify-center">
+            <button @click="switchLanguage('en')" class="mr-2" :style="{border: `2px solid ${activeLang === 'en' ? 'white' : 'transparent'}`}">
+              <v-img
+                height="20"
+                width="33"
+                :src="require('@/assets/en-flag.png')"
+                style="cursor: pointer"
+                alt="English Flag"
+              />
+            </button>
+            <button @click="switchLanguage('uk')" :style="{border: `2px solid ${activeLang === 'uk' ? 'white' : 'transparent'}`}">
+                <v-img
+                  height="20"
+                  width="33"
+                  :src="require('@/assets/ua-flag.png')"
+                  style="cursor: pointer"
+                  alt="Ukrainian Flag"
+                />
+            </button>
+          </div>
+          <div class="d-flex align-center fill-height text-center justify-center">{{ $t('shared.weather') }}</div>
         </v-col>
       </v-row>
     </v-container>
@@ -71,6 +89,7 @@
 export default {
   data: function () {
     return {
+      activeLang: null,
     }
   },
   computed: {
@@ -83,6 +102,24 @@ export default {
       return items.filter(({ show }) => show);
     },
   },
+  watch: {
+    activeLang: {
+      handler(v) {
+        if (v) {
+          this.$i18n.locale = v;
+        } else {
+          this.switchLanguage(this.$i18n.locale);
+        }
+      },
+      immediate: true
+    }
+  },
+  methods: {
+    switchLanguage(lang) {
+      this.activeLang = lang;
+      localStorage.setItem('dsns-competitions-lang', lang);
+    },
+  }
 }
 </script>
 

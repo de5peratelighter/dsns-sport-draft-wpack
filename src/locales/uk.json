@@ -1,0 +1,29 @@
+{
+  "shared": {
+    "weather": "Погода",
+    "onlineLive": "Онлайн трансляція",
+    "bestResults": "Кращі результати",
+    "bestByType": "Особисті результати по виду",
+    "teamBestByType": "Командна першість по виду",
+    "teamOverallBest": "Загальнокомандна першість",
+    "selectCompetitionTitle": "Виберіть змагання із вже існуючих або створіть нове",
+    "selectCompetitionCreate": "Створити",
+    "selectCompetitionEdit": "Змінити",
+    "selectCompetitionLeave": "Назад",
+    "navMenuCompetitionChange": "Змінити змагання",
+    "navMenuConfiguration": "Налаштування",
+    "navMenuRegister": "Реєстрація",
+    "navMenuProtocols": "Протоколи",
+    "navMenuLeave": "Вихід",
+    "navSubMenuTeams": "Команди",
+    "navSubMenuParticipants": "Учасники"
+  },
+  "const": {
+    "ASSAULT_LADDER": "Штурмова драбина", 
+    "HUNDRED_METER": "100 метрова смуга",
+    "DUELING": "Двоборство",
+    "RETRACTALE_LADDER": "Висувна драбина",
+    "RELAY": "Пожежна естафета",
+    "COMBAT_DEPLOYMENT": "Бойове розгортання"
+  }
+}

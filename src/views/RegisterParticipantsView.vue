@@ -220,10 +220,10 @@ export default {
                 return !!v && !!v.match(reg) || 'Формат число/число';
             },
             participantCategoryItems: [
+            {categoryName: 'ЗМС', categoryId: 'HMS'},
+            {categoryName: 'МСМК', categoryId: 'IMS'},
+            {categoryName: 'МС', categoryId: 'MS'},
                 {categoryName: 'КМС', categoryId: 'CMS'},
-                {categoryName: 'МС', categoryId: 'MS'},
-                {categoryName: 'МСМК', categoryId: 'IMS'},
-                {categoryName: 'ЗМС', categoryId: 'HMS'},
                 {categoryName: 'I', categoryId: 'I'},
                 {categoryName: 'II', categoryId: 'II'},
                 {categoryName: 'III', categoryId: 'III'},

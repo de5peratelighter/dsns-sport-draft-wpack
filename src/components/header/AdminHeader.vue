@@ -2,7 +2,7 @@
     <v-container ma-0 pa-0 fluid>
         <v-row justify="center" class="ma-0">
         <v-btn text color="white" @click="$router.push({name: 'selectCompetition'})">
-          Змінити змагання
+          {{ $t('shared.navMenuCompetitionChange') }}
         </v-btn>
         <v-menu
           offset-y
@@ -12,7 +12,7 @@
           <template v-slot:activator="{ on, attrs }">
             <v-btn text color="white" v-bind="attrs"
               v-on="on">
-              Налаштування
+              {{ $t('shared.navMenuConfiguration') }}
             </v-btn>
           </template>
           <v-list>
@@ -47,7 +47,7 @@
           <template v-slot:activator="{ on, attrs }">
             <v-btn text color="white" v-bind="attrs"
               v-on="on">
-              Реєстрація
+              {{ $t('shared.navMenuRegister') }}
             </v-btn>
           </template>
           <v-list>
@@ -70,7 +70,7 @@
           <template v-slot:activator="{ on, attrs }">
             <v-btn text color="white" v-bind="attrs"
               v-on="on">
-              Протоколи
+              {{ $t('shared.navMenuProtocols') }}
             </v-btn>
           </template>
           <v-list>
@@ -87,7 +87,7 @@
           </v-list>
         </v-menu>
         <v-btn text color="error" @click="$router.push({ name: 'main'})">
-          Вихід
+          {{ $t('shared.navMenuLeave') }}
         </v-btn>
       </v-row>
     </v-container>
@@ -120,25 +120,15 @@ export default {
     competitionId() {
       return this.$route.params.id;
     },
-    competitionTranslations() {
-      return {
-        ASSAULT_LADDER: 'Штурмова драбина', 
-        HUNDRED_METER: '100 метрова смуга',
-        DUELING: 'Двоборство',
-        RETRACTABLE_LADDER: 'Висувна драбина',
-        RELAY: 'Пожежна естафета',
-        COMBAT_DEPLOYMENT: 'Бойове розгортання'
-      }
-    },
     registrationMenuItems() {
       const params = {id: this.competitionId };
       return [
           {
-            title: 'Команди',
+            title: this.$t('shared.navSubMenuTeams'),
             to: { name: 'registerTeams', params }
           },
           {
-            title: 'Учасники',
+            title: this.$t('shared.navSubMenuParticipants'),
             to: { name: 'registerParticipants', params }
           },
       ]
@@ -146,11 +136,10 @@ export default {
     protocolMenuItems() {
       const params = { id: this.competitionId };
       const competitionReferences = this.competitionReferences;
-      const translations = this.competitionTranslations;
 
       return [...competitionReferences.map(({ reference, sportType}) => {
             return {
-              title: translations[sportType],
+              title: this.$t(`const.${sportType}`),
               to: { name: 'protocols', params: { ...params, type: reference }}
             }
         }), {
