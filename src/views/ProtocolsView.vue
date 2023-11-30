@@ -12,14 +12,14 @@
       <div class="d-flex" style="flex-direction: column">
         <h4 class="text-center mb-4">{{ activeCompetitionType ? `Стартовий протокол: ${competitionTranslations[activeCompetitionType.sportType]}` : '' }}</h4>
         <template v-if="isDueling">
-            <div>{{  competitionTranslations.ASSAULT_LADDER }} та {{ competitionTranslations.HUNDRED_METER }} наразі не завершені</div>
-              <v-btn
-                  color="light-green white--text"
-                  :disabled="!isDuelingReadyfToBeStarted"
-                  @click="startCompetition"
-              >
-                Розпочати змагання
-              </v-btn>
+          <div>{{  competitionTranslations.ASSAULT_LADDER }} та {{ competitionTranslations.HUNDRED_METER }} наразі не завершені</div>
+          <v-btn
+              color="light-green white--text"
+              :disabled="!isDuelingReadyfToBeStarted"
+              @click="startCompetition"
+          >
+            Розпочати змагання
+          </v-btn>
         </template>
         <v-btn 
           v-else
@@ -32,7 +32,7 @@
     </v-row>
     <v-row v-else>
       <template v-if="activeCompetitionType">
-        <v-col cols="7" class="pr-0">
+        <v-col lg="7" md="12" class="pr-0">
           <v-sheet :color="'rgba(0, 0, 0, 0.35)'" class="pa-2 white--text">
             <v-expansion-panels accordion>
               <v-expansion-panel>
@@ -524,12 +524,11 @@
               <template #no-data>
                 No data
               </template>
-              <template #footer>
-              </template>
+              <template #footer />
               </v-data-table>
             </v-sheet>
           </v-col>
-          <v-col cols="5">
+          <v-col lg="5" md="12">
             <v-sheet :color="'rgba(0, 0, 0, 0.35)'" class="pa-2 white--text" style="position: sticky; top: 5px;">
               <template v-if="!isRelay && !isCombatDeployment">
                 <h4 class="text-center">Кращі результати</h4>
@@ -566,9 +565,8 @@
                      <v-icon dark @click="fetchteamResultsByType">mdi-refresh</v-icon>
                   </h4>
                   <v-data-table
-                    v-if="isRelay || isCombatDeployment"
-                    :headers="sortedTeamResultsByTypeHeaders"
-                    :items="sortedTeamResultsByType"
+                    :headers="isRelayOrCombat ? sortedTeamResultsByTypeHeaders : teamResultsByTypeHeaders"
+                    :items="isRelayOrCombat ? sortedTeamResultsByType : teamResultsByType"
                     disable-pagination
                     disable-sort
                     hide-default-footer
@@ -583,30 +581,7 @@
                           {{ item.teamName }}
                         </td>
                         <td>
-                          {{ item.bestResultTeam }}
-                        </td>
-                      </tr>
-                    </template>
-                  </v-data-table>
-                  <v-data-table
-                    v-else
-                    :headers="teamResultsByTypeHeaders"
-                    :items="teamResultsByType"
-                    disable-pagination
-                    disable-sort
-                    hide-default-footer
-                    class="protocols-best-type"
-                  >
-                    <template #item="{ item, index }">
-                      <tr>
-                        <td>
-                          {{ index + 1}}
-                        </td>
-                        <td>
-                          {{ item.teamName }}
-                        </td>
-                        <td>
-                          {{ item.result }}
+                          {{ isRelayOrCombat ? item.bestResultTeam : item.result }}
                         </td>
                       </tr>
                     </template>
@@ -912,6 +887,9 @@ export default {
       const activeType = this.activeCompetitionType.sportType;
       if (['ASSAULT_LADDER', 'RETRACTABLE_LADDER'].includes(activeType)) return '0.15';
       return '0.24';
+    },
+    isRelayOrCombat() {
+      return this.isRelay || this.isCombatDeployment;
     },
     zeroValueOptions() {
       if (!this.activeCompetitionType) return [];

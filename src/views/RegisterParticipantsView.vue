@@ -156,7 +156,7 @@
                                 large
                                 @save="addNewParticipant"
                             >
-                                <v-btn dark color="primary" @click="fullname = ''">Додати</v-btn>
+                                <v-btn dark color="primary" @click="fullName = '', participantNumber = ''">Додати</v-btn>
                                 <template #input>
                                 <div class="mt-4 text-h6">
                                     Ініціали учасника

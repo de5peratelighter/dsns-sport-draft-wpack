@@ -1,12 +1,5 @@
 <template>
   <v-col cols="12">
-    <!-- <v-row>
-      <select v-model="$i18n.locale">
-        <option v-for="(lang, i) in langs" :key="`Lang${i}`" :value="lang">
-          {{ lang }}
-        </option>
-      </select>
-    </v-row> -->
     <v-row
       justify="center"
       align="center"
@@ -46,7 +39,6 @@
 export default {
   data: function () {
     return {
-      langs: ['en','ua']
     }
   },
 }

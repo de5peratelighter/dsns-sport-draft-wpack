@@ -159,32 +159,16 @@
     </v-row>
     <v-row class="mt-0">
       <v-col cols="6">
-        <v-combobox
+        <v-select
           v-model="ageType"
           :items="genderItems"
           outlined
-          chips
-          clearable
           label="Вікова категорія"
           item-text="name"
           item-value="id"
           dark
           hide-details
-        >
-          <template v-slot:selection="{ attrs, item, select, selected }">
-            <v-chip
-              v-bind="attrs"
-              :input-value="selected"
-              close
-              color="white"
-              text-color="grey darken-2"
-              @click="select"
-              @click:close="unselectGender(item.id)"
-            >
-              <strong>{{ item.name }}</strong>
-            </v-chip>
-          </template>
-        </v-combobox>
+        />
       </v-col>
     </v-row>
     <v-row class="mt-0">
@@ -259,7 +243,7 @@ export default {
       snackbarError: '',
       protocolOptions: [
         { id: 'SHOW_LOGOS', name: 'Відображати в протоколах логотипи', value: true },
-        { id: 'SHOW_COMPETITION_ICON', name: 'Відображати графічні символи видім змаганнь', value: false },
+        { id: 'SHOW_COMPETITION_ICON', name: 'Відображати графічні символи видів змаганнь', value: false },
         { id: 'SHOW_PROTOCOL_NORMATIVE', name: 'Відображати в стартових протоколах розрядні нормативи', value: true },
         { id: 'SHOW_PROTOCOL_ACHIEVEMENTS', name: 'Відображати в стартових протоколах вищі досягнення', value: true },
         { id: 'SHOW_PROTOCOL_LEVEL', name: 'Відображати в стартових протоколах колонку Розряд', value: true },
@@ -304,19 +288,25 @@ export default {
       ],
       genderItems: [
         {
-          id: 'JUNES', name: 'Юнаки та дівчата(12-14 мол. та 15-16 стар.)'
+          id: 'JUNES_MALE', name: 'Юнаки, юніори (від 12-14 молодша, 15-16 старша, 17-18 юніори)'
         },
         {
-          id: 'JUNIORS', name: 'Юніори та юніорки (17-18)'
+          id: 'JUNES_FEMALE', name: 'Дівчата, юніорки (від 12-14 молодша, 15-16 старша, 17-18 юніори)'
         },
         {
-          id: 'YOUNGS', name: 'Молодь (18-23)'
+          id: 'YOUNGS_MALE', name: 'Молодь (чоловіки) від 18 до 23'
         },
         {
-          id: 'ADULTS_MALE', name: 'Дорослі Чол (18+)'
+          id: 'YOUNGS_FEMALE', name: 'Молодь (жінки) від 18 до 23'
         },
         {
-          id: 'ADULTS_FEMALE', name: 'Дорослі Жін (18+)'
+          id: 'ADULTS_MALE', name: 'Дорослі (чоловіки) від 18+'
+        },
+        {
+          id: 'ADULTS_FEMALE', name: 'Дорослі (жінки) від 18+'
+        },
+        {
+          id: 'ADULTS_GENERAL', name: 'Відомчі (чоловіки, жінки) від 18+'
         },
       ],
       isDataInvalid: false,
@@ -375,7 +365,7 @@ export default {
       this.startDate = config.startDate || null;
       this.endDate = config.endDate || null;
       this.locationName = config.locationName || null;
-      this.ageType = this.genderItems.find(({ id }) => id === config.ageType);
+      this.ageType = config.ageType || null;
       this.sportTypes = this.sportTypesOptions.filter(({ id }) => (config.sportTypes ||[]).includes(id));
       this.parallelItems = this.parallelItemsOptions.filter(({ id }) => (config.parallelItems ||[]).includes(id));
       this.protocolOptionTypes = config.protocolOptionTypes || [];
@@ -393,7 +383,7 @@ export default {
         protocolOptionTypes: this.protocolOptionTypes,
       };
       if (this.ageType) {
-        requestData.ageType = this.ageType.id;
+        requestData.ageType = this.ageType;
       }
       if (this.time) {
         requestData.time = this.time;

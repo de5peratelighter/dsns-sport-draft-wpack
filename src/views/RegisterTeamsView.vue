@@ -81,7 +81,7 @@
                         <div class="mt-4 text-h6">
                             Назва команди
                         </div>
-                        <v-autocomplete
+                        <v-combobox
                             v-model="teamName"
                             :rules="[max25chars]"
                             :items="teamSearchItems"

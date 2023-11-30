@@ -43,14 +43,14 @@
                 <div>28-30 травня</div>
                 <div>м. Київ</div>
                 <div>
-                  <v-btn small icon>
-                    <v-icon color="white">mdi-facebook</v-icon>
-                  </v-btn>
-                  <v-btn small icon>
-                    <v-icon color="white">mdi-twitter</v-icon>
-                  </v-btn>
-                  <v-btn small icon>
-                    <v-icon color="white">mdi-youtube</v-icon>
+                  <v-btn v-for="(social, index) in socialLinks"
+                    :key="index"
+                    :href="social.url"
+                    small
+                    icon
+                    target="_blank"
+                  >
+                    <v-icon color="white">{{ `mdi-${social.name}` }}</v-icon>
                   </v-btn>
                 </div>
               </div>
@@ -62,9 +62,10 @@
           <div class="d-flex align-center text-center justify-center">
             <button 
               v-for="(language, index) in languageOptions"
-              @click="switchLanguage(language.code)"
+              :key="index"
               :class="index ? 'ml-2' : null"
               :style="language.style"
+              @click="switchLanguage(language.code)"
             >
               <v-img
                 :height="language.height"
@@ -96,6 +97,18 @@ export default {
         { title: 'Протокол команд', show: isLoggedIn },
       ];
       return items.filter(({ show }) => show);
+    },
+    socialLinks() {
+      // @TODO these to be provided by backend
+      const items = [
+        { name: 'telegram', url: 'https://google.com.ua'},
+        { name: 'facebook', url: ''},
+        { name: 'twitter', url: ''},
+        { name: 'youtube', url: ''},
+        { name: 'instagram', url: ''},
+        { name: 'web', url: ''},
+      ];
+      return items;
     },
     languageOptions() {
       const activeLang = this.activeLang;
