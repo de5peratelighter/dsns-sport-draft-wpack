@@ -60,23 +60,19 @@
         </v-col>
         <v-col cols="2">
           <div class="d-flex align-center text-center justify-center">
-            <button @click="switchLanguage('en')" class="mr-2" :style="{border: `2px solid ${activeLang === 'en' ? 'white' : 'transparent'}`}">
+            <button 
+              v-for="(language, index) in languageOptions"
+              @click="switchLanguage(language.code)"
+              :class="index ? 'ml-2' : null"
+              :style="language.style"
+            >
               <v-img
-                height="20"
-                width="33"
-                :src="require('@/assets/en-flag.png')"
+                :height="language.height"
+                :width="language.width"
+                :src="require(`@/assets/${language.code}-flag.png`)"
+                :alt="language.alt"
                 style="cursor: pointer"
-                alt="English Flag"
               />
-            </button>
-            <button @click="switchLanguage('uk')" :style="{border: `2px solid ${activeLang === 'uk' ? 'white' : 'transparent'}`}">
-                <v-img
-                  height="20"
-                  width="33"
-                  :src="require('@/assets/ua-flag.png')"
-                  style="cursor: pointer"
-                  alt="Ukrainian Flag"
-                />
             </button>
           </div>
           <div class="d-flex align-center fill-height text-center justify-center">{{ $t('shared.weather') }}</div>
@@ -101,6 +97,20 @@ export default {
       ];
       return items.filter(({ show }) => show);
     },
+    languageOptions() {
+      const activeLang = this.activeLang;
+      const defaultOptions = { width: '33', height: '20' }
+      return [
+        {
+          code: 'uk',
+          alt: 'Українська',
+        }, 
+        {
+          code: 'en',
+          alt: 'English language',
+        }
+      ].map((item) => ({...item, ...defaultOptions, style: {'border': `2px solid ${activeLang === item.code ? 'white' : 'transparent'}`}}));
+    }
   },
   watch: {
     activeLang: {
