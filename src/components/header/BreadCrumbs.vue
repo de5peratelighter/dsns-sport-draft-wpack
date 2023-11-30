@@ -1,6 +1,6 @@
 <template>
     <v-container ma-0 pa-0 fluid v-if="isVisible">
-        <v-row v-if="breadCrumbItems.length">
+        <v-row v-if="breadCrumbItems.length" class="justify-center">
           <v-breadcrumbs light :items="breadCrumbItems">
             <template v-slot:divider>
               <v-icon color="white">mdi-chevron-right</v-icon>
