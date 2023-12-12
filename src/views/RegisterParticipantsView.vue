@@ -220,9 +220,10 @@ export default {
                 return !!v && !!v.match(reg) || 'Формат число/число';
             },
             participantCategoryItems: [
-            {categoryName: 'ЗМС', categoryId: 'HMS'},
-            {categoryName: 'МСМК', categoryId: 'IMS'},
-            {categoryName: 'МС', categoryId: 'MS'},
+                {categoryName: 'Без категорії', categoryId: '0'},
+                {categoryName: 'ЗМС', categoryId: 'HMS'},
+                {categoryName: 'МСМК', categoryId: 'IMS'},
+                {categoryName: 'МС', categoryId: 'MS'},
                 {categoryName: 'КМС', categoryId: 'CMS'},
                 {categoryName: 'I', categoryId: 'I'},
                 {categoryName: 'II', categoryId: 'II'},
@@ -257,7 +258,7 @@ export default {
                 { text: "Ім'я та призвіще", value: 'fullName', width: '15%' },
                 { text: 'Дата народження', value: 'birthday', width: '10%' },
                 // { text: 'Вікова категорія', value: 'age', width: '5%' },
-                { text: 'Спортивна уласифікація', value: 'grade', width: '5%' },
+                { text: 'Спортивна класифікація', value: 'grade', width: '5%' },
             ];
             const sportTypeHeaders = this.sportTypeHeaders;
             return [...defaultHeaders, ...sportTypeHeaders]

@@ -60,6 +60,13 @@
                     </template>
                     <v-list>
                       <v-list-item
+                        @click="printDocProtocol()"
+                      >
+                        <v-list-item-title>
+                          ПРОТОКОЛ ТЕСТ (ДОК-файл з бекенду)
+                        </v-list-item-title>
+                      </v-list-item>
+                      <v-list-item
                         v-for="(menuItem, i) in printOptions"
                         :key="i"
                         @click="printProtocol(menuItem)"
@@ -662,6 +669,8 @@
 </template>
 
 <script>
+import { Document, Packer } from "docx";
+import { DATA_TO_DOC_PAGES } from '../protocols/defaultUtils';
 export default {
   data: function () {
     return {
@@ -1088,6 +1097,36 @@ export default {
       return this.axios.post(`private/competition-types/${this.competitionType}/undo-competition-type?competitionTypeStatus=${this.confirmRestoreDialogType}`)
         .then((response) => {
           window.location.reload();
+        });
+    },
+    async printDocProtocol () {
+      return this.axios.get(`private/protocols/${this.competitionId}`)
+        .then(({data}) => {
+          if (!data) return;
+          try {
+            const protocolsDoc = data.protocols; 
+            const nextFile = new Document({
+              sections: [
+                {
+                  children: DATA_TO_DOC_PAGES(protocolsDoc),
+                },
+              ],
+            });
+            if (nextFile) {
+              Packer.toBlob(nextFile).then(blob => {
+                const url = URL.createObjectURL(blob);
+                const downloadLink = document.createElement("a");
+                downloadLink.href = url;
+                downloadLink.download = "DocumentWithPageBreak.docx";
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+              })
+            }
+          } catch(err) {
+            console.error('Parsing:', err)
+            this.showError({message: 'Protocol parsing failed'})
+          }
         });
     },
     async printProtocol(option) {
