@@ -83,7 +83,6 @@
                         </div>
                         <v-combobox
                             v-model="teamName"
-                            :rules="[max25chars]"
                             :items="teamSearchItems"
                             :loading="teamSearchLoading"
                             :search-input.sync="teamSearchText"
@@ -140,7 +139,6 @@ export default {
             ],
             areTeamsLoading: false,
             teams: [],
-            max25chars: v => v.length <= 25 || 'Назва не більше 25 символів!',
             notEmpty: v => !!v || 'Значення пусте',
             isNumeric: v => !isNaN(v) || 'Лише числа',
             lotNumber: '',
@@ -194,6 +192,9 @@ export default {
             this.teamName = '';
         },
         addItem() {
+            // making sure teamName value is correct (can be auto-selected or manually entered) - just overriding vuetify logic here
+            this.teamName = typeof this.teamName === 'string' ? this.teamName : this.teamName.teamName;
+
             const data = {
                 teamName: this.teamName.trim(),
                 lotNumber: Number(this.lotNumber)
