@@ -39,9 +39,9 @@
             />
             <div class="d-flex flex-column align-left ml-6 flex-grow-1">
               <div class="d-flex flex-row justify-space-between flex-grow-1 flex-shrink-0 align-center">
-                <div class="text-h6">Чемпіонат України з пожежно-прикладного спорту</div>
-                <div>28-30 травня</div>
-                <div>м. Київ</div>
+                <div class="text-h6">{{ this.$t(`shared.championshipOfUkraineFirefightingSports`) }}</div>
+                <div>{{ this.$t(`shared.eventDate`) }}</div>
+                <div>{{ this.$t(`shared.eventPlaceKyiv`) }}</div>
                 <div>
                   <v-btn v-for="(social, index) in socialLinks"
                     :key="index"
@@ -54,7 +54,7 @@
                   </v-btn>
                 </div>
               </div>
-              <div class="text-subtitle-1 mb-1">подолання 100м смуги з перешкодами</div>
+              <div class="text-subtitle-1 mb-1">{{ this.$t(`shared.overcoming100mObstacleCourse`) }}</div>
             </div>
           </div> 
         </v-col>
@@ -93,8 +93,8 @@ export default {
     mainMenuItems() {
       const isLoggedIn = true;
       const items = [
-        { title: 'Реєстрація команди', show: isLoggedIn },
-        { title: 'Протокол команд', show: isLoggedIn },
+        { title: this.$t(`shared.teamRegistration`), show: isLoggedIn },
+        { title: this.$t(`shared.commandProtocol`), show: isLoggedIn },
       ];
       return items.filter(({ show }) => show);
     },

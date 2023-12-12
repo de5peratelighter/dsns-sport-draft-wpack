@@ -143,10 +143,10 @@ export default {
               to: { name: 'protocols', params: { ...params, type: reference }}
             }
         }), {
-                title: 'Загальнокомандний',
+                title: this.$t(`shared.navMenuProtocolsGeneralTeam`),
             },
             {
-                title: 'Загальнокомандний (по етапах)',
+                title: this.$t(`shared.navMenuProtocolsGeneralTeamByStages`),
             }
         ];
     },
@@ -154,20 +154,20 @@ export default {
         const params = {id: this.competitionId };
         return [
         {
-          title: 'Параметри змаганнь',
+          title: this.$t(`shared.navMenuConfigurationParameters`),
           items: [
-            { title: 'Основні', to: { name: 'configMain', params } },
-            { title: 'Детально по видах', to: { name: 'configByType', params} },
-            { title: 'Суддівська бригада', to: { name: 'configJudges', params} },
-            { title: 'Логотипи', to: { name: 'configLogos', params} } 
+            { title: this.$t(`shared.navMenuConfigurationMain`), to: { name: 'configMain', params } },
+            { title: this.$t(`shared.navMenuConfigurationDetails`), to: { name: 'configByType', params} },
+            { title: this.$t(`shared.navMenuConfigurationJury`), to: { name: 'configJudges', params} },
+            { title: this.$t(`shared.navMenuConfigurationLogos`), to: { name: 'configLogos', params} } 
           ]
         },
         {
-          title: 'Досягнення',
+          title: this.$t(`shared.navMenuConfigurationAchievement`),
           to: { name: 'configAchievements', params}
         },
         {
-          title: 'Розрядні нормативи',
+          title: this.$t(`shared.navMenuConfigurationBitStandarts`),
           to: { name: 'configNormatives', params}
         },
       ]
