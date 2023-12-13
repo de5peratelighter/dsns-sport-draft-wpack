@@ -12,9 +12,8 @@
                         <tr>
                             <td>
                                 <div class="d-flex align-center">
-                                    <v-btn icon="$close" width="25" height="25" color="error"
-                                        @click="deleteParticipant(item)">
-                                        Х
+                                    <v-btn icon width="20" height="20" color="error" @click="deleteParticipant(item)" style="margin-right: 5px;">
+                                        <v-icon>mdi-close</v-icon>
                                     </v-btn>
                                     {{ index + 1 }}
                                 </div>
