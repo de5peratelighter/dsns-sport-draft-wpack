@@ -80,10 +80,10 @@ export default {
       snackbarColor: 'primary',
       snackbarError: '',
       participantCategoryItems: [
-        { categoryName: 'Суддя міжнародної категорії', qualificationId: 'IC' },
-        { categoryName: 'Суддя національної категорії', qualificationId: 'NC' },
-        { categoryName: 'Суддя I-категорії', qualificationId: 'ICAT' },
-        { categoryName: 'Суддя II-категорії', categoryId: 'IICAT' },
+        { categoryName: 'cуддя міжнародної категорії', qualificationId: 'IC' },
+        { categoryName: 'cуддя національної категорії', qualificationId: 'NC' },
+        { categoryName: 'cуддя I категорії', qualificationId: 'ICAT' },
+        { categoryName: 'cуддя II категорії', categoryId: 'IICAT' },
       ],
     }
   },
@@ -100,14 +100,14 @@ export default {
     },
     seniorConfigurationHeaders() {
       return [
-        { text: 'Старший суддя з виду', value: this.translationKey, width: '20%' },
+        { text: 'Старший суддя', value: this.translationKey, width: '20%' },
         { text: 'Суддівська кваліфікація', value: this.nameKey, width: '45%' },
         { text: 'Призвіще, ініціали', value: this.initialsKey, width: '35%' },
       ]
     },
     assistantConfigurationHeaders() {
       return [
-        { text: 'Заступник судді з виду', value: this.translationKey, width: '20%' },
+        { text: 'Заступник старшого судді', value: this.translationKey, width: '20%' },
         { text: 'Суддівська кваліфікація', value: this.nameKey, width: '45%' },
         { text: 'Призвіще, ініціали', value: this.initialsKey, width: '35%' },
       ]
@@ -116,13 +116,13 @@ export default {
       const coreJudgesTypes = {
         MAIN: 'Головний суддя змаганнь',
         MAIN_SECRETARY: 'Головний секретар змаганнь',
-        INSPECTOR: 'Суддя інспектор змаганнь',
-        STARTER: 'Стартер',
-        ASSISTANCE_STARTER: 'Стартер заст.'
+        INSPECTOR: 'Суддя-інспектор змаганнь',
+        STARTER: 'Основний стартер',
+        ASSISTANCE_STARTER: 'Помічник стартера'
       };
       const competitionJudgesTypes = {
         JUDGE_ASSAULT_LADDER: 'Штурмова драбина',
-        JUDGE_HUNDRED_METER: '100 метрова смуга',
+        JUDGE_HUNDRED_METER: '100 метро а смуга',
         JUDGE_DUELING: 'Двоборство',
         JUDGE_RETRACTABLE_LADDER: 'Висувна драбина',
         JUDGE_RELAY: 'Пожежна естафета',
