@@ -157,7 +157,7 @@ export default {
                 { categoryName: 'I-ю', categoryId: 'I_TEEN' },
                 { categoryName: 'II-ю', categoryId: 'II_TEEN' },
                 { categoryName: 'III-ю', categoryId: 'III_TEEN' },
-                { categoryName: 'Б/р', categoryId: '0' },
+                { categoryName: 'Б/р', categoryId: "NONE" },
             ],
             areParticipantsLoading: false,
             birthday: null,

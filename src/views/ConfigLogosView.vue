@@ -3,51 +3,31 @@
     <v-row class="text-center align-center justify-center">
       <v-col cols="6">
         <v-card max-width="400" class="justify-center text-center mx-auto pa-2">
-            <v-card-title class="subtitle-1">
-              Логотип у верхній лівій частині протоколів
-            </v-card-title>
-            <v-img
-              class="my-2"
-              :src="leftLogo"
-            ></v-img>
-            <v-file-input
-              accept="image/*"
-              v-model="leftFile"
-              label="Виберіть файл"
-              :prepend-icon="null"
-              prepend-inner-icon="mdi-paperclip"
-              outlined
-              :show-size="1000"
-              hide-details
-            />
-            <v-btn color="light-green" block class="mt-2">
-              Зберегти
-            </v-btn>
-          </v-card>
-      </v-col>
-      <v-col cols="6">
-        <v-card max-width="400" class="justify-center text-center mx-auto pa-2">
-           <v-card-title class="subtitle-1">
-              Логотип у верхній правій частині протоколів
-            </v-card-title>
-            <v-img
-              class="my-2"
-              :src="rightLogo"
-            ></v-img>
-            <v-file-input
-              accept="image/*"
-              v-model="rightFile"
-              label="Виберіть файл"
-              :prepend-icon="null"
-              prepend-inner-icon="mdi-paperclip"
-              outlined
-              :show-size="1000"
-              hide-details
-            />
-            <v-btn color="light-green" block class="mt-2">
-              Зберегти
-            </v-btn>
-          </v-card>
+          <v-card-title class="subtitle-1">
+            Вибір логотипа у частинах протоколу
+          </v-card-title>
+          <v-img class="my-2" :src="leftLogo"></v-img>
+          <v-file-input accept="image/*" v-model="leftFile" label="Виберіть файл" :prepend-icon="null"
+            prepend-inner-icon="mdi-paperclip" outlined :show-size="1000" hide-details />
+          <v-select class="my-2" v-model="logoPosition" :items="['Зверху', 'Знизу', 'Зліва', 'Справа']"
+            label="Розміщення логотипу"></v-select>
+          <v-card-title class="subtitle-1">
+            Вибір статі учасників
+          </v-card-title>
+          <v-radio-group v-model="selectedGender">
+            <v-row>
+              <v-col cols="6">
+                <v-radio value="male" label="Чоловіки"></v-radio>
+              </v-col>
+              <v-col cols="6">
+                <v-radio value="female" label="Жінки"></v-radio>
+              </v-col>
+            </v-row>
+          </v-radio-group>
+          <v-btn color="light-green" block class="mt-2">
+            Зберегти
+          </v-btn>
+        </v-card>
       </v-col>
     </v-row>
   </v-container>
