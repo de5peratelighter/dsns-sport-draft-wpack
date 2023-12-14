@@ -147,7 +147,6 @@ export default {
                 return !!v && !!v.match(reg) || 'Формат число/число';
             },
             participantCategoryItems: [
-                { categoryName: 'Без категорії', categoryId: '0' },
                 { categoryName: 'ЗМС', categoryId: 'HMS' },
                 { categoryName: 'МСМК', categoryId: 'IMS' },
                 { categoryName: 'МС', categoryId: 'MS' },
@@ -158,6 +157,7 @@ export default {
                 { categoryName: 'I-ю', categoryId: 'I_TEEN' },
                 { categoryName: 'II-ю', categoryId: 'II_TEEN' },
                 { categoryName: 'III-ю', categoryId: 'III_TEEN' },
+                { categoryName: 'Б/р', categoryId: '0' },
             ],
             areParticipantsLoading: false,
             birthday: null,
@@ -185,7 +185,7 @@ export default {
                 { text: "Ім'я та призвіще", value: 'fullName', width: '15%' },
                 { text: 'Дата народження', value: 'birthday', width: '10%' },
                 // { text: 'Вікова категорія', value: 'age', width: '5%' },
-                { text: 'Спортивна класифікація', value: 'grade', width: '5%' },
+                { text: 'Спортивна кваліфікація', value: 'grade', width: '5%' },
             ];
             const sportTypeHeaders = this.sportTypeHeaders;
             return [...defaultHeaders, ...sportTypeHeaders]
