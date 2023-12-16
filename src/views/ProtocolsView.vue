@@ -1104,11 +1104,10 @@ export default {
         .then(({data}) => {
           if (!data) return;
           try {
-            const protocolsDoc = data.protocols; 
             const nextFile = new Document({
               sections: [
                 {
-                  children: DATA_TO_DOC_PAGES(protocolsDoc),
+                  children: DATA_TO_DOC_PAGES(data),
                 },
               ],
             });

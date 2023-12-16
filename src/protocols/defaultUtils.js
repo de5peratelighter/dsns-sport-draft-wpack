@@ -21,7 +21,7 @@ const allCellBorders = ({...cellBorders, right: invisibleBorder});
 
 const spacing = { before: 50, after: 50 };
 
-const multiLine = (text, allCaps = false) => text.split('\n').map((t, index) => index ? new TextRun({text: t, break: 1, allCaps }) : new TextRun({text: t, allCaps }))
+const multiLine = (text = '', allCaps = false) => text.split('\n').map((t, index) => index ? new TextRun({text: t, break: 1, allCaps }) : new TextRun({text: t, allCaps }))
 
 /**
  * 
@@ -822,7 +822,8 @@ const GIVE_TABLE_BY_TYPE = (type, tables) => {
         case 'PERSONAL_RESULTS':
             return TABLE_PERSONAL_RESULTS(tables)
         default:
-            console.error(`Incorrect table type`);
+            console.error(`Incorrect table type, ignoring it`, type);
+            return [spacer];
       }
 };
 

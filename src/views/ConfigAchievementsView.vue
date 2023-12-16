@@ -20,7 +20,7 @@
           v-model="selectedIndexes"
           active-class="primary--text"
         >
-          <template v-for="(item, index) in competitions">
+          <template v-for="(item, index) in filteredRecords">
             <v-list-item :key="item.title" class="competitions-item">
               <template #default>
                 <v-list-item-content>
@@ -28,7 +28,7 @@
 
                   <v-list-item-subtitle
                     class="text--primary"
-                    v-text="item.competitionDate"
+                    v-text="item.time"
                   ></v-list-item-subtitle>
 
                 </v-list-item-content>
@@ -37,10 +37,10 @@
                   <v-row>
 
                   <v-btn icon>
-                    <v-icon color="grey darken-2" @click="editCompetitionItem(item)">mdi-file-edit-outline</v-icon>
+                    <v-icon color="grey darken-2" @click="editRecord(item)">mdi-file-edit-outline</v-icon>
                   </v-btn>
                   <v-btn icon>
-                    <v-icon color="error">mdi-delete</v-icon>
+                    <v-icon color="error" @click="deleteRecord(item)">mdi-delete</v-icon>
                   </v-btn>
                 </v-row>
 
@@ -83,11 +83,16 @@
                   required
               ></v-text-field>
               <v-text-field
-                  v-model="editItem.competitionDate"
-                  label="Date"
+                  v-model="editItem.time"
+                  label="Time"
                   required
               ></v-text-field>
-              <vue-editor v-model="content" :editorOptions="editorSettings" />
+              <v-select
+                v-model="editItem.sportType"
+                :items="competitionItems"
+                label="Змагання"
+              ></v-select>
+              <vue-editor v-model="editItem.description" :editorOptions="editorSettings" />
             </v-col>
         </v-card-text>
 
@@ -95,7 +100,7 @@
           <v-btn
             class="white--text"
             color="green darken-1"
-            @click="editDialog = false"
+            @click="saveRecord"
           >
             Зберегти
           </v-btn>
@@ -108,47 +113,53 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-
+    <v-alert
+        v-model="showAlert"
+        ref="alertDialog"
+        :type="alertType"
+        dismissible
+        class="alert-message"
+    >
+      {{ alertMessage }}
+    </v-alert>
   </v-container>
 </template>
 
 <script>
-//import { VueEditor } from "vue2-editor";
+const defaultEditItem = { name: '', time: '', description: '', sportType: null};
+
 export default {
-  components: {
-   // VueEditor
-  },
   data: function () {
     return {
+      isEditingExistingItem: false,
       editDialog: false,
-      editItem: { name: '', competitionDate: ''},
+      editItem: defaultEditItem,
 
       selectedIndexes: [],
-      competitions: [],
+      records: [],
       competitionType: null,
       competitionItems: [
         {
-          value: 'one_hundred_meters', text: '100 метрова смуга'
+          value: 'HUNDRED_METER', text: '100 метрова смуга'
         }, 
         {
-          value: 'assault_ladder', text: 'Штурмова драбина'
+          value: 'ASSAULT_LADDER', text: 'Штурмова драбина'
         },
         {
-          value: 'dueling', text: 'Двоборство'
+          value: 'DUELING', text: 'Двоборство'
         },
         {
-          value: 'retractable_ladder', text: 'Висувна драбина'
+          value: 'RETRACTALE_LADDER', text: 'Висувна драбина'
         },
         {
-          value: 'fire_relay', text: 'Пожежна естафета'
+          value: 'RELAY', text: 'Пожежна естафета'
         },
         {
-          value: 'deployment', text: 'Бойове розгортання'
+          value: 'COMBAT_DEPLOYMENT', text: 'Бойове розгортання'
         }
       ],
 
       configurations: [],
-      content: '',
       editorSettings: {
         modules: {
           toolbar: [
@@ -156,13 +167,21 @@ export default {
             [{ align: '' }, { align: 'center' }, { align: 'right' }, { align: 'justify' }]
           ]
         }
-      }
+      },
+
+      alertType: 'error',
+      showAlert: false,
+      alertMessage: '',
     }
   },
   computed: {
     chosenItem () {
       const { length, [0]: selectedItem} = this.selectedItems;
       return length == 1 ? selectedItem : null;
+    },
+    filteredRecords() {
+      const competitionType = this.competitionType;
+      return this.records.filter(({sportType}) => sportType === competitionType);
     }
   },
   async mounted() {
@@ -170,19 +189,41 @@ export default {
   },
   methods: {
     addCompetitionItem() {
-      this.editItem = {name: '', competitionDate: ''};
+      this.editItem = defaultEditItem;
       this.editDialog = true;
+      this.isEditingExistingItem = false;
     },
-    editCompetitionItem(item) {
+    editRecord(item) {
       this.editItem = item;
       this.editDialog = true;
-      console.warn('item', item)
+      this.isEditingExistingItem = true;
+    },
+    async saveRecord() {
+      try {
+        const data = this.isEditingExistingItem 
+          ? await this.axios.put('private/records', this.editItem) 
+          : await this.axios.post('private/records', this.editItem);
+        await this.fetchCompetitios();
+        this.editDialog = false;
+        this.editItem = defaultEditItem;
+      } catch(error) {
+        this.showError(error);
+      }
     },
     async fetchCompetitios() {
-      return this.axios.get('private/competitions')
+      return this.axios.get('private/records')
         .then(({ data = [] }) => {
-          this.competitions = data;
+          this.records = data;
         })
+    },
+    async deleteRecord({reference}) {
+      if (!reference) console.error('Cant be deleted as there is no reference');
+      return this.axios.delete(`private/records/${reference}`,)
+        .then(() => this.fetchCompetitios())
+    },
+    showError(error) {
+        this.alertMessage = error.response && error.response.data.description ? error.response.data.description : error.message;
+        this.showAlert = true;
     }
   }
 }
