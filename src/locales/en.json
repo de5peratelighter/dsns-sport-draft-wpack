@@ -1,8 +1,10 @@
 {
   "shared": {
+    "profile": "Profile",
     "eventDate": "May 28-30",
     "eventPlaceKyiv": "Kyiv",
     "weather": "Weather",
+    "athletesBase": "Base of Athletes",
     "teamRegistration": "Team registration",
     "commandProtocol": "Command protocol",
     "championshipOfUkraineFirefightingSports": "Championship of Ukraine in firefighting-applied sports",

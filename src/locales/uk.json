@@ -1,10 +1,12 @@
 {
   "shared": {
+    "profile": "Профіль",
     "eventDate": "28-30 травня",
     "eventPlaceKyiv": "Київ",
     "weather": "Погода",
+    "athletesBase": "База Спортсменів",
     "teamRegistration": "Реєстрація команди",
-    "commandProtocol": "Протокол команд",
+    "commandProtocol": "Протокол змагань",
     "championshipOfUkraineFirefightingSports": "Чемпіонат України з пожежно-прикладного спорту",
     "overcoming100mObstacleCourse": "подолання 100м смуги з перешкодами",
     "onlineLive": "Онлайн трансляція",
