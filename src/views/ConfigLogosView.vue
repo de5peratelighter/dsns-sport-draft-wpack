@@ -2,53 +2,56 @@
   <v-container class="config-logos white--text" ma-0 pa-0 fluid color="white">
     <v-row class="text-center align-center justify-center">
       <v-col cols="6">
-        <v-card max-width="400" class="justify-center text-center mx-auto pa-3">
-          <v-card-title class="subtitle-1">
-            <template v-if="logoImage">
-              Збережене лого
-            </template>
-            <template v-else>
-              <template v-if="nextFile">
-                Вибране лого (ще не збережене)
-              </template>
-              <template v-else>
-                Лого не вибрано
-              </template>
-            </template>
+        <v-card max-width="800" class="justify-center text-center mx-auto pa-3">
+          <v-card-title class="text-center subtitle-1">
+              Логотипи
           </v-card-title>
-
-          <v-img v-if="nextLogoTemporary" class="my-2" :src="nextLogoTemporary" contain />
-          <v-img v-else-if="logoImage" class="my-2" :src="logoImage" contain />
-          <v-file-input accept="image/*" v-model="nextFile" label="Виберіть файл" :prepend-icon="null"
-            prepend-inner-icon="mdi-paperclip" outlined :show-size="1000" hide-details 
-          />
-          <v-select class="mt-2" v-model="selectedCompetitionType" :items="sportTypes"
-            label="Вид змаганнь" hide-details
-          />
-          <v-select class="mt-2" v-model="selectedDirection" :items="logoDirectionItems"
-            label="Розміщення логотипу" hide-details 
-          />
-          <v-select class="mt-2" v-model="selectedGender" :items="genderItems"
-            label="Стать" hide-details
-          />
-        
-          <v-btn 
-            :disabled="!nextFile || !selectedCompetitionType || !selectedGender || !selectedDirection"
-            color="light-green" block class="mt-2"
-            @click="saveNextLogo"
-          >
+          <template>
+            <v-row class="flex-container">
+              <v-col cols="6">
+                <v-file-input class="smaller-input" accept="image/*" v-model="nextFileLeft" label="Виберіть файл"
+                  :prepend-icon="null" prepend-inner-icon="mdi-paperclip" outlined hide-details @change="saveNextLogo('LEFT')" />
+                <p class="text-caption">(Верхній логотип з ліва)</p>
+                <v-file-input class="smaller-input" accept="image/*" v-model="nextFileRight.file" label="Виберіть файл"
+                  :prepend-icon="null" prepend-inner-icon="mdi-paperclip" outlined hide-details @change="saveNextLogo('RIGHT')" />
+                <p class="text-caption">(Верхній логотип з права)</p>
+                <v-file-input accept="image/*" v-model="nextFileMan" label="Виберіть файл" :prepend-icon="null"
+                  prepend-inner-icon="mdi-paperclip" outlined :show-size="1000" hide-details />
+                <p class="text-caption">(Стать чоловіча)</p>
+                <v-file-input accept="image/*" v-model="nextFileWoman" label="Виберіть файл" :prepend-icon="null"
+                  prepend-inner-icon="mdi-paperclip" outlined :show-size="1000" hide-details />
+                <p class="text-caption">(Стать жіноча)</p>
+              </v-col>
+              <v-col cols="6">
+                <v-file-input accept="image/*" v-model="nextFileRight" label="Виберіть файл" :prepend-icon="null"
+                  prepend-inner-icon="mdi-paperclip" outlined :show-size="1000" hide-details />
+                <p class="text-caption">(Штурмова драбина)</p>
+                <v-file-input accept="image/*" v-model="nextFileRight" label="Виберіть файл" :prepend-icon="null"
+                  prepend-inner-icon="mdi-paperclip" outlined :show-size="1000" hide-details />
+                <p class="text-caption">(100-метрова смуга)</p>
+                <v-file-input accept="image/*" v-model="nextFileRight" label="Виберіть файл" :prepend-icon="null"
+                  prepend-inner-icon="mdi-paperclip" outlined :show-size="1000" hide-details />
+                <p class="text-caption">(Двоєборство)</p>
+                <v-file-input accept="image/*" v-model="nextFileRight" label="Виберіть файл" :prepend-icon="null"
+                  prepend-inner-icon="mdi-paperclip" outlined :show-size="1000" hide-details />
+                <p class="text-caption">(Пожежна естафета)</p>
+                <v-file-input accept="image/*" v-model="nextFileRight" label="Виберіть файл" :prepend-icon="null"
+                  prepend-inner-icon="mdi-paperclip" outlined :show-size="1000" hide-details />
+                <p class="text-caption">(Бойове розгортання)</p>
+                <v-file-input accept="image/*" v-model="nextFileRight" label="Виберіть файл" :prepend-icon="null"
+                  prepend-inner-icon="mdi-paperclip" outlined :show-size="1000" hide-details />
+                <p class="text-caption">(Висувна драбина)</p>
+              </v-col>
+            </v-row>
+          </template>
+          <!-- <v-btn :disabled="!nextFile || !selectedCompetitionType || !selectedGender || !selectedDirection"
+            color="light-green" block class="mt-2" @click="saveNextLogo">
             Зберегти
-          </v-btn>
+          </v-btn> -->
         </v-card>
       </v-col>
     </v-row>
-    <v-alert
-        v-model="showAlert"
-        ref="alertDialog"
-        :type="alertType"
-        dismissible
-        class="alert-message"
-    >
+    <v-alert v-model="showAlert" ref="alertDialog" :type="alertType" dismissible class="alert-message">
       {{ alertMessage }}
     </v-alert>
   </v-container>
@@ -74,6 +77,14 @@ export default {
           value: 'WOMAN', text: 'Жінки'
         },
       ],
+      nextFileLeft: {
+        file: null,
+        fileDirection: 'LEFT',
+      },
+      nextFileRight: {
+        file: null,
+        fileDirection: 'RIGHT',
+      },
       logos: [],
       logoImage: null,
       nextFile: null,
@@ -105,8 +116,8 @@ export default {
     },
     sportTypes() {
       return this.availableSportTypes.map((sportType) => ({
-          value: sportType,
-          text: this.$t(`const.${sportType}`)
+        value: sportType,
+        text: this.$t(`const.${sportType}`)
       }));
     },
   },
@@ -126,7 +137,7 @@ export default {
   },
   methods: {
     async parseFiles() {
-      const {data} = await this.axios.get(`private/files/competition/${this.competitionId}`);
+      const { data } = await this.axios.get(`private/files/competition/${this.competitionId}`);
       this.logos = data; // @TODO data.files
       this.availableSportTypes = ["ASSAULT_LADDER", "DUELING", "HUNDRED_METER"] // @TODO data.competitionTypes
     },
@@ -135,22 +146,49 @@ export default {
       this.logoImage = data.config ? data.config?.baseURL + data.config?.url : null;
       this.nextFile = null;
     },
-    async saveNextLogo() {
-      const file = this.nextFile;
-      if (!file) return console.error('no file selected')
-      var formData = new FormData();
-      formData.append("file", file);
-      return this.axios
-        .post(`private/files/competition/${this.competitionId}?fileDirection=${this.selectedDirection}&gender=${this.selectedGender}&competition=${this.selectedCompetitionType}`, 
-            formData, {headers: {'Content-Type': 'multipart/form-data'}}
-        )
-        .then(() => this.parseFiles())
-        .catch((error) => this.showError(error))
+    async saveNextLogo(fileDirection, gender, competitionType) {
+      const fileData = this.nextFileLeft.fileDirection === fileDirection ? this.nextFileLeft : this.nextFileRight;
+      const file = fileData.file;
+
+      if (!file) {
+        console.error('No file selected');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('fileDirection', fileDirection);
+      formData.append('gender', gender);
+      formData.append('competitionType', competitionType);
+
+      try {
+        await this.axios.post(`/api/v1/private/files/competition/${this.competitionId}`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        this.parseFiles();
+      } catch (error) {
+        this.showError(error);
+      }
+    },
     },
     showError(error) {
-        this.alertMessage = error.response && error.response.data.description ? error.response.data.description : error.message;
-        this.showAlert = true;
+      this.alertMessage = error.response && error.response.data.description ? error.response.data.description : error.message;
+      this.showAlert = true;
     }
   }
-}
 </script>
+
+<style>
+.text-center {
+  justify-content: center;
+}
+.flex-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.text-caption {
+  color: #777;
+  margin-top: 5px;
+}
+</style>
