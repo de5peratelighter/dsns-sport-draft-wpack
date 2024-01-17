@@ -143,14 +143,17 @@ export default {
   },
   computed: {
     mainMenuItems() {
-      const isLoggedIn = false;
+      const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+
       const items = [
         { title: this.$t(`shared.profile`), show: isLoggedIn },
         { title: this.$t(`shared.commandProtocol`), show: isLoggedIn },
         { title: this.$t(`shared.userRegistration`), show: !isLoggedIn },
         { title: this.$t(`shared.userLogin`), show: !isLoggedIn },
         { title: this.$t(`shared.athletesBase`), show: isLoggedIn },
+        { title: this.$t(`shared.userLogout`), show: isLoggedIn },
       ];
+
       return items.filter(({ show }) => show);
     },
     socialLinks() {
@@ -230,6 +233,12 @@ export default {
         this.$refs.loginSuccessDialog.isActive = false;
       }
     },
+    setAuthenticationStatus(isLoggedIn) {
+      localStorage.setItem('isLoggedIn', isLoggedIn);
+    },
+    updateMainMenuItems() {
+      this.$forceUpdate();
+    },
     async registerUser() {
       try {
         const response = await axios.post('public/auth/registration', {
@@ -262,6 +271,8 @@ export default {
         });
 
         console.log('Успішний вхід:', response.data);
+        this.setAuthenticationStatus(true);
+        this.updateMainMenuItems();
 
         // Assuming the backend sends the JWT token in the response
         const { accessToken, refreshToken, reference } = response.data;
@@ -280,11 +291,26 @@ export default {
         console.error('Помилка входу:', error);
       }
     },
+    logoutUser() {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('reference');
+      localStorage.removeItem('isLoggedIn');
+
+      this.loginUsername = '';
+      this.loginPassword = '';
+      this.setAuthenticationStatus(false);
+
+      delete axios.defaults.headers.common['Authorization'];
+    },
+
     handleMenuItemClick(item) {
       if (item.title === this.$t('shared.userRegistration')) {
         this.openRegistrationDialog();
       } else if (item.title === this.$t('shared.userLogin')) {
         this.openLoginDialog();
+      } else if (item.title === this.$t('shared.userLogout')) {
+        this.logoutUser();
       }
     },
     async fetchWeather() {
