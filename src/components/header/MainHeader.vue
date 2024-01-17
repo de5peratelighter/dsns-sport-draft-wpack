@@ -15,7 +15,7 @@
 
               <v-list>
                 <v-list-item v-for="(item, i) in mainMenuItems" :key="i">
-                  <v-list-item-title>{{ item.title }}</v-list-item-title>
+                  <v-list-item-title @click="handleMenuItemClick(item)">{{ item.title }}</v-list-item-title>
                 </v-list-item>
               </v-list>
             </v-menu>
@@ -50,7 +50,7 @@
           <template>
             <div>
               <div v-if="weatherData">
-                <p>Температура в Києві: {{ weatherData.main.temp }}°C, {{ weatherData.weather[0].description }}</p>
+                <p>Температура в Києві: {{ weatherData.main.temp }}°C</p>
                 <!-- <p>Опис: {{ weatherData.weather[0].description }}</p> -->
               </div>
               <div v-else>
@@ -61,6 +61,58 @@
         </div>
       </v-col>
     </v-row>
+    <v-dialog v-model="registrationDialog" max-width="600">
+      <v-card>
+        <v-card-title class="headline">{{ this.$t(`shared.userRegistration`) }}</v-card-title>
+        <v-card-text>
+          <v-form @submit.prevent="registerUser">
+            <v-text-field v-model="firstName" label="Ім'я" required></v-text-field>
+            <v-text-field v-model="secondName" label="Прізвище" required></v-text-field>
+            <v-text-field v-model="username" label="Логін" required></v-text-field>
+            <v-text-field v-model="password" label="Пароль" required></v-text-field>
+            <v-card-actions>
+              <v-btn type="submit" color="primary">Зареєструватись</v-btn>
+              <v-btn @click="cancelRegistration">Скасувати</v-btn>
+            </v-card-actions>
+          </v-form>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="registrationSuccessDialog" max-width="400" ref="registrationSuccessDialog">
+      <v-card>
+        <v-card-title>Успішна реєстрація</v-card-title>
+        <v-card-actions>
+          <p>Зв'яжіться з адміном для завершення реєстрації.</p>
+          <v-btn @click="closeRegistrationSuccessDialog">OK</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="loginDialog" max-width="600">
+      <v-card>
+        <v-card-title class="headline">{{ this.$t(`shared.userLogin`) }}</v-card-title>
+        <v-card-text>
+          <v-form @submit.prevent="loginUser">
+            <v-text-field v-model="loginUsername" label="Логін" required></v-text-field>
+            <v-text-field v-model="loginPassword" label="Пароль" required></v-text-field>
+            <v-card-actions>
+              <v-btn type="submit" color="primary">Увійти</v-btn>
+              <v-btn @click="cancelLogin">Скасувати</v-btn>
+            </v-card-actions>
+          </v-form>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="loginSuccessDialog" max-width="400" ref="loginSuccessDialog">
+      <v-card>
+        <v-card-title>Успішний вхід</v-card-title>
+        <v-card-actions>
+          <p>Ви успішно увійшли в систему.</p>
+          <br>
+          <v-btn @click="closeLoginSuccessDialog">OK</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -69,6 +121,16 @@ import axios from 'axios';
 export default {
   data: function () {
     return {
+      loginUsername: '',
+      loginPassword: '',
+      loginDialog: false,
+      loginSuccessDialog: false,
+      username: '',
+      firstName: '',
+      secondName: '',
+      password: '',
+      registrationDialog: false,
+      registrationSuccessDialog: false,
       activeLang: null,
       weatherData: null,
       apiKey: '4a697c396f11e7450074d7f1e5b233ec',
@@ -81,11 +143,12 @@ export default {
   },
   computed: {
     mainMenuItems() {
-      const isLoggedIn = true;
+      const isLoggedIn = false;
       const items = [
         { title: this.$t(`shared.profile`), show: isLoggedIn },
         { title: this.$t(`shared.commandProtocol`), show: isLoggedIn },
-        { title: this.$t(`shared.teamRegistration`), show: isLoggedIn },
+        { title: this.$t(`shared.userRegistration`), show: !isLoggedIn },
+        { title: this.$t(`shared.userLogin`), show: !isLoggedIn },
         { title: this.$t(`shared.athletesBase`), show: isLoggedIn },
       ];
       return items.filter(({ show }) => show);
@@ -130,9 +193,99 @@ export default {
     }
   },
   methods: {
+    openRegistrationDialog() {
+      const registrationButton = this.mainMenuItems.find(item => item.title === this.$t('shared.userRegistration'));
+      if (registrationButton) {
+        this.registrationDialog = true;
+      }
+    },
+    cancelRegistration() {
+      this.registrationDialog = false;
+    },
+    showAdminMessage() {
+      this.registrationDialog = false;
+      this.registrationSuccessDialog = true;
+    },
+    closeRegistrationSuccessDialog() {
+      if (this.$refs.registrationSuccessDialog) {
+        this.$refs.registrationSuccessDialog.isActive = false;
+      }
+    },
     switchLanguage(lang) {
       this.activeLang = lang;
       localStorage.setItem('dsns-competitions-lang', lang);
+    },
+    openLoginDialog() {
+      this.loginDialog = true;
+    },
+    cancelLogin() {
+      this.loginDialog = false;
+    },
+    showLoginSuccessMessage() {
+      this.loginDialog = false;
+      this.loginSuccessDialog = true;
+    },
+    closeLoginSuccessDialog() {
+      if (this.$refs.loginSuccessDialog) {
+        this.$refs.loginSuccessDialog.isActive = false;
+      }
+    },
+    async registerUser() {
+      try {
+        const response = await axios.post('public/auth/registration', {
+          username: this.username,
+          password: this.password,
+          firstName: this.firstName,
+          secondName: this.secondName,
+        });
+
+        console.log('Успішна реєстрація:', response.data);
+        this.registrationDialog = false;
+
+        // Assuming the backend sends the JWT token in the response
+        const { accessToken, refreshToken, reference } = response.data;
+
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
+        localStorage.setItem('reference', reference);
+
+        this.showAdminMessage();
+      } catch (error) {
+        console.error('Помилка реєстрації:', error);
+      }
+    },
+    async loginUser() {
+      try {
+        const response = await axios.post('public/auth/login', {
+          username: this.loginUsername,
+          password: this.loginPassword,
+        });
+
+        console.log('Успішний вхід:', response.data);
+
+        // Assuming the backend sends the JWT token in the response
+        const { accessToken, refreshToken, reference } = response.data;
+
+        // Save tokens in localStorage or Vuex store
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
+        localStorage.setItem('reference', reference);
+
+        // Add the Authorization header for future requests
+        axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+
+        // Show success message or redirect to a new page
+        this.showLoginSuccessMessage();
+      } catch (error) {
+        console.error('Помилка входу:', error);
+      }
+    },
+    handleMenuItemClick(item) {
+      if (item.title === this.$t('shared.userRegistration')) {
+        this.openRegistrationDialog();
+      } else if (item.title === this.$t('shared.userLogin')) {
+        this.openLoginDialog();
+      }
     },
     async fetchWeather() {
       try {
