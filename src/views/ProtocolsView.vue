@@ -257,7 +257,7 @@
                               {{ item.participantFullName }}
                             </td>
                           </template>
-                          Особовий результат
+                          Особистий результат
                       </v-tooltip>
                       </template>
                       <template v-else>

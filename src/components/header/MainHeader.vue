@@ -61,7 +61,7 @@
         </div>
       </v-col>
     </v-row>
-    <v-dialog v-model="registrationDialog" max-width="600">
+    <v-dialog v-model="registrationDialog" max-width="400" rounded>
       <v-card>
         <v-card-title class="headline">{{ this.$t(`shared.userRegistration`) }}</v-card-title>
         <v-card-text>
@@ -69,32 +69,49 @@
             <v-text-field v-model="firstName" label="Ім'я" required></v-text-field>
             <v-text-field v-model="secondName" label="Прізвище" required></v-text-field>
             <v-text-field v-model="username" label="Логін" required></v-text-field>
-            <v-text-field v-model="password" label="Пароль" required></v-text-field>
-            <v-card-actions>
-              <v-btn type="submit" color="primary">Зареєструватись</v-btn>
+            <v-text-field v-model="password" label="Пароль" required class="password-input-wrapper"
+              :type="showPassword ? 'text' : 'password'">
+              <template v-slot:append-outer>
+                <v-icon @click="showPassword = !showPassword" class="toggle-password-visibility">
+                  {{ showPassword ? 'mdi-eye-off' : 'mdi-eye' }}
+                </v-icon>
+              </template>
+            </v-text-field>
+            <v-card-actions class="d-flex justify-space-between">
+              <v-btn type="submit" color="primary" class="elevation-3">Зареєструватись</v-btn>
               <v-btn @click="cancelRegistration">Скасувати</v-btn>
             </v-card-actions>
           </v-form>
         </v-card-text>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="registrationSuccessDialog" max-width="400" ref="registrationSuccessDialog">
+    <v-dialog v-model="registrationSuccessDialog" max-width="400" ref="registrationSuccessDialog" rounded>
       <v-card>
-        <v-card-title>Успішна реєстрація</v-card-title>
+        <v-card-title>Успішно!</v-card-title>
         <v-card-actions>
           <p>Зв'яжіться з адміном для завершення реєстрації.</p>
           <v-btn @click="closeRegistrationSuccessDialog">OK</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="loginDialog" max-width="600">
+    <v-dialog v-model="loginDialog" max-width="400" rounded>
       <v-card>
         <v-card-title class="headline">{{ this.$t(`shared.userLogin`) }}</v-card-title>
         <v-card-text>
           <v-form @submit.prevent="loginUser">
             <v-text-field v-model="loginUsername" label="Логін" required></v-text-field>
-            <v-text-field v-model="loginPassword" label="Пароль" required></v-text-field>
-            <v-card-actions>
+            <v-text-field v-model="loginPassword" label="Пароль" required class="password-input-wrapper"
+              :type="showPassword ? 'text' : 'password'">
+              <template v-slot:append-outer>
+                <v-icon @click="togglePasswordVisibility" class="toggle-password-visibility">
+                  {{ showPassword ? 'mdi-eye-off' : 'mdi-eye' }}
+                </v-icon>
+              </template>
+            </v-text-field>
+
+            <v-alert v-if="loginError" type="error" class="mt-4">{{ loginError }}</v-alert>
+
+            <v-card-actions class="d-flex justify-space-between">
               <v-btn type="submit" color="primary">Увійти</v-btn>
               <v-btn @click="cancelLogin">Скасувати</v-btn>
             </v-card-actions>
@@ -103,12 +120,13 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="loginSuccessDialog" max-width="400" ref="loginSuccessDialog">
+    <v-dialog v-model="loginSuccessDialog" max-width="400" ref="loginSuccessDialog" rounded>
       <v-card>
-        <v-card-title>Успішний вхід</v-card-title>
-        <v-card-actions>
+        <v-card-title>Успішно!</v-card-title>
+        <v-card-text class="success-message">
           <p>Ви успішно увійшли в систему.</p>
-          <br>
+        </v-card-text>
+        <v-card-actions class="d-flex justify-center">
           <v-btn @click="closeLoginSuccessDialog">OK</v-btn>
         </v-card-actions>
       </v-card>
@@ -125,10 +143,12 @@ export default {
       loginPassword: '',
       loginDialog: false,
       loginSuccessDialog: false,
+      loginError: null,
       username: '',
       firstName: '',
       secondName: '',
       password: '',
+      showPassword: false,
       registrationDialog: false,
       registrationSuccessDialog: false,
       activeLang: null,
@@ -233,6 +253,9 @@ export default {
         this.$refs.loginSuccessDialog.isActive = false;
       }
     },
+    togglePasswordVisibility() {
+      this.showPassword = !this.showPassword;
+    },
     setAuthenticationStatus(isLoggedIn) {
       localStorage.setItem('isLoggedIn', isLoggedIn);
     },
@@ -270,25 +293,29 @@ export default {
           password: this.loginPassword,
         });
 
-        console.log('Успішний вхід:', response.data);
-        this.setAuthenticationStatus(true);
-        this.updateMainMenuItems();
-
-        // Assuming the backend sends the JWT token in the response
         const { accessToken, refreshToken, reference } = response.data;
 
-        // Save tokens in localStorage or Vuex store
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('refreshToken', refreshToken);
         localStorage.setItem('reference', reference);
 
-        // Add the Authorization header for future requests
         axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
 
-        // Show success message or redirect to a new page
         this.showLoginSuccessMessage();
+
+        this.startTokenRefreshTimer();
       } catch (error) {
-        console.error('Помилка входу:', error);
+        console.error('Login error:', error);
+
+        const errorCode = error.response.data.code;
+
+        if (errorCode === '400-002') {
+          this.loginError = this.$t('shared.incorrectPasswordErrorMessage');
+        } else if (errorCode === '404-002') {
+          this.loginError = this.$t('shared.userNotFoundErrorMessage');
+        } else {
+          this.loginError = this.$t('shared.loginErrorMessage');
+        }
       }
     },
     logoutUser() {
@@ -302,6 +329,42 @@ export default {
       this.setAuthenticationStatus(false);
 
       delete axios.defaults.headers.common['Authorization'];
+
+      this.stopTokenRefreshTimer();
+    },
+    startTokenRefreshTimer() {
+      this.stopTokenRefreshTimer();
+
+      // Set a timer to refresh the token one hour before it expires
+      const refreshTokenInterval = setInterval(async () => {
+        try {
+          const refreshToken = localStorage.getItem('refreshToken');
+          if (refreshToken) {
+            const refreshResponse = await axios.post('public/auth/new-access-token', {
+              refreshToken,
+            });
+
+            const newAccessToken = refreshResponse.data.accessToken;
+            localStorage.setItem('accessToken', newAccessToken);
+
+            axios.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
+          }
+        } catch (error) {
+          console.error('Token refresh error:', error);
+          // Handle token refresh error, e.g., redirect to login
+          // and stop the refresh timer
+          this.logoutUser();
+        }
+      }, 1000 * 60 * 59); // Refresh every 59 minutes
+
+      // Save the interval ID to clear it later
+      this.refreshTokenInterval = refreshTokenInterval;
+    },
+    stopTokenRefreshTimer() {
+      if (this.refreshTokenInterval) {
+        clearInterval(this.refreshTokenInterval);
+        this.refreshTokenInterval = null;
+      }
     },
 
     handleMenuItemClick(item) {
@@ -325,3 +388,52 @@ export default {
 }
 </script>
 
+<style>
+.success-message {
+  padding: 16px;
+}
+
+.v-btn {
+  min-width: auto;
+  padding: 8px 16px;
+}
+
+.v-dialog {
+  border-radius: 10px;
+}
+
+.v-card-title {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+}
+
+.v-card-actions {
+  margin-top: 16px;
+}
+
+.elevation-3 {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.password-input-wrapper {
+  position: relative;
+}
+
+.password-input-wrapper .toggle-password-visibility {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.password-input-wrapper .password-input {
+  width: calc(100% - 40px);
+  padding-right: 40px;
+}
+
+.toggle-password-visibility {
+  padding-bottom: 7px;
+}
+</style>
