@@ -222,7 +222,7 @@ export default {
         this.registrationDialog = true;
       }
     },
-    cancelRegistration() {                           иммммм
+    cancelRegistration() {
       this.registrationDialog = false;
     },
     showAdminMessage() {
@@ -258,9 +258,6 @@ export default {
     },
     setAuthenticationStatus(isLoggedIn) {
       localStorage.setItem('isLoggedIn', isLoggedIn);
-    },
-    updateMainMenuItems() {
-      this.$forceUpdate();
     },
     async registerUser() {
       try {
@@ -335,7 +332,6 @@ export default {
     startTokenRefreshTimer() {
       this.stopTokenRefreshTimer();
 
-      // Set a timer to refresh the token one hour before it expires
       const refreshTokenInterval = setInterval(async () => {
         try {
           const refreshToken = localStorage.getItem('refreshToken');
