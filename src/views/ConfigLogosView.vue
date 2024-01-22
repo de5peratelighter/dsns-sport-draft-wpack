@@ -9,55 +9,61 @@
           <template>
             <v-row class="flex-container">
               <v-col cols="6">
-                  <v-file-input class="smaller-input" accept="image/*" v-model="logoFiles.LEFT" label="Виберіть файл"
+                <v-file-input class="smaller-input" accept="image/*" v-model="logoFiles.LEFT" label="Виберіть файл"
                   :prepend-icon="null" prepend-inner-icon="mdi-paperclip" outlined hide-details
                   @change="saveNextLogo('LEFT')" />
+                <img v-if="logoImage.LEFT" :src="logoImage.LEFT" alt="LEFT Logo" class="logo-image" height="40">
                 <p class="text-caption">(Верхній логотип з ліва)</p>
                 <v-file-input class="smaller-input" accept="image/*" v-model="logoFiles.RIGHT" label="Виберіть файл"
                   :prepend-icon="null" prepend-inner-icon="mdi-paperclip" outlined hide-details
                   @change="saveNextLogo('RIGHT')" />
+                <img v-if="logoImage.RIGHT" :src="logoImage.RIGHT" alt="RIGHT Logo" class="logo-image" height="40">
                 <p class="text-caption">(Верхній логотип з права)</p>
                 <v-file-input class="smaller-input" accept="image/*" v-model="logoFiles.MAN" label="Виберіть файл"
                   :prepend-icon="null" prepend-inner-icon="mdi-paperclip" outlined hide-details
                   @change="saveNextLogo('MAN')" />
+                <img v-if="logoImage.MAN" :src="logoImage.MAN" alt="MAN Logo" class="logo-image" height="40">
                 <p class="text-caption">(Стать чоловіча)</p>
                 <v-file-input class="smaller-input" accept="image/*" v-model="logoFiles.WOMAN" label="Виберіть файл"
                   :prepend-icon="null" prepend-inner-icon="mdi-paperclip" outlined hide-details
                   @change="saveNextLogo('WOMAN')" />
+                <img v-if="logoImage.WOMAN" :src="logoImage.WOMAN" alt="WOMAN Logo" class="logo-image" height="40">
                 <p class="text-caption">(Стать жіноча)</p>
               </v-col>
               <v-col cols="6">
-                <v-file-input class="smaller-input" accept="image/*" v-model="logoFiles.ASSAULT_LADDER" label="Виберіть файл"
-                  :prepend-icon="null" prepend-inner-icon="mdi-paperclip" outlined hide-details
+                <v-file-input class="smaller-input" accept="image/*" v-model="logoFiles.ASSAULT_LADDER"
+                  label="Виберіть файл" :prepend-icon="null" prepend-inner-icon="mdi-paperclip" outlined hide-details
                   @change="saveNextLogo('ASSAULT_LADDER')" />
+                  <img v-if="logoImage.ASSAULT_LADDER" :src="logoImage.ASSAULT_LADDER" alt="ASSAULT LADDER Logo" class="logo-image" height="40">
                 <p class="text-caption">(Штурмова драбина)</p>
-                <v-file-input class="smaller-input" accept="image/*" v-model="logoFiles.HUNDRED_METTER" label="Виберіть файл"
-                  :prepend-icon="null" prepend-inner-icon="mdi-paperclip" outlined hide-details
+                <v-file-input class="smaller-input" accept="image/*" v-model="logoFiles.HUNDRED_METTER"
+                  label="Виберіть файл" :prepend-icon="null" prepend-inner-icon="mdi-paperclip" outlined hide-details
                   @change="saveNextLogo('HUNDRED_METTER')" />
+                  <img v-if="logoImage.HUNDRED_METTER" :src="logoImage.HUNDRED_METTER" alt="HUNDRED METTER Logo" class="logo-image" height="40">
                 <p class="text-caption">(100-метрова смуга)</p>
                 <v-file-input class="smaller-input" accept="image/*" v-model="logoFiles.DUELLING" label="Виберіть файл"
                   :prepend-icon="null" prepend-inner-icon="mdi-paperclip" outlined hide-details
                   @change="saveNextLogo('DUELLING')" />
+                  <img v-if="logoImage.DUELLING" :src="logoImage.DUELLING" alt="DUELLING Logo" class="logo-image" height="40">
                 <p class="text-caption">(Двоєборство)</p>
                 <v-file-input class="smaller-input" accept="image/*" v-model="logoFiles.RELAY" label="Виберіть файл"
                   :prepend-icon="null" prepend-inner-icon="mdi-paperclip" outlined hide-details
                   @change="saveNextLogo('RELAY')" />
+                  <img v-if="logoImage.RELAY" :src="logoImage.RELAY" alt="RELAY Logo" class="logo-image" height="40">
                 <p class="text-caption">(Пожежна естафета)</p>
-                <v-file-input class="smaller-input" accept="image/*" v-model="logoFiles.COMBAT_DEPLOYMENT" label="Виберіть файл"
-                  :prepend-icon="null" prepend-inner-icon="mdi-paperclip" outlined hide-details
+                <v-file-input class="smaller-input" accept="image/*" v-model="logoFiles.COMBAT_DEPLOYMENT"
+                  label="Виберіть файл" :prepend-icon="null" prepend-inner-icon="mdi-paperclip" outlined hide-details
                   @change="saveNextLogo('COMBAT_DEPLOYMENT')" />
+                  <img v-if="logoImage.COMBAT_DEPLOYMENT" :src="logoImage.COMBAT_DEPLOYMENT" alt="RELAY Logo" class="logo-image" height="40">
                 <p class="text-caption">(Бойове розгортання)</p>
-                <v-file-input class="smaller-input" accept="image/*" v-model="logoFiles.RETRACTABLE_LADDER" label="Виберіть файл"
-                  :prepend-icon="null" prepend-inner-icon="mdi-paperclip" outlined hide-details
+                <v-file-input class="smaller-input" accept="image/*" v-model="logoFiles.RETRACTABLE_LADDER"
+                  label="Виберіть файл" :prepend-icon="null" prepend-inner-icon="mdi-paperclip" outlined hide-details
                   @change="saveNextLogo('RETRACTABLE_LADDER')" />
+                  <img v-if="logoImage.RETRACTABLE_LADDER" :src="logoImage.RETRACTABLE_LADDER" alt="RELAY Logo" class="logo-image" height="40">
                 <p class="text-caption">(Висувна драбина)</p>
               </v-col>
             </v-row>
           </template>
-          <!-- <v-btn :disabled="!nextFile || !selectedCompetitionType || !selectedGender || !selectedDirection"
-            color="light-green" block class="mt-2" @click="saveNextLogo">
-            Зберегти
-          </v-btn> -->
         </v-card>
       </v-col>
     </v-row>
@@ -84,7 +90,18 @@ export default {
         COMBAT_DEPLOYMENT: null,
         RETRACTABLE_LADDER: null,
       },
-      logoImage: null,
+      logoImage: {
+        LEFT: null,
+        RIGHT: null,
+        MAN: null,
+        WOMAN: null,
+        ASSAULT_LADDER: null,
+        HUNDRED_METTER: null,
+        DUELLING: null,
+        RELAY: null,
+        COMBAT_DEPLOYMENT: null,
+        RETRACTABLE_LADDER: null,
+      },
       nextFile: null,
       selectedDirection: 'LEFT',
       alertType: 'error',
@@ -125,13 +142,18 @@ export default {
   methods: {
     async parseFiles() {
       const { data } = await this.axios.get(`private/files/competition/${this.competitionId}`);
-      this.logos = data; // @TODO data.files
-      this.availableSportTypes = ["ASSAULT_LADDER", "DUELING", "HUNDRED_METER"] // @TODO data.competitionTypes
+      this.logos = data;
+      this.loadLogoImages(); 
     },
     async retrieveFileReference(reference) {
       const data = await this.axios.get(`private/files/${reference}`);
-      this.logoImage = data.config ? data.config?.baseURL + data.config?.url : null;
-      this.nextFile = null;
+      return data.config ? data.config.baseURL + data.config.url : null;
+    },
+    async loadLogoImages() {
+      for (const logo of this.logos) {
+        const image = await this.retrieveFileReference(logo.reference);
+        this.$set(this.logoImage, logo.fileDirection, image);
+      }
     },
     async saveNextLogo(direction) {
       const file = this.logoFiles[direction];
