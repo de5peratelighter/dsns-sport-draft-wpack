@@ -144,9 +144,6 @@ export default {
             }
         }), {
                 title: this.$t(`shared.navMenuProtocolsGeneralTeam`),
-            },
-            {
-                title: this.$t(`shared.navMenuProtocolsGeneralTeamByStages`),
             }
         ];
     },
