@@ -170,7 +170,7 @@ export default {
         { title: this.$t(`shared.commandProtocol`), show: isLoggedIn },
         { title: this.$t(`shared.userRegistration`), show: !isLoggedIn },
         { title: this.$t(`shared.userLogin`), show: !isLoggedIn },
-        { title: this.$t(`shared.athletesBase`), show: isLoggedIn },
+        { title: this.$t(`shared.athletesBase`), show: !isLoggedIn },
         { title: this.$t(`shared.userLogout`), show: isLoggedIn },
       ];
 
@@ -362,7 +362,6 @@ export default {
         this.refreshTokenInterval = null;
       }
     },
-
     handleMenuItemClick(item) {
       if (item.title === this.$t('shared.userRegistration')) {
         this.openRegistrationDialog();
@@ -370,6 +369,8 @@ export default {
         this.openLoginDialog();
       } else if (item.title === this.$t('shared.userLogout')) {
         this.logoutUser();
+      } else if (item.title === this.$t('shared.athletesBase')) {
+        this.$router.push('/admin');
       }
     },
     async fetchWeather() {
