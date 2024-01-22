@@ -1,255 +1,187 @@
 <template>
   <v-container class="protocols-view white--text" ma-0 pa-0 fluid>
     <div v-if="isPageLoading" class="text-center">
-      <v-progress-circular
-        :size="100"
-        color="white"
-        indeterminate
-      ></v-progress-circular>
+      <v-progress-circular :size="100" color="white" indeterminate></v-progress-circular>
     </div>
     <template v-else>
-    <v-row v-if="activeCompetitionStatus === 'INACTIVE'" class="text-center justify-center mt-3">
-      <div class="d-flex" style="flex-direction: column">
-        <h4 class="text-center mb-4">{{ activeCompetitionType ? `Стартовий протокол: ${competitionTranslations[activeCompetitionType.sportType]}` : '' }}</h4>
-        <template v-if="isDueling">
-          <div>{{  competitionTranslations.ASSAULT_LADDER }} та {{ competitionTranslations.HUNDRED_METER }} наразі не завершені</div>
-          <v-btn
-              color="light-green white--text"
-              :disabled="!isDuelingReadyfToBeStarted"
-              @click="startCompetition"
-          >
+      <v-row v-if="activeCompetitionStatus === 'INACTIVE'" class="text-center justify-center mt-3">
+        <div class="d-flex" style="flex-direction: column">
+          <h4 class="text-center mb-4">{{ activeCompetitionType ? `Стартовий протокол:
+            ${competitionTranslations[activeCompetitionType.sportType]}` : '' }}</h4>
+          <template v-if="isDueling">
+            <div>{{ competitionTranslations.ASSAULT_LADDER }} та {{ competitionTranslations.HUNDRED_METER }} наразі не
+              завершені</div>
+            <v-btn color="light-green white--text" :disabled="!isDuelingReadyfToBeStarted" @click="startCompetition">
+              Розпочати змагання
+            </v-btn>
+          </template>
+          <v-btn v-else color="light-green white--text" @click="startCompetition">
             Розпочати змагання
           </v-btn>
-        </template>
-        <v-btn 
-          v-else
-          color="light-green white--text"
-          @click="startCompetition"
-        >
-          Розпочати змагання
-        </v-btn>
-      </div>
-    </v-row>
-    <v-row v-else>
-      <template v-if="activeCompetitionType">
-        <v-col lg="7" md="12" class="pr-0">
-          <v-sheet :color="'rgba(0, 0, 0, 0.35)'" class="pa-2 white--text">
-            <v-expansion-panels accordion>
-              <v-expansion-panel>
-                <v-expansion-panel-header style="padding: 0 15px;">
-                  <h4 class="text-center">
-                    {{ activeCompetitionType ? `${competitionTranslations[activeCompetitionType.sportType]}` : '' }}
-                  <v-menu>
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-btn
-                        color="primary"
-                        dark
-                        small
-                        v-bind="attrs" v-on="on"
-                        class="ml-2"
-                      >
-                        Друк
-                        <v-icon
-                          dark
-                          right
-                        >
-                        mdi-printer
-                        </v-icon>
-                      </v-btn>
-                        
-                    </template>
-                    <v-list>
-                      <v-list-item
-                        @click="printDocProtocol()"
-                      >
-                        <v-list-item-title>
-                          ПРОТОКОЛ ТЕСТ (ДОК-файл з бекенду)
-                        </v-list-item-title>
-                      </v-list-item>
-                      <v-list-item
-                        v-for="(menuItem, i) in printOptions"
-                        :key="i"
-                        @click="printProtocol(menuItem)"
-                      >
-                        <v-list-item-title>
-                          {{ menuItem.text }}
-                        </v-list-item-title>
-                      </v-list-item>
-                    </v-list>
-                  </v-menu>
-                </h4>
-                </v-expansion-panel-header>
-                <v-expansion-panel-content style="pointer-events: none">
-                  <div class="d-flex justify-space-between align-center"> 
-                    <div class="mr-1">Легенда:</div>
-                    <v-text-field
-                      :value="'Збережений результат'"
-                      success
-                      outlined
-                      dense
-                      hide-details
-                      class="no-border mr-1"
-                    />
-                    <v-text-field
-                      :value="'Результат з руч. хронометражем'"
-                      outlined
-                      dense
-                      hide-details
-                      suffix="0.24"
-                      class="border-yellow mr-1"
-                      style="border: 1px solid darkorange"
-                    />
-                    <v-text-field
-                      value="Дискваліфікований"
-                      outlined
-                      dense
-                      hide-details
-                    >
-                      <template v-slot:append>
-                        <v-menu style="top: -12px" offset-y>
-                          <template v-slot:activator="{ on, attrs }">
+        </div>
+      </v-row>
+      <v-row v-else>
+        <template v-if="activeCompetitionType">
+          <v-col lg="7" md="12" class="pr-0">
+            <v-sheet :color="'rgba(0, 0, 0, 0.35)'" class="pa-2 white--text">
+              <v-expansion-panels accordion>
+                <v-expansion-panel>
+                  <v-expansion-panel-header style="padding: 0 15px;">
+                    <h4 class="text-center">
+                      {{ activeCompetitionType ? `${competitionTranslations[activeCompetitionType.sportType]}` : '' }}
+                      <v-menu>
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-btn color="primary" dark small v-bind="attrs" v-on="on" class="ml-2">
+                            Друк
+                            <v-icon dark right>
+                              mdi-printer
+                            </v-icon>
+                          </v-btn>
+
+                        </template>
+                        <v-list>
+                          <v-list-item @click="printDocProtocol()">
+                            <v-list-item-title>
+                              ПРОТОКОЛ ТЕСТ (ДОК-файл з бекенду)
+                            </v-list-item-title>
+                          </v-list-item>
+                          <v-list-item v-for="(menuItem, i) in printOptions" :key="i" @click="printProtocol(menuItem)">
+                            <v-list-item-title>
+                              {{ menuItem.text }}
+                            </v-list-item-title>
+                          </v-list-item>
+                        </v-list>
+                      </v-menu>
+                    </h4>
+                  </v-expansion-panel-header>
+                  <v-expansion-panel-content style="pointer-events: none">
+                    <div class="d-flex justify-space-between align-center">
+                      <div class="mr-1">Легенда:</div>
+                      <v-text-field :value="'Збережений результат'" success outlined dense hide-details
+                        class="no-border mr-1" />
+                      <v-text-field :value="'Результат з руч. хронометражем'" outlined dense hide-details
+                        :suffix="getChronometrySuffix(activeCompetitionType.sportType)" class="border-yellow mr-1"
+                        style="border: 1px solid darkorange" />
+                      <v-text-field value="Дискваліфікований" outlined dense hide-details>
+                        <template v-slot:append>
+                          <v-menu style="top: -12px" offset-y>
+                            <template v-slot:activator="{ on, attrs }">
                               <v-icon left v-bind="attrs" v-on="on">mdi-comment-alert</v-icon>
-                          </template>
-                          <v-list>
-                            <v-list-item>
-                              <v-list-item-title class="red--text" />
-                            </v-list-item>
-                          </v-list>
-                        </v-menu>
+                            </template>
+                            <v-list>
+                              <v-list-item>
+                                <v-list-item-title class="red--text" />
+                              </v-list-item>
+                            </v-list>
+                          </v-menu>
+                        </template>
+                      </v-text-field>
+                    </div>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+              </v-expansion-panels>
+
+              <v-stepper v-model="stepper" non-linear style="position: sticky; top: 0; z-index: 1">
+                <v-stepper-header>
+                  <v-stepper-step editable :color="activeCompetitionStatus === 'ACTIVE' ? 'primary' : 'success'"
+                    :edit-icon="activeCompetitionStatus === 'ACTIVE' ? '$edit' : '$complete'"
+                    :complete="activeCompetitionStatus === 'FINAL' || activeCompetitionStatus === 'HALF_FINAL'" step="1"
+                    @click="getRaceData('ACTIVE')">
+                    <span :class="{ 'text-decoration-underline': stepper === 1 }">
+                      Стартовий протокол
+                      <v-icon left class="ml-1" color="red"
+                        @click.stop.prevent="restoreCompetition('INACTIVE')">mdi-history</v-icon>
+                    </span>
+                  </v-stepper-step>
+                  <template v-if="!isDueling && !isRelay && !isCombatDeployment">
+                    <v-divider></v-divider>
+
+                    <v-stepper-step :editable="availableHalfFinal"
+                      :color="activeCompetitionStatus === 'HALF_FINAL' ? 'primary' : 'success'"
+                      :edit-icon="activeCompetitionStatus === 'HALF_FINAL' ? '$edit' : '$complete'"
+                      :complete="activeCompetitionStatus === 'FINAL'" step="2" @click="getRaceData('HALF_FINAL')">
+                      <span :class="{ 'text-decoration-underline': stepper === 2 }">
+                        Пів-фінал
+                        <v-icon v-if="activeCompetitionStatus === 'HALF_FINAL'" left class="ml-1" color="red"
+                          @click.stop.prevent="restoreCompetition('ACTIVE')">mdi-history</v-icon>
+                      </span>
+                      <v-btn v-if="activeCompetitionStatus === 'ACTIVE'" small color="light-green white--text"
+                        :disabled="!availableHalfFinal" @click.stop.prevent="startHalfFinal">
+                        Старт
+                      </v-btn>
+                    </v-stepper-step>
+
+                    <v-divider></v-divider>
+
+                    <v-stepper-step step="3" :editable="availableFinal"
+                      :color="activeCompetitionStatus === 'FINAL' ? 'primary' : 'success'" @click="getRaceData('FINAL')">
+                      <span :class="{ 'text-decoration-underline': stepper === 3 }">
+                        Фінал
+                        <v-icon v-if="activeCompetitionStatus === 'FINAL'" left class="ml-1" color="red"
+                          @click.stop.prevent="restoreCompetition('HALF_FINAL')">mdi-history</v-icon>
+                      </span>
+                      <v-btn v-if="activeCompetitionStatus === 'HALF_FINAL'" small color="light-green white--text"
+                        :disabled="!availableFinal" @click.stop.prevent="startFinal">
+                        Старт
+                      </v-btn>
+                    </v-stepper-step>
+                  </template>
+                </v-stepper-header>
+              </v-stepper>
+              <v-data-table :headers="participantHeaders" :items="participants" :loading="isLoading" disable-pagination
+                disable-sort hide-default-footer :style="columnWidths" class="protocols-table">
+                <template #item="{ item, index }">
+                  <tr
+                    :class="{ 'tr-height-extended': isRelay || isCombatDeployment, 'tr-odd': isRelay || isCombatDeployment ? index % 2 : item[stepper == 1 ? 'trackNumber' : stepper == 2 ? 'halfFinalTrackNumber' : 'finalTrackNumber'] % 2 === 0 }"
+                    :style="{ 'height': isRelay || isCombatDeployment ? 'auto' : 'initial' }">
+                    <template v-if="stepper == 1">
+                      <template v-if="!isDueling">
+                        <td>
+                          {{ item.trackNumber }}
+                        </td>
+                        <td>
+                          {{ isRelay || isCombatDeployment ? item.raceNumber : item.roadNumber }}
+                        </td>
                       </template>
-                    </v-text-field>
-                  </div>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-            </v-expansion-panels> 
-            
-            <v-stepper v-model="stepper" non-linear style="position: sticky; top: 0; z-index: 1">
-              <v-stepper-header>
-                <v-stepper-step
-                  editable
-                  :color="activeCompetitionStatus === 'ACTIVE' ? 'primary' : 'success'"
-                  :edit-icon="activeCompetitionStatus === 'ACTIVE' ? '$edit' : '$complete'"
-                  :complete="activeCompetitionStatus === 'FINAL' || activeCompetitionStatus === 'HALF_FINAL'"
-                  step="1"
-                  @click="getRaceData('ACTIVE')"
-                >
-                  <span :class="{'text-decoration-underline': stepper === 1}">
-                    Стартовий протокол
-                    <v-icon left class="ml-1" color="red" @click.stop.prevent="restoreCompetition('INACTIVE')">mdi-history</v-icon>
-                  </span>
-                </v-stepper-step>
-                <template v-if="!isDueling && !isRelay && !isCombatDeployment">
-                <v-divider></v-divider>
-
-                <v-stepper-step
-                  :editable="availableHalfFinal"
-                  :color="activeCompetitionStatus === 'HALF_FINAL' ? 'primary' : 'success'"
-                  :edit-icon="activeCompetitionStatus === 'HALF_FINAL' ? '$edit' : '$complete'"
-                  :complete="activeCompetitionStatus === 'FINAL'"
-                  step="2"
-                  @click="getRaceData('HALF_FINAL')"
-                >
-                  <span :class="{'text-decoration-underline': stepper === 2}">
-                    Пів-фінал
-                    <v-icon v-if="activeCompetitionStatus === 'HALF_FINAL'" left class="ml-1" color="red" @click.stop.prevent="restoreCompetition('ACTIVE')">mdi-history</v-icon>
-                  </span>
-                  <v-btn 
-                    v-if="activeCompetitionStatus === 'ACTIVE'"
-                    small
-                    color="light-green white--text"
-                    :disabled="!availableHalfFinal"
-                    @click.stop.prevent="startHalfFinal"
-                  >
-                    Старт
-                  </v-btn>
-                </v-stepper-step>
-
-                <v-divider></v-divider>
-
-                <v-stepper-step
-                  step="3"
-                  :editable="availableFinal"
-                  :color="activeCompetitionStatus === 'FINAL' ? 'primary' : 'success'"
-                  @click="getRaceData('FINAL')"
-                >
-                  <span :class="{'text-decoration-underline': stepper === 3}">
-                    Фінал
-                    <v-icon v-if="activeCompetitionStatus === 'FINAL'" left class="ml-1" color="red" @click.stop.prevent="restoreCompetition('HALF_FINAL')">mdi-history</v-icon>
-                  </span>
-                  <v-btn 
-                    v-if="activeCompetitionStatus === 'HALF_FINAL'"
-                    small
-                    color="light-green white--text"
-                    :disabled="!availableFinal"
-                    @click.stop.prevent="startFinal"
-                  >
-                    Старт
-                  </v-btn>
-                </v-stepper-step>
-                </template>
-              </v-stepper-header>
-            </v-stepper>
-            <v-data-table
-              :headers="participantHeaders"
-              :items="participants"
-              :loading="isLoading"
-              disable-pagination
-              disable-sort
-              hide-default-footer
-              :style="columnWidths"
-              class="protocols-table"
-            >
-              <template #item="{ item, index }">
-                <tr :class="{ 'tr-height-extended': isRelay || isCombatDeployment, 'tr-odd': isRelay || isCombatDeployment ? index % 2 : item[stepper == 1 ? 'trackNumber' : stepper == 2 ? 'halfFinalTrackNumber' : 'finalTrackNumber'] % 2 === 0 }"
-                  :style="{'height': isRelay || isCombatDeployment ? 'auto' : 'initial'}"
-                >
-                  <template v-if="stepper == 1">
-                    <template v-if="!isDueling">
+                    </template>
+                    <template v-if="stepper == 2">
                       <td>
-                        {{ item.trackNumber }}
+                        {{ item.halfFinalTrackNumber }}
                       </td>
                       <td>
-                        {{ isRelay || isCombatDeployment ? item.raceNumber : item.roadNumber }}
+                        {{ item.halfFinalRoadNumber }}
                       </td>
                     </template>
-                  </template>
-                  <template v-if="stepper == 2">
-                    <td>
-                      {{ item.halfFinalTrackNumber }}
-                    </td>
-                    <td>
-                      {{ item.halfFinalRoadNumber }}
-                    </td>
-                  </template>
-                  <template v-if="stepper == 3">
-                    <td>
-                      {{ item.finalTrackNumber }}
-                    </td>
-                    <td>
-                      {{ item.finalRoadNumber }}
-                    </td>
-                  </template>
-                  <template v-if="isRelay || isCombatDeployment">
-                    <td style="display:grid;grid-column: 3/6;">
-                      <div v-for="(subitem,subItemIndex) in item.teamParticipants" :key="subItemIndex" class="protocols-sub-item">
-                        <div>{{ participantCategoryTranslations[subitem.participantCategory] }}</div>
-                        <div>{{ subitem.birthday ? subitem.birthday.slice(0,4) : '' }}</div>
-                        <div>{{ subitem.fullName }}</div>
-                      </div>
-                    </td>
-                  </template>
-                  <template v-else>
-                    <td>
-                      {{ item.participantNumber }}
-                    </td>
-                    <td>
-                      {{ participantCategoryTranslations[item.participantCategory] }}
-                    </td>
-                    <td>
-                      {{ item.participantBirthday ? item.participantBirthday.slice(0,4) : '' }}
-                    </td>
-                  </template>
-                  <template v-if="!isRelay && !isCombatDeployment">
+                    <template v-if="stepper == 3">
+                      <td>
+                        {{ item.finalTrackNumber }}
+                      </td>
+                      <td>
+                        {{ item.finalRoadNumber }}
+                      </td>
+                    </template>
+                    <template v-if="isRelay || isCombatDeployment">
+                      <td style="display:grid;grid-column: 3/6;">
+                        <div v-for="(subitem, subItemIndex) in item.teamParticipants" :key="subItemIndex"
+                          class="protocols-sub-item">
+                          <div>{{ participantCategoryTranslations[subitem.participantCategory] }}</div>
+                          <div>{{ subitem.birthday ? subitem.birthday.slice(0, 4) : '' }}</div>
+                          <div>{{ subitem.fullName }}</div>
+                        </div>
+                      </td>
+                    </template>
+                    <template v-else>
+                      <td>
+                        {{ item.participantNumber }}
+                      </td>
+                      <td>
+                        {{ participantCategoryTranslations[item.participantCategory] }}
+                      </td>
+                      <td>
+                        {{ item.participantBirthday ? item.participantBirthday.slice(0, 4) : '' }}
+                      </td>
+                    </template>
+                    <template v-if="!isRelay && !isCombatDeployment">
                       <template v-if="item.personal">
                         <v-tooltip left>
                           <template v-slot:activator="{ on, attrs }">
@@ -258,280 +190,224 @@
                             </td>
                           </template>
                           Особистий результат
-                      </v-tooltip>
+                        </v-tooltip>
                       </template>
                       <template v-else>
                         <td>
                           {{ item.participantFullName }}
                         </td>
                       </template>
-                  </template>
-                  <td>
-                    {{ isRelay || isCombatDeployment ? item.teamName : item.participantTeamName }}
-                  </td>
-                  <template v-if="stepper == 1">
-                    <template v-if="isDueling">
-                      <td>{{ item.hundredMeterResult }}</td>
-                      <td>{{ item.assaultLadderResult }}</td>
-                      <td>{{ item.duelingResult }}</td>
                     </template>
-                    <template v-else>
-                      <template v-if="isRelay">
-                        <td>
-                          <v-text-field
-                            :value="item.bestResultTeam"
-                            :success="!!item.bestResultTeam"
-                            :suffix="item.relayResultShifted ? plusValueOffset : null"
-                            outlined
-                            dense
-                            hide-details
-                            :class="['no-border', {'border-yellow': item.relayResultShifted}]"
-                            @focus="bestResultTeam = item.bestResultTeam"
-                            @input="validateValueResult($event, 'bestResultTeam')"
-                            @change="saveResults(item, 'bestResultTeam', 'relayDisqualificationType')"
-                          >
-                            <template v-if="item.bestResultTeam == '0'" v-slot:append>
-                              <v-menu style="top: -12px" offset-y>
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-icon left v-bind="attrs" v-on="on">mdi-comment-alert</v-icon>
-                                </template>
-                                <v-list>
-                                  <v-list-item
-                                    v-for="(menuItem, i) in zeroValueOptions"
-                                    :key="i"
-                                    @click="saveResults(item, 'bestResultTeam', 'relayDisqualificationType', menuItem.value)"
-                                  >
-                                    <v-list-item-title :class="{'red--text': item.relayDisqualificationType === menuItem.value}">
-                                      {{ menuItem.text }}
-                                    </v-list-item-title>
-                                  </v-list-item>
-                                </v-list>
-                              </v-menu>
-                            </template>
-                          </v-text-field>
-                        </td>
-                      </template>
-                      <template v-else-if="isCombatDeployment">
-                        <td>
-                          <v-text-field
-                            :value="item.firstTeamResult"
-                            :success="!!item.firstTeamResult"
-                            outlined
-                            dense
-                            hide-details
-                            :class="['no-border', {'border-yellow': item.firstTeamResultShifted}]"
-                            @focus="firstTeamResult = item.firstTeamResult"
-                            @input="validateValueResult($event, 'firstTeamResult')"
-                            @change="saveResults(item, 'firstTeamResult', 'firstDisqualificationType')"
-                          >
-                            <template v-if="item.firstTeamResult == '0'" v-slot:append>
-                              <v-menu style="top: -12px" offset-y>
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-icon left v-bind="attrs" v-on="on">mdi-comment-alert</v-icon>
-                                </template>
-                                <v-list>
-                                  <v-list-item
-                                    v-for="(menuItem, i) in zeroValueOptions"
-                                    :key="i"
-                                    @click="saveResults(item, 'firstTeamResult', 'firstDisqualificationType', menuItem.value)"
-                                  >
-                                    <v-list-item-title :class="{'red--text': item.firstDisqualificationType === menuItem.value}">
-                                      {{ menuItem.text }}
-                                    </v-list-item-title>
-                                  </v-list-item>
-                                </v-list>
-                              </v-menu>
-                            </template>
-                          </v-text-field>
-                        </td>
-                        <td>
-                          <v-text-field
-                            :value="item.secondTeamResult"
-                            :success="!!item.secondTeamResult"
-                            outlined
-                            dense
-                            hide-details
-                            :class="['no-border', {'border-yellow': item.secondTeamResultShifted}]"
-                            @focus="secondTeamResult = item.secondTeamResult"
-                            @input="validateValueResult($event, 'secondTeamResult')"
-                            @change="saveResults(item, 'secondTeamResult', 'secondDisqualificationType')"
-                          >
-                            <template v-if="item.secondTeamResult == '0'" v-slot:append>
-                              <v-menu style="top: -12px" offset-y>
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-icon left v-bind="attrs" v-on="on">mdi-comment-alert</v-icon>
-                                </template>
-                                <v-list>
-                                  <v-list-item
-                                    v-for="(menuItem, i) in zeroValueOptions"
-                                    :key="i"
-                                    @click="saveResults(item, 'secondTeamResult', 'secondDisqualificationType', menuItem.value)"
-                                  >
-                                    <v-list-item-title :class="{'red--text': item.secondDisqualificationType === menuItem.value}">
-                                      {{ menuItem.text }}
-                                    </v-list-item-title>
-                                  </v-list-item>
-                                </v-list>
-                              </v-menu>
-                            </template>
-                          </v-text-field>
-                        </td>
-                        <td style="line-height: 40px;">
-                          {{ item.bestResultTeam }}
-                        </td>
+                    <td>
+                      {{ isRelay || isCombatDeployment ? item.teamName : item.participantTeamName }}
+                    </td>
+                    <template v-if="stepper == 1">
+                      <template v-if="isDueling">
+                        <td>{{ item.hundredMeterResult }}</td>
+                        <td>{{ item.assaultLadderResult }}</td>
+                        <td>{{ item.duelingResult }}</td>
                       </template>
                       <template v-else>
-                        <td>
-                          <v-text-field
-                            :value="item.firstResult"
-                            :success="!!item.firstResult"
-                            outlined
-                            dense
-                            hide-details
-                            :class="['no-border', {'border-yellow': item.firstResultShifted}]"
-                            @focus="firstResult = item.firstResult"
-                            @input="validateValueResult($event, 'firstResult')"
-                            @change="saveResults(item, 'firstResult', 'firstDisqualificationType')"
-                          >
-                            <template v-if="item.firstResult == '0'" v-slot:append>
-                              <v-menu style="top: -12px" offset-y>
-                                <template v-slot:activator="{ on, attrs }">
+                        <template v-if="isRelay">
+                          <td>
+                            <v-text-field :value="item.bestResultTeam" :success="!!item.bestResultTeam"
+                              :suffix="item.relayResultShifted ? plusValueOffset : null" outlined dense hide-details
+                              :class="['no-border', { 'border-yellow': item.relayResultShifted }]"
+                              @focus="bestResultTeam = item.bestResultTeam"
+                              @input="validateValueResult($event, 'bestResultTeam')"
+                              @change="saveResults(item, 'bestResultTeam', 'relayDisqualificationType')">
+                              <template v-if="item.bestResultTeam == '0'" v-slot:append>
+                                <v-menu style="top: -12px" offset-y>
+                                  <template v-slot:activator="{ on, attrs }">
                                     <v-icon left v-bind="attrs" v-on="on">mdi-comment-alert</v-icon>
-                                </template>
-                                <v-list>
-                                  <v-list-item
-                                    v-for="(menuItem, i) in zeroValueOptions"
-                                    :key="i"
-                                    @click="saveResults(item, 'firstResult', 'firstDisqualificationType', menuItem.value)"
-                                  >
-                                    <v-list-item-title :class="{'red--text': item.firstDisqualificationType === menuItem.value}">
-                                      {{ menuItem.text }}
-                                    </v-list-item-title>
-                                  </v-list-item>
-                                </v-list>
-                              </v-menu>
-                            </template>
-                          </v-text-field>
-                        </td>
-                        <td>
-                          <v-text-field
-                            :value="item.secondResult"
-                            :success="!!item.secondResult"
-                            outlined
-                            dense
-                            hide-details
-                            :class="['no-border protocols-value-input', {'border-yellow': item.secondResultShifted}]"
-                            @focus="secondResult = item.secondResult"
-                            @input="validateValueResult($event, 'secondResult')"
-                            @change="saveResults(item, 'secondResult', 'secondDisqualificationType')"
-                          >
-                            <template v-if="item.secondResult == '0'" v-slot:append>
-                              <v-menu style="top: -12px" offset-y>
-                                <template v-slot:activator="{ on, attrs }">
+                                  </template>
+                                  <v-list>
+                                    <v-list-item v-for="(menuItem, i) in zeroValueOptions" :key="i"
+                                      @click="saveResults(item, 'bestResultTeam', 'relayDisqualificationType', menuItem.value)">
+                                      <v-list-item-title
+                                        :class="{ 'red--text': item.relayDisqualificationType === menuItem.value }">
+                                        {{ menuItem.text }}
+                                      </v-list-item-title>
+                                    </v-list-item>
+                                  </v-list>
+                                </v-menu>
+                              </template>
+                            </v-text-field>
+                          </td>
+                        </template>
+                        <template v-else-if="isCombatDeployment">
+                          <td>
+                            <v-text-field :value="item.firstTeamResult" :success="!!item.firstTeamResult" outlined dense
+                              hide-details :class="['no-border', { 'border-yellow': item.firstTeamResultShifted }]"
+                              @focus="firstTeamResult = item.firstTeamResult"
+                              @input="validateValueResult($event, 'firstTeamResult')"
+                              @change="saveResults(item, 'firstTeamResult', 'firstDisqualificationType')">
+                              <template v-if="item.firstTeamResult == '0'" v-slot:append>
+                                <v-menu style="top: -12px" offset-y>
+                                  <template v-slot:activator="{ on, attrs }">
                                     <v-icon left v-bind="attrs" v-on="on">mdi-comment-alert</v-icon>
-                                </template>
-                                <v-list>
-                                  <v-list-item
-                                    v-for="(menuItem, i) in zeroValueOptions"
-                                    :key="i"
-                                    @click="saveResults(item, 'secondResult', 'secondDisqualificationType', menuItem.value)"
-                                  >
-                                    <v-list-item-title :class="{'red--text': item.secondDisqualificationType === menuItem.value}">
-                                      {{ menuItem.text }}
-                                    </v-list-item-title>
-                                  </v-list-item>
-                                </v-list>
-                              </v-menu>
-                            </template>
-                          </v-text-field>
-                        </td>
-                        <td>
-                          {{ item.bestResult }}
-                        </td>
+                                  </template>
+                                  <v-list>
+                                    <v-list-item v-for="(menuItem, i) in zeroValueOptions" :key="i"
+                                      @click="saveResults(item, 'firstTeamResult', 'firstDisqualificationType', menuItem.value)">
+                                      <v-list-item-title
+                                        :class="{ 'red--text': item.firstDisqualificationType === menuItem.value }">
+                                        {{ menuItem.text }}
+                                      </v-list-item-title>
+                                    </v-list-item>
+                                  </v-list>
+                                </v-menu>
+                              </template>
+                            </v-text-field>
+                          </td>
+                          <td>
+                            <v-text-field :value="item.secondTeamResult" :success="!!item.secondTeamResult" outlined dense
+                              hide-details :class="['no-border', { 'border-yellow': item.secondTeamResultShifted }]"
+                              @focus="secondTeamResult = item.secondTeamResult"
+                              @input="validateValueResult($event, 'secondTeamResult')"
+                              @change="saveResults(item, 'secondTeamResult', 'secondDisqualificationType')">
+                              <template v-if="item.secondTeamResult == '0'" v-slot:append>
+                                <v-menu style="top: -12px" offset-y>
+                                  <template v-slot:activator="{ on, attrs }">
+                                    <v-icon left v-bind="attrs" v-on="on">mdi-comment-alert</v-icon>
+                                  </template>
+                                  <v-list>
+                                    <v-list-item v-for="(menuItem, i) in zeroValueOptions" :key="i"
+                                      @click="saveResults(item, 'secondTeamResult', 'secondDisqualificationType', menuItem.value)">
+                                      <v-list-item-title
+                                        :class="{ 'red--text': item.secondDisqualificationType === menuItem.value }">
+                                        {{ menuItem.text }}
+                                      </v-list-item-title>
+                                    </v-list-item>
+                                  </v-list>
+                                </v-menu>
+                              </template>
+                            </v-text-field>
+                          </td>
+                          <td style="line-height: 40px;">
+                            {{ item.bestResultTeam }}
+                          </td>
+                        </template>
+                        <template v-else>
+                          <td>
+                            <v-text-field :value="item.firstResult" :success="!!item.firstResult" outlined dense
+                              hide-details :class="['no-border', { 'border-yellow': item.firstResultShifted }]"
+                              @focus="firstResult = item.firstResult" @input="validateValueResult($event, 'firstResult')"
+                              @change="saveResults(item, 'firstResult', 'firstDisqualificationType')">
+                              <template v-if="item.firstResult == '0'" v-slot:append>
+                                <v-menu style="top: -12px" offset-y>
+                                  <template v-slot:activator="{ on, attrs }">
+                                    <v-icon left v-bind="attrs" v-on="on">mdi-comment-alert</v-icon>
+                                  </template>
+                                  <v-list>
+                                    <v-list-item v-for="(menuItem, i) in zeroValueOptions" :key="i"
+                                      @click="saveResults(item, 'firstResult', 'firstDisqualificationType', menuItem.value)">
+                                      <v-list-item-title
+                                        :class="{ 'red--text': item.firstDisqualificationType === menuItem.value }">
+                                        {{ menuItem.text }}
+                                      </v-list-item-title>
+                                    </v-list-item>
+                                  </v-list>
+                                </v-menu>
+                              </template>
+                            </v-text-field>
+                          </td>
+                          <td>
+                            <v-text-field :value="item.secondResult" :success="!!item.secondResult" outlined dense
+                              hide-details
+                              :class="['no-border protocols-value-input', { 'border-yellow': item.secondResultShifted }]"
+                              @focus="secondResult = item.secondResult"
+                              @input="validateValueResult($event, 'secondResult')"
+                              @change="saveResults(item, 'secondResult', 'secondDisqualificationType')">
+                              <template v-if="item.secondResult == '0'" v-slot:append>
+                                <v-menu style="top: -12px" offset-y>
+                                  <template v-slot:activator="{ on, attrs }">
+                                    <v-icon left v-bind="attrs" v-on="on">mdi-comment-alert</v-icon>
+                                  </template>
+                                  <v-list>
+                                    <v-list-item v-for="(menuItem, i) in zeroValueOptions" :key="i"
+                                      @click="saveResults(item, 'secondResult', 'secondDisqualificationType', menuItem.value)">
+                                      <v-list-item-title
+                                        :class="{ 'red--text': item.secondDisqualificationType === menuItem.value }">
+                                        {{ menuItem.text }}
+                                      </v-list-item-title>
+                                    </v-list-item>
+                                  </v-list>
+                                </v-menu>
+                              </template>
+                            </v-text-field>
+                          </td>
+                          <td>
+                            {{ item.bestResult }}
+                          </td>
+                        </template>
                       </template>
                     </template>
-                  </template>
-                  <template v-if="stepper == 2">
-                    <td>
-                      <v-text-field
-                        :value="item.halfFinalResult"
-                        :success="!!item.halfFinalResult"
-                        outlined
-                        dense
-                        hide-details
-                        :class="['no-border protocols-value-input', {'border-yellow': item.halfFinalResultShifted}]"
-                        :suffix="item.halfFinalResultShifted ? plusValueOffset : null"
-                        @focus="halfFinalResult = item.halfFinalResult"
-                        @input="validateValueResult($event, 'halfFinalResult')"
-                        @change="saveResults(item, 'halfFinalResult', 'halfFinalDisqualificationType')"
-                      >
-                        <template v-if="item.halfFinalResult == '0'" v-slot:append>
-                          <v-menu style="top: -12px" offset-y>
-                            <template v-slot:activator="{ on, attrs }">
+                    <template v-if="stepper == 2">
+                      <td>
+                        <v-text-field :value="item.halfFinalResult" :success="!!item.halfFinalResult" outlined dense
+                          hide-details
+                          :class="['no-border protocols-value-input', { 'border-yellow': item.halfFinalResultShifted }]"
+                          :suffix="item.halfFinalResultShifted ? plusValueOffset : null"
+                          @focus="halfFinalResult = item.halfFinalResult"
+                          @input="validateValueResult($event, 'halfFinalResult')"
+                          @change="saveResults(item, 'halfFinalResult', 'halfFinalDisqualificationType')">
+                          <template v-if="item.halfFinalResult == '0'" v-slot:append>
+                            <v-menu style="top: -12px" offset-y>
+                              <template v-slot:activator="{ on, attrs }">
                                 <v-icon left v-bind="attrs" v-on="on">mdi-comment-alert</v-icon>
-                            </template>
-                            <v-list>
-                              <v-list-item
-                                v-for="(menuItem, i) in zeroValueOptions"
-                                :key="i"
-                                @click="saveResults(item, 'halfFinalResult', 'halfFinalDisqualificationType', menuItem.value)"
-                              >
-                                <v-list-item-title :class="{'red--text': item.halfFinalDisqualificationType === menuItem.value}">
-                                  {{ menuItem.text }}
-                                </v-list-item-title>
-                              </v-list-item>
-                            </v-list>
-                          </v-menu>
-                        </template>
-                      </v-text-field>
-                    </td>
-                  </template>
-                  <template v-if="stepper == 3">
-                    <td>
-                      <v-text-field
-                        v-if="activeCompetitionStatus === 'FINAL'"
-                        :value="item.finalResult"
-                        :success="!!item.finalResult"
-                        outlined
-                        dense
-                        hide-details
-                        :class="['no-border protocols-value-input', {'border-yellow': item.finalResultShifted}]"
-                        :suffix="item.finalResultShifted ? plusValueOffset : null"
-                        @focus="finalResult = item.finalResult"
-                        @input="validateValueResult($event, 'finalResult')"
-                        @change="saveResults(item, 'finalResult', 'finalDisqualificationType')"
-                      >
-                        <template v-if="item.finalResult == '0'" v-slot:append>
-                          <v-menu style="top: -12px" offset-y>
-                            <template v-slot:activator="{ on, attrs }">
+                              </template>
+                              <v-list>
+                                <v-list-item v-for="(menuItem, i) in zeroValueOptions" :key="i"
+                                  @click="saveResults(item, 'halfFinalResult', 'halfFinalDisqualificationType', menuItem.value)">
+                                  <v-list-item-title
+                                    :class="{ 'red--text': item.halfFinalDisqualificationType === menuItem.value }">
+                                    {{ menuItem.text }}
+                                  </v-list-item-title>
+                                </v-list-item>
+                              </v-list>
+                            </v-menu>
+                          </template>
+                        </v-text-field>
+                      </td>
+                    </template>
+                    <template v-if="stepper == 3">
+                      <td>
+                        <v-text-field v-if="activeCompetitionStatus === 'FINAL'" :value="item.finalResult"
+                          :success="!!item.finalResult" outlined dense hide-details
+                          :class="['no-border protocols-value-input', { 'border-yellow': item.finalResultShifted }]"
+                          :suffix="item.finalResultShifted ? plusValueOffset : null"
+                          @focus="finalResult = item.finalResult" @input="validateValueResult($event, 'finalResult')"
+                          @change="saveResults(item, 'finalResult', 'finalDisqualificationType')">
+                          <template v-if="item.finalResult == '0'" v-slot:append>
+                            <v-menu style="top: -12px" offset-y>
+                              <template v-slot:activator="{ on, attrs }">
                                 <v-icon left v-bind="attrs" v-on="on">mdi-comment-alert</v-icon>
-                            </template>
-                            <v-list>
-                              <v-list-item
-                                v-for="(menuItem, i) in zeroValueOptions"
-                                :key="i"
-                                @click="saveResults(item, 'finalResult', 'finalDisqualificationType', menuItem.value)"
-                              >
-                                <v-list-item-title :class="{'red--text': item.finalDisqualificationType === menuItem.value}">
-                                  {{ menuItem.text }}
-                                </v-list-item-title>
-                              </v-list-item>
-                            </v-list>
-                          </v-menu>
+                              </template>
+                              <v-list>
+                                <v-list-item v-for="(menuItem, i) in zeroValueOptions" :key="i"
+                                  @click="saveResults(item, 'finalResult', 'finalDisqualificationType', menuItem.value)">
+                                  <v-list-item-title
+                                    :class="{ 'red--text': item.finalDisqualificationType === menuItem.value }">
+                                    {{ menuItem.text }}
+                                  </v-list-item-title>
+                                </v-list-item>
+                              </v-list>
+                            </v-menu>
+                          </template>
+                        </v-text-field>
+                        <template v-else>
+                          {{ item.finalResult }}
                         </template>
-                      </v-text-field>
-                      <template v-else>
-                        {{ item.finalResult }}
-                      </template>
-                    </td>
-                  </template>
-                </tr>
-              </template>
+                      </td>
+                    </template>
+                  </tr>
+                </template>
 
-              <template #no-data>
-                No data
-              </template>
-              <template #footer />
+                <template #no-data>
+                  No data
+                </template>
+                <template #footer />
               </v-data-table>
             </v-sheet>
           </v-col>
@@ -539,14 +415,8 @@
             <v-sheet :color="'rgba(0, 0, 0, 0.35)'" class="pa-2 white--text" style="position: sticky; top: 5px;">
               <template v-if="!isRelay && !isCombatDeployment">
                 <h4 class="text-center">Кращі результати</h4>
-                <v-data-table
-                  :headers="bestResultsHeaders"
-                  :items="bestParticipants"
-                  disable-pagination
-                  disable-sort
-                  hide-default-footer
-                  class="protocols-best-results"
-                >
+                <v-data-table :headers="bestResultsHeaders" :items="bestParticipants" disable-pagination disable-sort
+                  hide-default-footer class="protocols-best-results">
                   <template #item="{ item, index }">
                     <tr>
                       <td>
@@ -569,20 +439,15 @@
               <v-row class="mt-1">
                 <v-col cols="6">
                   <h4 class="text-center text-no-wrap">Командна першість по виду
-                     <v-icon dark @click="fetchteamResultsByType">mdi-refresh</v-icon>
+                    <v-icon dark @click="fetchteamResultsByType">mdi-refresh</v-icon>
                   </h4>
-                  <v-data-table
-                    :headers="isRelayOrCombat ? sortedTeamResultsByTypeHeaders : teamResultsByTypeHeaders"
-                    :items="isRelayOrCombat ? sortedTeamResultsByType : teamResultsByType"
-                    disable-pagination
-                    disable-sort
-                    hide-default-footer
-                    class="protocols-best-type"
-                  >
+                  <v-data-table :headers="isRelayOrCombat ? sortedTeamResultsByTypeHeaders : teamResultsByTypeHeaders"
+                    :items="isRelayOrCombat ? sortedTeamResultsByType : teamResultsByType" disable-pagination disable-sort
+                    hide-default-footer class="protocols-best-type">
                     <template #item="{ item, index }">
                       <tr>
                         <td>
-                          {{ index + 1}}
+                          {{ index + 1 }}
                         </td>
                         <td>
                           {{ item.teamName }}
@@ -596,20 +461,14 @@
                 </v-col>
                 <v-col cols="6">
                   <h4 class="text-center text-no-wrap">Загальнокомандна першість
-                     <v-icon dark @click="fetchteamResultsOverall">mdi-refresh</v-icon>
+                    <v-icon dark @click="fetchteamResultsOverall">mdi-refresh</v-icon>
                   </h4>
-                  <v-data-table
-                    :headers="teamResultsOverallHeaders"
-                    :items="teamResultsOverall"
-                    disable-pagination
-                    disable-sort
-                    hide-default-footer
-                    class="protocols-best-team"
-                  >
+                  <v-data-table :headers="teamResultsOverallHeaders" :items="teamResultsOverall" disable-pagination
+                    disable-sort hide-default-footer class="protocols-best-team">
                     <template #item="{ item, index }">
                       <tr>
                         <td>
-                          {{ index + 1}}
+                          {{ index + 1 }}
                         </td>
                         <td>
                           {{ item.teamName }}
@@ -626,11 +485,8 @@
           </v-col>
         </template>
       </v-row>
-      </template>
-      <v-dialog
-        v-model="confirmRestoreDialog"
-        max-width="600"
-      >
+    </template>
+    <v-dialog v-model="confirmRestoreDialog" max-width="600">
       <v-card ma-2>
         <v-card-title>
           {{ confirmRestoreDialogMessage }}
@@ -638,33 +494,19 @@
 
         <v-card-actions>
           <v-spacer />
-          <v-btn
-            text
-            color="primary"
-            @click="confirmRestoreDialog = false, confirmRestoreDialogType = null"
-          >
+          <v-btn text color="primary" @click="confirmRestoreDialog = false, confirmRestoreDialogType = null">
             Скасувати
           </v-btn>
 
-          <v-btn
-            color="red darken-1"
-            text
-            @click="undoCompetition"
-          >
+          <v-btn color="red darken-1" text @click="undoCompetition">
             Підтвердити
           </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
-      <v-alert
-        v-model="showAlert"
-        ref="alertDialog"
-        :type="alertType"
-        dismissible
-        class="alert-message"
-      >
-        {{ alertMessage }}
-      </v-alert>
+    <v-alert v-model="showAlert" ref="alertDialog" :type="alertType" dismissible class="alert-message">
+      {{ alertMessage }}
+    </v-alert>
   </v-container>
 </template>
 
@@ -706,7 +548,7 @@ export default {
       availableHalfFinal: false,
       availableFinal: false,
       stepper: 1,
-      
+
       alertType: 'error',
       showAlert: false,
       alertMessage: '',
@@ -737,22 +579,22 @@ export default {
       ];
       if (this.isDueling) {
         options.push(
-          {text:'Результати', value: 'DUELING_RESULT_CSV'},
+          { text: 'Результати', value: 'DUELING_RESULT_CSV' },
         )
       } else {
         if (this.isCombatDeployment || this.isRelay) {
           options.push(
-            {text:'Стартовий протокол', value: 'START_TEAM_CSV'},
-            {text:'Результати', value: 'RESULT_CSV'}
+            { text: 'Стартовий протокол', value: 'START_TEAM_CSV' },
+            { text: 'Результати', value: 'RESULT_CSV' }
           )
         } else {
           options.push(
-            {text:'Стартовий протокол', value: 'START_CSV'},
-            {text:'Пів-фінальний протокол', value: 'START_HALF_FINAL_CSV'},
-            {text:'Фінальний протокол', value: 'START_FINAL_CSV'},
-            {text:'Результати Стартовий протокол', value: 'RESULT_CSV'},
-            {text:'Результати Пів-фінальний протокол', value: 'RESULT_HALF_FINAL_CSV'},
-            {text:'Результати Фінальний протокол', value: 'RESULT_FINAL_CSV'}
+            { text: 'Стартовий протокол', value: 'START_CSV' },
+            { text: 'Пів-фінальний протокол', value: 'START_HALF_FINAL_CSV' },
+            { text: 'Фінальний протокол', value: 'START_FINAL_CSV' },
+            { text: 'Результати Стартовий протокол', value: 'RESULT_CSV' },
+            { text: 'Результати Пів-фінальний протокол', value: 'RESULT_HALF_FINAL_CSV' },
+            { text: 'Результати Фінальний протокол', value: 'RESULT_FINAL_CSV' }
           )
         }
       }
@@ -766,14 +608,14 @@ export default {
     },
     activeCompetitionType() {
       const competitionType = this.competitionType;
-      return this.competitionReferences.find(({reference}) => reference === competitionType);
+      return this.competitionReferences.find(({ reference }) => reference === competitionType);
     },
     activeCompetitionStatus() {
       return this.activeCompetitionType && this.activeCompetitionType.status;
     },
     competitionTranslations() {
       return {
-        ASSAULT_LADDER: 'Штурмова драбина', 
+        ASSAULT_LADDER: 'Штурмова драбина',
         HUNDRED_METER: '100 метрова смуга',
         DUELING: 'Двоборство',
         RETRACTABLE_LADDER: 'Висувна драбина',
@@ -783,7 +625,7 @@ export default {
     },
     participantCategoryTranslations() {
       return {
-        CMS: 'КМС', 
+        CMS: 'КМС',
         MS: 'МС',
         IMS: 'МСМК',
         HMS: 'ЗМС',
@@ -799,7 +641,7 @@ export default {
     columnWidths() {
       const widths = [];
       this.participantHeaders.forEach((header) => widths.push(header.width));
-      return `grid-template-columns: ${ widths.length ? widths.join(' ') : 'inherit'}`
+      return `grid-template-columns: ${widths.length ? widths.join(' ') : 'inherit'}`
     },
     isDueling() {
       return this.activeCompetitionType.sportType === 'DUELING'
@@ -812,7 +654,7 @@ export default {
     },
     isDuelingReadyfToBeStarted() {
       const relatedCompetitions = this.competitionReferences.filter(({ sportType }) => ['ASSAULT_LADDER', 'HUNDRED_METER'].includes(sportType))
-      return this.isDueling && relatedCompetitions.length && relatedCompetitions.every(({status}) => status === 'FINAL')
+      return this.isDueling && relatedCompetitions.length && relatedCompetitions.every(({ status }) => status === 'FINAL')
     },
     participantHeaders() {
       const status = this.stepper;
@@ -846,13 +688,13 @@ export default {
 
       if (isRelay || isCombatDeployment) {
         headers.push(
-          { text: 'Звання/розряд', value: 'participantCategory', width: '60px'  },
+          { text: 'Звання/розряд', value: 'participantCategory', width: '60px' },
           { text: 'Рік народж.', value: 'participantBirthday', width: '60px' }
         );
       } else {
         headers.push(
           { text: '№ учас.', value: 'participantNumber', width: '60px' },
-          { text: 'Звання/розряд', value: 'participantCategory', width: '60px'  },
+          { text: 'Звання/розряд', value: 'participantCategory', width: '60px' },
           { text: 'Рік народж.', value: 'participantBirthday', width: '60px' },
         )
       }
@@ -863,25 +705,25 @@ export default {
       if (status == 1) {
         if (isDueling) {
           headers.push(
-            { text: '100-м смуга', value: 'hundredMeterResult', width: '80px'  },
-            { text: this.competitionTranslations.ASSAULT_LADDER, value: 'assaultLadderResult', width: '80px'  },
-            { text: 'Сума', value: 'duelingResult', width: '80px'  }
+            { text: '100-м смуга', value: 'hundredMeterResult', width: '80px' },
+            { text: this.competitionTranslations.ASSAULT_LADDER, value: 'assaultLadderResult', width: '80px' },
+            { text: 'Сума', value: 'duelingResult', width: '80px' }
           )
-        } else if(isRelay) {
+        } else if (isRelay) {
           headers.push(
-            { text: 'Результати', value: 'bestResultTeam', width: '100px'  },
+            { text: 'Результати', value: 'bestResultTeam', width: '100px' },
           )
         } else {
           headers.push(
-            { text: 'Перша спроба', value: 'firstResult', width: '80px'  },
+            { text: 'Перша спроба', value: 'firstResult', width: '80px' },
             { text: 'Друга спроба', value: 'secondResult', width: '80px' },
-            { text: 'Кращий', value: 'bestResult', width: '80px'  }
+            { text: 'Кращий', value: 'bestResult', width: '80px' }
           )
         }
       }
       if (status == 2) {
         headers.push(
-          { text: 'Результат пів-фіналу', value: 'halfFinalResult', width: '1fr'  }
+          { text: 'Результат пів-фіналу', value: 'halfFinalResult', width: '1fr' }
         )
       }
       if (status == 3) {
@@ -906,51 +748,51 @@ export default {
       let typeSpecializedOptions = [];
       if (activeType === 'HUNDRED_METER') {
         typeSpecializedOptions = [{
-            text: 'Розгалуження',
-            value: 'BRANCHING'
-          },
-          {
-            text: 'Ствол на фініші',
-            value: 'BARREL_FINISH_LINE'
-          },
-          {
-            text: 'Не зєднані рукава між собою',
-            value: 'NO_BRANCHING'
-          }]
+          text: 'Розгалуження',
+          value: 'BRANCHING'
+        },
+        {
+          text: 'Ствол на фініші',
+          value: 'BARREL_FINISH_LINE'
+        },
+        {
+          text: 'Не зєднані рукава між собою',
+          value: 'NO_BRANCHING'
+        }]
       } else if (activeType === 'ASSAULT_LADDER') {
         typeSpecializedOptions = [{
-            text: 'Фінішний майданчик',
-            value: 'FINISH_PLACE'
-          }]
+          text: 'Фінішний майданчик',
+          value: 'FINISH_PLACE'
+        }]
       } else if (activeType === 'RELAY') {
         typeSpecializedOptions = [{
-            text: 'Фінішний майданчик',
-            value: 'TRANSMISSION_ZONE'
-          }, {
-            text: 'Деко',
-            value: 'DECO'
-          },
-          {
-            text: 'Розгалуження',
-            value: 'BRANCHING'
-          },
-          {
-            text: 'Не зєднані рукава між собою',
-            value: 'NO_BRANCHING'
-          }]
+          text: 'Фінішний майданчик',
+          value: 'TRANSMISSION_ZONE'
+        }, {
+          text: 'Деко',
+          value: 'DECO'
+        },
+        {
+          text: 'Розгалуження',
+          value: 'BRANCHING'
+        },
+        {
+          text: 'Не зєднані рукава між собою',
+          value: 'NO_BRANCHING'
+        }]
       } else if (activeType === 'COMBAT_DEPLOYMENT') {
         typeSpecializedOptions = [{
-            text: 'Обмежувальна лінія',
-            value: 'LIMITING_LINE'
-          },
-          {
-            text: 'Розрив рукава',
-            value: 'SLEEFE_TEAR'
-          },
-          {
-            text: 'Не зднана сітка',
-            value: 'NOT_CONNECTED_GRID'
-          }]
+          text: 'Обмежувальна лінія',
+          value: 'LIMITING_LINE'
+        },
+        {
+          text: 'Розрив рукава',
+          value: 'SLEEFE_TEAR'
+        },
+        {
+          text: 'Не зднана сітка',
+          value: 'NOT_CONNECTED_GRID'
+        }]
       }
       return [
         {
@@ -1020,6 +862,13 @@ export default {
         })
         .catch((error) => this.showError(error))
     },
+    getChronometrySuffix(sportType) {
+      if (sportType === 'ASSAULT_LADDER') {
+        return '0.15';
+      } else {
+        return '0.24';
+      }
+    },
     async getBestResults() {
       return this.axios.get(`private/competition-types/${this.competitionType}/best-race-results`)
         .then(({ data }) => {
@@ -1027,18 +876,19 @@ export default {
           this.availableFinal = data.availableFinal;
           this.bestParticipants = data.bestResultList;
         })
+      console.log();
     },
     async getCompetitionReferences() {
       this.isPageLoading = true;
       return this.axios.get(`private/competitions/${this.competitionId}/type`)
-          .then(({ data }) => {
-            this.competitionReferences = data;
-            this.isPageLoading = false;
-            if (this.activeCompetitionType && this.activeCompetitionStatus !== 'INACTIVE') this.getRaceData();
-          })
-          .catch(() => {
-            this.isPageLoading = false;
-          });
+        .then(({ data }) => {
+          this.competitionReferences = data;
+          this.isPageLoading = false;
+          if (this.activeCompetitionType && this.activeCompetitionStatus !== 'INACTIVE') this.getRaceData();
+        })
+        .catch(() => {
+          this.isPageLoading = false;
+        });
     },
     async getRaceData(status = this.activeCompetitionStatus) {
       this.isLoading = true;
@@ -1064,17 +914,17 @@ export default {
           request = await this.axios.get(`private/competition-types/${this.competitionType}/final-race-results`);
         }
         if (!request) return;
-          this.isLoading = false;
-          this.stepper = stepper;
-          this.participants = request.data;
-          if (request.data.length) {
-            return Promise.all([this.getBestResults(), this.fetchteamResultsByType(), this.fetchteamResultsOverall()])
-          }
-      } catch(error) {
+        this.isLoading = false;
+        this.stepper = stepper;
+        this.participants = request.data;
+        if (request.data.length) {
+          return Promise.all([this.getBestResults(), this.fetchteamResultsByType(), this.fetchteamResultsOverall()])
+        }
+      } catch (error) {
         this.isLoading = false;
       }
     },
-    async fetchteamResultsByType () {
+    async fetchteamResultsByType() {
       if (this.isRelay || this.isCombatDeployment) {
         return this.axios.get(`private/competition-types/${this.competitionType}/start-team-race-list?sort=bestResultTeam,ASC`)
           .then(({ data }) => {
@@ -1086,22 +936,22 @@ export default {
           this.teamResultsByType = data;
         })
     },
-    async fetchteamResultsOverall () {
+    async fetchteamResultsOverall() {
       return this.axios.post(`private/teams/competitions/${this.competitionId}/generate-team-results`)
         .then(({ data }) => {
           this.teamResultsOverall = data;
         })
     },
-    async undoCompetition () {
+    async undoCompetition() {
       if (!this.confirmRestoreDialogType) return;
       return this.axios.post(`private/competition-types/${this.competitionType}/undo-competition-type?competitionTypeStatus=${this.confirmRestoreDialogType}`)
         .then((response) => {
           window.location.reload();
         });
     },
-    async printDocProtocol () {
+    async printDocProtocol() {
       return this.axios.get(`private/protocols/${this.competitionId}`)
-        .then(({data}) => {
+        .then(({ data }) => {
           if (!data) return;
           try {
             const nextFile = new Document({
@@ -1122,9 +972,9 @@ export default {
                 document.body.removeChild(downloadLink);
               })
             }
-          } catch(err) {
+          } catch (err) {
             console.error('Parsing:', err)
-            this.showError({message: 'Protocol parsing failed'})
+            this.showError({ message: 'Protocol parsing failed' })
           }
         });
     },
@@ -1132,7 +982,7 @@ export default {
       return this.axios.get(`private/competition-types/${this.competitionType}/csv/download?csvType=${option.value}`)
         .then((res) => {
           const data = res.data;
-          const blob = new Blob([data], {type: 'text/csv;charset=utf-8'});
+          const blob = new Blob([data], { type: 'text/csv;charset=utf-8' });
           const fileName = `${this.competitionTranslations[this.activeCompetitionType.sportType]}`
           if (!blob) return;
           const a = document.createElement('a');
@@ -1148,12 +998,12 @@ export default {
     },
     async saveResults(participant, key, disqualifiedKey = null, disqualifiedValue = null) {
       const [isRelay, isCombatDeployment] = [this.isRelay, this.isCombatDeployment];
-      
+
       console.warn('participant', participant)
       const raceReference = isRelay || isCombatDeployment ? participant.reference : participant.raceReference;
       if (!raceReference) return Promise.reject('Incorrect raceReference for saving');
-       
-      let result = key in this ? `${this[key]}`.trim().replaceAll(',','.') : '';
+
+      let result = key in this ? `${this[key]}`.trim().replaceAll(',', '.') : '';
       // prevent empty values
       if (isNaN(result)) return;
 
@@ -1164,7 +1014,7 @@ export default {
         if (Number(participant[key]) === Number(result)) return;
         // formatting dot
         if (!result.includes('.')) result = result + '.00';
-        if (result.split('.')[1].length < 2) result = result + '0'; 
+        if (result.split('.')[1].length < 2) result = result + '0';
       }
 
       const foundIndex = this.participants
@@ -1183,10 +1033,10 @@ export default {
       }
 
       return this.axios.patch(`private/competition-types/${isRelay || isCombatDeployment ? 'team-races' : 'races'}/${raceReference}/save-results`, reqData)
-        .then(({data = {}}) => {
+        .then(({ data = {} }) => {
           // directly saving new properties (since most of other properties returned are null)
           this.$set(this.participants, foundIndex, {
-            ...participant, 
+            ...participant,
             firstResult: data.firstResult,
             secondResult: data.secondResult,
             bestResult: data.bestResult,
@@ -1208,9 +1058,9 @@ export default {
             secondTeamResulShiftedt: data.secondTeamResultShifted,
             relayDisqualificationType: data.relayDisqualificationType,
             relayResultShifted: data.relayResultShifted
-           });
-           // refetch best results
-           this.getBestResults();
+          });
+          // refetch best results
+          this.getBestResults();
         })
         .catch((error) => {
           this.$set(this.participants, foundIndex, participant);
@@ -1224,7 +1074,7 @@ export default {
     validateValueResult(value, key) {
       if (key in this) {
         const shiftedKey = this.shiftedValueKey(this.isRelay ? 'relayResult' : key);
-        
+
         if (value.includes('+')) {
           this[key] = `${Number(value.replace('+', '')) + Number(this.plusValueOffset)}`;
           if (shiftedKey) this[shiftedKey] = true;
@@ -1235,7 +1085,7 @@ export default {
       }
     },
     shiftedValueKey(key) {
-      const shiftedKey = key+'Shifted';
+      const shiftedKey = key + 'Shifted';
       if (shiftedKey in this) return shiftedKey;
     },
     restoreCompetition(step) {
@@ -1256,75 +1106,98 @@ export default {
 </script>
 
 <style lang="scss">
-  table .v-input__slot {
-    padding: 5px!important;
-  }
-  .protocols-print-icon {
-    cursor: pointer;
-    margin: 0!important;
-    height: 25px;
-    margin-top: 25px;
-  }
-  .protocols-value-input  {
-    .v-input__append-outer{
-      margin-left: 0!important;
-      button {
-        margin-right: 0!important;
-      }
-    }
-    .v-input__append-inner {
-      margin-top: 5px!important;
-    }
-  }
-  .protocols-table {
-    th, td {
-      padding: 0 5px!important;
-      display: flex;
-      align-items: center;
-    }
-    .v-data-table__wrapper, table, thead, tbody, tr {
-      grid-template-columns: inherit;
-    }
-    tr {
-      display: grid;
-    }
-    tr.tr-odd {
-      background: rgba(0,0,0,.07);
-    }
-    tr.tr-height-extended {
-      td {
-        padding: 10px 5px!important;
-        align-items: baseline!important;
-        height: inherit!important;
-      }
-    }
-    tbody tr:hover {
-      background-color: rgba(24,103,192, 0.20)!important;
-    }
-    .protocols-sub-item {
-      display: grid;
-      grid-template-columns: 60px 60px 1fr;
+table .v-input__slot {
+  padding: 5px !important;
+}
+
+.protocols-print-icon {
+  cursor: pointer;
+  margin: 0 !important;
+  height: 25px;
+  margin-top: 25px;
+}
+
+.protocols-value-input {
+  .v-input__append-outer {
+    margin-left: 0 !important;
+
+    button {
+      margin-right: 0 !important;
     }
   }
-  .alert-message {
-    position: fixed;
-    bottom: 0;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    margin: 0;
+
+  .v-input__append-inner {
+    margin-top: 5px !important;
   }
-  .v-application div.border-yellow {
-    color: darkorange!important;
+}
+
+.protocols-table {
+
+  th,
+  td {
+    padding: 0 5px !important;
+    display: flex;
+    align-items: center;
   }
-  .protocols-best-results, .protocols-best-type, .protocols-best-team {
-    thead {
-      position: sticky;
-      top: 0;
-      background: #fff;
+
+  .v-data-table__wrapper,
+  table,
+  thead,
+  tbody,
+  tr {
+    grid-template-columns: inherit;
+  }
+
+  tr {
+    display: grid;
+  }
+
+  tr.tr-odd {
+    background: rgba(0, 0, 0, .07);
+  }
+
+  tr.tr-height-extended {
+    td {
+      padding: 10px 5px !important;
+      align-items: baseline !important;
+      height: inherit !important;
     }
-    .v-data-table__wrapper {
-      max-height: 520px;
-      overflow: auto;
-    }
   }
+
+  tbody tr:hover {
+    background-color: rgba(24, 103, 192, 0.20) !important;
+  }
+
+  .protocols-sub-item {
+    display: grid;
+    grid-template-columns: 60px 60px 1fr;
+  }
+}
+
+.alert-message {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+}
+
+.v-application div.border-yellow {
+  color: darkorange !important;
+}
+
+.protocols-best-results,
+.protocols-best-type,
+.protocols-best-team {
+  thead {
+    position: sticky;
+    top: 0;
+    background: #fff;
+  }
+
+  .v-data-table__wrapper {
+    max-height: 520px;
+    overflow: auto;
+  }
+}
 </style>

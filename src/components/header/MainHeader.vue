@@ -222,7 +222,7 @@ export default {
         this.registrationDialog = true;
       }
     },
-    cancelRegistration() {
+    cancelRegistration() {                           иммммм
       this.registrationDialog = false;
     },
     showAdminMessage() {
