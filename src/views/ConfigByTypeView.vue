@@ -39,7 +39,7 @@
               <v-row v-if="showCheckboxes(tab.sportType)">
                 <v-checkbox v-model="tab.skipHalfFinal" label="Пропустити півфінал" dark
                   style="margin: 30px 30px 0px 20px"></v-checkbox>
-                <v-checkbox v-model="tab.skipFinal" label="Пропустити фінал" dark style="margin-top: 30px"></v-checkbox>
+                <v-checkbox v-model="tab.skipFinals" label="Пропустити фінал" dark style="margin-top: 30px"></v-checkbox>
               </v-row>
 
               <v-col v-if="tab.startProtocolRule === 'BLOCK_LOT'" cols="6">
@@ -144,7 +144,7 @@ export default {
       endDateMenu: {},
       endTimeMenu: {},
       skipHalfFinal: false,
-      skipFinal: false,
+      skipFinals: false,
 
       alertType: 'error',
       showAlert: false,
@@ -246,7 +246,7 @@ export default {
 
       const payload = {
         skipHalfFinal: this.skipHalfFinal,
-        skipFinal: this.skipFinal,
+        skipFinals: this.skipFinals,
       };
 
       return this.axios.post(`private/competition-types/${tab.reference}/start-competition-type`, payload)
