@@ -26,6 +26,9 @@
             <v-sheet :color="'rgba(0, 0, 0, 0.35)'" class="pa-2 white--text">
               <v-expansion-panels accordion>
                 <v-expansion-panel>
+                  <v-btn :color="comleted ? 'success' : 'grey'" dark small class="ml-2 mt-2" >
+                        {{completed ? "Проведено" : "Триває"}}
+                      </v-btn>
                   <v-expansion-panel-header style="padding: 0 15px;">
                     <h4 class="text-center">
                       {{ activeCompetitionType ? `${competitionTranslations[activeCompetitionType.sportType]}` : '' }}
@@ -545,6 +548,7 @@ export default {
         { text: 'Команда', value: 'teamName', width: '45%' },
         { text: 'Сума', value: 'result', width: '45%' },
       ],
+      completed: false,
       availableHalfFinal: false,
       availableFinal: false,
       stepper: 1,
