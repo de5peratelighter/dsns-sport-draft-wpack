@@ -12,7 +12,8 @@
                         <tr>
                             <td>
                                 <div class="d-flex align-center">
-                                    <v-btn icon width="20" height="20" color="error" @click="deleteParticipant(item)" style="margin-right: 5px;">
+                                    <v-btn icon width="20" height="20" color="error" @click="deleteParticipant(item)"
+                                        style="margin-right: 5px;">
                                         <v-icon>mdi-close</v-icon>
                                     </v-btn>
                                     {{ index + 1 }}
@@ -199,9 +200,14 @@ export default {
                 RELAY: 'Пожежна естафета',
                 COMBAT_DEPLOYMENT: 'Бойове розгортання'
             }
-            return this.competitionReferences.map((reference) => {
-                return { text: mapper[reference.sportType], value: reference.sportType, width: '10%' }
-            });
+            // return this.competitionReferences.map((reference) => {
+            //     return { text: mapper[reference.sportType], value: reference.sportType, width: '10%' }
+            // });
+            return [
+                { text: mapper['HUNDRED_METER'], value: 'HUNDRED_METER', width: '10%' },
+                { text: mapper['ASSAULT_LADDER'], value: 'ASSAULT_LADDER', width: '10%' },
+                { text: mapper['DUELING'], value: 'DUELING', width: '10%' },
+            ];
         }
     },
     mounted() {
