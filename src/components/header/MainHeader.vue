@@ -94,31 +94,6 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="loginDialog" max-width="400" rounded>
-      <v-card>
-        <v-card-title class="headline">{{ this.$t(`shared.userLogin`) }}</v-card-title>
-        <v-card-text>
-          <v-form @submit.prevent="loginUser">
-            <v-text-field v-model="loginUsername" label="Логін" required></v-text-field>
-            <v-text-field v-model="loginPassword" label="Пароль" required class="password-input-wrapper"
-              :type="showPassword ? 'text' : 'password'">
-              <template v-slot:append-outer>
-                <v-icon @click="togglePasswordVisibility" class="toggle-password-visibility">
-                  {{ showPassword ? 'mdi-eye-off' : 'mdi-eye' }}
-                </v-icon>
-              </template>
-            </v-text-field>
-
-            <v-alert v-if="loginError" type="error" class="mt-4">{{ loginError }}</v-alert>
-
-            <v-card-actions class="d-flex justify-space-between">
-              <v-btn type="submit" color="primary">Увійти</v-btn>
-              <v-btn @click="cancelLogin">Скасувати</v-btn>
-            </v-card-actions>
-          </v-form>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
 
     <v-dialog v-model="loginSuccessDialog" max-width="400" ref="loginSuccessDialog" rounded>
       <v-card>
@@ -137,6 +112,12 @@
 <script>
 import axios from 'axios';
 export default {
+  props: {
+    isLoggedIn: {
+      type: Boolean,
+      default: false
+    }
+  },
   data: function () {
     return {
       loginUsername: '',
@@ -155,7 +136,8 @@ export default {
       weatherData: null,
       apiKey: '4a697c396f11e7450074d7f1e5b233ec',
       city: 'Kyiv',
-      units: 'metric'
+      units: 'metric',
+      accessToken: ''
     }
   },
   mounted() {
@@ -163,14 +145,14 @@ export default {
   },
   computed: {
     mainMenuItems() {
-      const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+      const isLoggedIn = this.isLoggedIn;
 
       const items = [
         { title: this.$t(`shared.profile`), show: isLoggedIn },
         { title: this.$t(`shared.commandProtocol`), show: isLoggedIn },
         { title: this.$t(`shared.userRegistration`), show: !isLoggedIn },
         { title: this.$t(`shared.userLogin`), show: !isLoggedIn },
-        { title: this.$t(`shared.athletesBase`), show: !isLoggedIn },
+        { title: this.$t(`shared.athletesBase`), show: isLoggedIn },
         { title: this.$t(`shared.userLogout`), show: isLoggedIn },
       ];
 
@@ -238,26 +220,13 @@ export default {
       this.activeLang = lang;
       localStorage.setItem('dsns-competitions-lang', lang);
     },
-    openLoginDialog() {
-      this.loginDialog = true;
-    },
     cancelLogin() {
-      this.loginDialog = false;
-    },
-    showLoginSuccessMessage() {
-      this.loginDialog = false;
-      this.loginSuccessDialog = true;
+      this.$emit('toggleLoginDialog', false)
     },
     closeLoginSuccessDialog() {
       if (this.$refs.loginSuccessDialog) {
         this.$refs.loginSuccessDialog.isActive = false;
       }
-    },
-    togglePasswordVisibility() {
-      this.showPassword = !this.showPassword;
-    },
-    setAuthenticationStatus(isLoggedIn) {
-      localStorage.setItem('isLoggedIn', isLoggedIn);
     },
     async registerUser() {
       try {
@@ -271,104 +240,18 @@ export default {
         console.log('Успішна реєстрація:', response.data);
         this.registrationDialog = false;
 
-        // Assuming the backend sends the JWT token in the response
-        const { accessToken, refreshToken, reference } = response.data;
-
-        localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('refreshToken', refreshToken);
-        localStorage.setItem('reference', reference);
-
         this.showAdminMessage();
       } catch (error) {
         console.error('Помилка реєстрації:', error);
-      }
-    },
-    async loginUser() {
-      try {
-        const response = await axios.post('public/auth/login', {
-          username: this.loginUsername,
-          password: this.loginPassword,
-        });
-
-        const { accessToken, refreshToken, reference } = response.data;
-
-        localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('refreshToken', refreshToken);
-        localStorage.setItem('reference', reference);
-
-        axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-
-        this.showLoginSuccessMessage();
-
-        this.startTokenRefreshTimer();
-      } catch (error) {
-        console.error('Login error:', error);
-
-        const errorCode = error.response.data.code;
-
-        if (errorCode === '400-002') {
-          this.loginError = this.$t('shared.incorrectPasswordErrorMessage');
-        } else if (errorCode === '404-002') {
-          this.loginError = this.$t('shared.userNotFoundErrorMessage');
-        } else {
-          this.loginError = this.$t('shared.loginErrorMessage');
-        }
-      }
-    },
-    logoutUser() {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('reference');
-      localStorage.removeItem('isLoggedIn');
-
-      this.loginUsername = '';
-      this.loginPassword = '';
-      this.setAuthenticationStatus(false);
-
-      delete axios.defaults.headers.common['Authorization'];
-
-      this.stopTokenRefreshTimer();
-    },
-    startTokenRefreshTimer() {
-      this.stopTokenRefreshTimer();
-
-      const refreshTokenInterval = setInterval(async () => {
-        try {
-          const refreshToken = localStorage.getItem('refreshToken');
-          if (refreshToken) {
-            const refreshResponse = await axios.post('public/auth/new-access-token', {
-              refreshToken,
-            });
-
-            const newAccessToken = refreshResponse.data.accessToken;
-            localStorage.setItem('accessToken', newAccessToken);
-
-            axios.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
-          }
-        } catch (error) {
-          console.error('Token refresh error:', error);
-          // Handle token refresh error, e.g., redirect to login
-          // and stop the refresh timer
-          this.logoutUser();
-        }
-      }, 1000 * 60 * 59); // Refresh every 59 minutes
-
-      // Save the interval ID to clear it later
-      this.refreshTokenInterval = refreshTokenInterval;
-    },
-    stopTokenRefreshTimer() {
-      if (this.refreshTokenInterval) {
-        clearInterval(this.refreshTokenInterval);
-        this.refreshTokenInterval = null;
       }
     },
     handleMenuItemClick(item) {
       if (item.title === this.$t('shared.userRegistration')) {
         this.openRegistrationDialog();
       } else if (item.title === this.$t('shared.userLogin')) {
-        this.openLoginDialog();
+        this.$emit('toggleLoginDialog', true)
       } else if (item.title === this.$t('shared.userLogout')) {
-        this.logoutUser();
+        this.$emit('logoutUser')
       } else if (item.title === this.$t('shared.athletesBase')) {
         this.$router.push('/admin');
       }
