@@ -37,16 +37,18 @@ export default {
     };
   },
   methods: {
-    toggleUserStatus(userId, isActive) {
-      axios.put(`private/users/eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJuYXphcjIwMjEiLCJyb2xlIjoiUk9MRV9BRE1JTiIsImlhdCI6MTcwNTk0NzYwMiwiZXhwIjoxNzA1OTQ4MjAyfQ.QG_TZ4xlkTCA4NyA4pMSQeoCQeJd0Aymol_WWNm1qUc/status`, { isActive })
+    toggleUserStatus(id, isActive) {
+      console.log('Request Payload:', { id, isActive });
+      axios.put(`private/users/${id}/status`, { isActive })
         .then(() => {
-          const updatedUserIndex = this.users.content.findIndex(user => user.reference === userId);
+          const updatedUserIndex = this.users.content.findIndex(user => user.reference === id);
           if (updatedUserIndex !== -1) {
             this.$set(this.users.content, updatedUserIndex, { ...this.users.content[updatedUserIndex], isActive });
           }
         })
         .catch(error => {
           console.error('Error updating user status:', error);
+          console.log('Error response:', error.response);
         });
     },
     fetchUsers() {
