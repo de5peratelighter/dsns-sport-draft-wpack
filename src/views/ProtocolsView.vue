@@ -26,7 +26,10 @@
             <v-sheet :color="'rgba(0, 0, 0, 0.35)'" class="pa-2 white--text">
               <v-expansion-panels accordion>
                 <v-expansion-panel>
-                  <v-btn :color="comleted ? 'success' : 'grey'" dark small class="ml-2 mt-2" >
+                  <v-btn 
+                    :color="completed ? 'success' : 'grey'"
+                    dark small class="ml-2 mt-2"
+                  >
                         {{completed ? "Проведено" : "Триває"}}
                       </v-btn>
                   <v-expansion-panel-header style="padding: 0 15px;">
@@ -213,10 +216,14 @@
                       <template v-else>
                         <template v-if="isRelay">
                           <td>
-                            <v-text-field :value="item.bestResultTeam" :success="!!item.bestResultTeam"
-                              :suffix="item.relayResultShifted ? plusValueOffset : null" outlined dense hide-details
+                            <v-text-field 
+                              :value="item.bestResultTeam" 
+                              :success="!!item.bestResultTeam"
+                              :suffix="item.relayResultShifted ? plusValueOffset : null"
+                              :disabled="isUpdatingResults"
                               :class="['no-border', { 'border-yellow': item.relayResultShifted }]"
-                              @focus="bestResultTeam = item.bestResultTeam"
+                              outlined dense hide-details
+                              @focus="focusItemUpdate($event, item, 'bestResultTeam')"
                               @input="validateValueResult($event, 'bestResultTeam')"
                               @change="saveResults(item, 'bestResultTeam', 'relayDisqualificationType')">
                               <template v-if="item.bestResultTeam == '0'" v-slot:append>
@@ -240,9 +247,13 @@
                         </template>
                         <template v-else-if="isCombatDeployment">
                           <td>
-                            <v-text-field :value="item.firstTeamResult" :success="!!item.firstTeamResult" outlined dense
-                              hide-details :class="['no-border', { 'border-yellow': item.firstTeamResultShifted }]"
-                              @focus="firstTeamResult = item.firstTeamResult"
+                            <v-text-field 
+                              :value="item.firstTeamResult" 
+                              :success="!!item.firstTeamResult"
+                              :disabled="isUpdatingResults"
+                              :class="['no-border', { 'border-yellow': item.firstTeamResultShifted }]"
+                              outlined dense hide-details
+                              @focus="focusItemUpdate($event, item, 'firstTeamResult')"
                               @input="validateValueResult($event, 'firstTeamResult')"
                               @change="saveResults(item, 'firstTeamResult', 'firstDisqualificationType')">
                               <template v-if="item.firstTeamResult == '0'" v-slot:append>
@@ -264,9 +275,13 @@
                             </v-text-field>
                           </td>
                           <td>
-                            <v-text-field :value="item.secondTeamResult" :success="!!item.secondTeamResult" outlined dense
-                              hide-details :class="['no-border', { 'border-yellow': item.secondTeamResultShifted }]"
-                              @focus="secondTeamResult = item.secondTeamResult"
+                            <v-text-field 
+                              :value="item.secondTeamResult" 
+                              :success="!!item.secondTeamResult"
+                              :disabled="isUpdatingResults"
+                              :class="['no-border', { 'border-yellow': item.secondTeamResultShifted }]"
+                              outlined dense hide-details
+                              @focus="focusItemUpdate($event, item, 'secondTeamResult')"
                               @input="validateValueResult($event, 'secondTeamResult')"
                               @change="saveResults(item, 'secondTeamResult', 'secondDisqualificationType')">
                               <template v-if="item.secondTeamResult == '0'" v-slot:append>
@@ -293,9 +308,14 @@
                         </template>
                         <template v-else>
                           <td>
-                            <v-text-field :value="item.firstResult" :success="!!item.firstResult" outlined dense
-                              hide-details :class="['no-border', { 'border-yellow': item.firstResultShifted }]"
-                              @focus="firstResult = item.firstResult" @input="validateValueResult($event, 'firstResult')"
+                            <v-text-field 
+                              :value="item.firstResult" 
+                              :success="!!item.firstResult"
+                              :disabled="isUpdatingResults"
+                              :class="['no-border', { 'border-yellow': item.firstResultShifted }]"
+                              outlined dense hide-details
+                              @focus="focusItemUpdate($event, item, 'firstResult')"
+                              @input="validateValueResult($event, 'firstResult')"
                               @change="saveResults(item, 'firstResult', 'firstDisqualificationType')">
                               <template v-if="item.firstResult == '0'" v-slot:append>
                                 <v-menu style="top: -12px" offset-y>
@@ -316,10 +336,13 @@
                             </v-text-field>
                           </td>
                           <td>
-                            <v-text-field :value="item.secondResult" :success="!!item.secondResult" outlined dense
-                              hide-details
+                            <v-text-field 
+                              :value="item.secondResult" 
+                              :success="!!item.secondResult" 
+                              :disabled="isUpdatingResults"
                               :class="['no-border protocols-value-input', { 'border-yellow': item.secondResultShifted }]"
-                              @focus="secondResult = item.secondResult"
+                              outlined dense hide-details
+                              @focus="focusItemUpdate($event, item, 'secondResult')"
                               @input="validateValueResult($event, 'secondResult')"
                               @change="saveResults(item, 'secondResult', 'secondDisqualificationType')">
                               <template v-if="item.secondResult == '0'" v-slot:append>
@@ -348,11 +371,14 @@
                     </template>
                     <template v-if="stepper == 2">
                       <td>
-                        <v-text-field :value="item.halfFinalResult" :success="!!item.halfFinalResult" outlined dense
-                          hide-details
+                        <v-text-field 
+                          :value="item.halfFinalResult" 
+                          :success="!!item.halfFinalResult" 
+                          :disabled="isUpdatingResults"
                           :class="['no-border protocols-value-input', { 'border-yellow': item.halfFinalResultShifted }]"
                           :suffix="item.halfFinalResultShifted ? plusValueOffset : null"
-                          @focus="halfFinalResult = item.halfFinalResult"
+                          outlined dense hide-details
+                          @focus="focusItemUpdate($event, item, 'halfFinalResult')"
                           @input="validateValueResult($event, 'halfFinalResult')"
                           @change="saveResults(item, 'halfFinalResult', 'halfFinalDisqualificationType')">
                           <template v-if="item.halfFinalResult == '0'" v-slot:append>
@@ -376,11 +402,15 @@
                     </template>
                     <template v-if="stepper == 3">
                       <td>
-                        <v-text-field v-if="activeCompetitionStatus === 'FINAL'" :value="item.finalResult"
-                          :success="!!item.finalResult" outlined dense hide-details
+                        <v-text-field v-if="activeCompetitionStatus === 'FINAL'" 
+                          :value="item.finalResult"
+                          :disabled="isUpdatingResults"
+                          :success="!!item.finalResult"
                           :class="['no-border protocols-value-input', { 'border-yellow': item.finalResultShifted }]"
                           :suffix="item.finalResultShifted ? plusValueOffset : null"
-                          @focus="finalResult = item.finalResult" @input="validateValueResult($event, 'finalResult')"
+                          outlined dense hide-details
+                          @focus="focusItemUpdate($event, item, 'finalResult')"
+                          @input="validateValueResult($event, 'finalResult')"
                           @change="saveResults(item, 'finalResult', 'finalDisqualificationType')">
                           <template v-if="item.finalResult == '0'" v-slot:append>
                             <v-menu style="top: -12px" offset-y>
@@ -575,6 +605,9 @@ export default {
       confirmRestoreDialog: false,
       confirmRestoreDialogMessage: 'Повернутись на попередній етап змаганнь?',
       confirmRestoreDialogType: null,
+
+      isUpdatingResults: false,
+      isUpdatingTimeout: null,
     }
   },
   computed: {
@@ -817,6 +850,17 @@ export default {
         if (v) this.getCompetitionReferences();
       },
       immediate: true
+    },
+    isUpdatingResults: {
+      handler(value) {
+        // refetch best results with delay
+        clearTimeout(this.isUpdatingTimeout);
+        if (!value) {
+          this.isUpdatingTimeout = setTimeout(() => {
+            this.getBestResults();
+          }, 3000)
+        }
+      }
     }
   },
   methods: {
@@ -1003,7 +1047,6 @@ export default {
     async saveResults(participant, key, disqualifiedKey = null, disqualifiedValue = null) {
       const [isRelay, isCombatDeployment] = [this.isRelay, this.isCombatDeployment];
 
-      console.warn('participant', participant)
       const raceReference = isRelay || isCombatDeployment ? participant.reference : participant.raceReference;
       if (!raceReference) return Promise.reject('Incorrect raceReference for saving');
 
@@ -1036,8 +1079,10 @@ export default {
         reqData.participantReference = participant.participantReference;
       }
 
+      this.isUpdatingResults = true;
       return this.axios.patch(`private/competition-types/${isRelay || isCombatDeployment ? 'team-races' : 'races'}/${raceReference}/save-results`, reqData)
         .then(({ data = {} }) => {
+          this.isUpdatingResults = false;
           // directly saving new properties (since most of other properties returned are null)
           this.$set(this.participants, foundIndex, {
             ...participant,
@@ -1063,10 +1108,9 @@ export default {
             relayDisqualificationType: data.relayDisqualificationType,
             relayResultShifted: data.relayResultShifted
           });
-          // refetch best results
-          this.getBestResults();
         })
         .catch((error) => {
+          this.isUpdatingResults = false;
           this.$set(this.participants, foundIndex, participant);
           this.showError(error);
         })
@@ -1087,6 +1131,10 @@ export default {
           if (shiftedKey) this[shiftedKey] = false;
         }
       }
+    },
+    focusItemUpdate(event, key, item) {
+      if (event) event.target.select();
+      this[key] = item[key];
     },
     shiftedValueKey(key) {
       const shiftedKey = key + 'Shifted';
