@@ -1,8 +1,17 @@
 <template>
   <v-container fluid class="admin-panel-container">
     <v-row class="text-center justify-center">
-      <v-col cols="8">
-        <h2 class="white--text">БАЗА СПОРТСМЕНІВ</h2>
+      <v-col cols="10">
+        <v-row class="d-flex align-center">
+          <v-col cols="auto">
+            <v-btn icon @click="goBack">
+              <v-icon color="white">mdi-arrow-left</v-icon>
+            </v-btn>
+          </v-col>
+          <v-col cols="auto">
+            <h2 class="white--text mb-0">БАЗА СПОРТСМЕНІВ</h2>
+          </v-col>
+        </v-row>
         <v-list>
           <v-list-item-group v-if="users && users.content.length > 0">
             <v-list-item v-for="user in users.content" :key="user.reference">
@@ -64,6 +73,9 @@ export default {
         .catch(error => {
           console.error('Error fetching users:', error);
         });
+    },
+    goBack() {
+      this.$router.go(-1);
     },
   },
   mounted() {
