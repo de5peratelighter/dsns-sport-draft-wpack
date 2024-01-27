@@ -1,7 +1,6 @@
 <template>
   <v-container class="competition-edit-container white--text" ma-0 pa-0 fluid>
     <div class="text-center">
-      <div>У консолі є змінна <strong class="orange--text">window.pages</strong> що відповідає за вміст doc-файлу, <br/> при зміні даниху ній - зміниться вмістиме файлу при наступному скачуванню</div>
       <v-btn color="white" @click="downloadMockedFile">
         Отримати тестовий Doc-file
       </v-btn>

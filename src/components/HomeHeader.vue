@@ -47,6 +47,7 @@ export default {
   },
   data: function () {
     return {
+      isLoggedIn: false,
       loginUsername: '',
       loginPassword: '',
       loginDialog: false,
@@ -69,6 +70,9 @@ export default {
   },
   mounted() {
     this.isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    if (this.isLoggedIn) {
+      this.getRefreshToken();
+    }
     this.accessToken = localStorage.getItem('accessToken') ?? '';
   },
   methods: {
@@ -91,7 +95,7 @@ export default {
 
         this.showLoginSuccessMessage();
 
-        this.startTokenRefreshTimer();
+        this.downloadMockedFile();
       } catch (error) {
         console.error('Login error:', error);
 
@@ -134,11 +138,8 @@ export default {
       this.toggleLoginDialog(false);
       this.loginSuccessDialog = true;
     },
-    startTokenRefreshTimer() {
-      this.stopTokenRefreshTimer();
-
-      const refreshTokenInterval = setInterval(async () => {
-        try {
+    async getRefreshToken() {
+      try {
           const refreshToken = localStorage.getItem('refreshToken');
           if (refreshToken) {
             const refreshResponse = await axios.post('public/auth/new-access-token', {
@@ -149,6 +150,7 @@ export default {
             localStorage.setItem('accessToken', newAccessToken);
 
             axios.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
+            this.accessToken = newAccessToken;
           }
         } catch (error) {
           console.error('Token refresh error:', error);
@@ -157,6 +159,12 @@ export default {
           this.logoutUser(); // Redirect or perform necessary actions
           this.stopTokenRefreshTimer();
         }
+    },
+    startTokenRefreshTimer() {
+      this.stopTokenRefreshTimer();
+
+      const refreshTokenInterval = setInterval(() => {
+        this.getRefreshToken();
       }, 1000 * 60 * 30); // Refresh every 30 minutes
 
       // Save the interval ID to clear it later
