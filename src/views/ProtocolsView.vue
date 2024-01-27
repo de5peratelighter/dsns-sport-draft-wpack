@@ -223,7 +223,7 @@
                               :disabled="isUpdatingResults"
                               :class="['no-border', { 'border-yellow': item.relayResultShifted }]"
                               outlined dense hide-details
-                              @focus="focusItemUpdate($event, item, 'bestResultTeam')"
+                              @focus="focusItemUpdate($event, item, 'bestResultTeam', index, 0)"
                               @input="validateValueResult($event, 'bestResultTeam')"
                               @change="saveResults(item, 'bestResultTeam', 'relayDisqualificationType')">
                               <template v-if="item.bestResultTeam == '0'" v-slot:append>
@@ -253,7 +253,7 @@
                               :disabled="isUpdatingResults"
                               :class="['no-border', { 'border-yellow': item.firstTeamResultShifted }]"
                               outlined dense hide-details
-                              @focus="focusItemUpdate($event, item, 'firstTeamResult')"
+                              @focus="focusItemUpdate($event, item, 'firstTeamResult', index, 0)"
                               @input="validateValueResult($event, 'firstTeamResult')"
                               @change="saveResults(item, 'firstTeamResult', 'firstDisqualificationType')">
                               <template v-if="item.firstTeamResult == '0'" v-slot:append>
@@ -281,7 +281,7 @@
                               :disabled="isUpdatingResults"
                               :class="['no-border', { 'border-yellow': item.secondTeamResultShifted }]"
                               outlined dense hide-details
-                              @focus="focusItemUpdate($event, item, 'secondTeamResult')"
+                              @focus="focusItemUpdate($event, item, 'secondTeamResult', index, 1)"
                               @input="validateValueResult($event, 'secondTeamResult')"
                               @change="saveResults(item, 'secondTeamResult', 'secondDisqualificationType')">
                               <template v-if="item.secondTeamResult == '0'" v-slot:append>
@@ -314,7 +314,7 @@
                               :disabled="isUpdatingResults"
                               :class="['no-border', { 'border-yellow': item.firstResultShifted }]"
                               outlined dense hide-details
-                              @focus="focusItemUpdate($event, item, 'firstResult')"
+                              @focus="focusItemUpdate($event, item, 'firstResult', index, 0)"
                               @input="validateValueResult($event, 'firstResult')"
                               @change="saveResults(item, 'firstResult', 'firstDisqualificationType')">
                               <template v-if="item.firstResult == '0'" v-slot:append>
@@ -342,7 +342,7 @@
                               :disabled="isUpdatingResults"
                               :class="['no-border protocols-value-input', { 'border-yellow': item.secondResultShifted }]"
                               outlined dense hide-details
-                              @focus="focusItemUpdate($event, item, 'secondResult')"
+                              @focus="focusItemUpdate($event, item, 'secondResult', index, 1)"
                               @input="validateValueResult($event, 'secondResult')"
                               @change="saveResults(item, 'secondResult', 'secondDisqualificationType')">
                               <template v-if="item.secondResult == '0'" v-slot:append>
@@ -378,7 +378,7 @@
                           :class="['no-border protocols-value-input', { 'border-yellow': item.halfFinalResultShifted }]"
                           :suffix="item.halfFinalResultShifted ? plusValueOffset : null"
                           outlined dense hide-details
-                          @focus="focusItemUpdate($event, item, 'halfFinalResult')"
+                          @focus="focusItemUpdate($event, item, 'halfFinalResult', index, 0)"
                           @input="validateValueResult($event, 'halfFinalResult')"
                           @change="saveResults(item, 'halfFinalResult', 'halfFinalDisqualificationType')">
                           <template v-if="item.halfFinalResult == '0'" v-slot:append>
@@ -409,7 +409,7 @@
                           :class="['no-border protocols-value-input', { 'border-yellow': item.finalResultShifted }]"
                           :suffix="item.finalResultShifted ? plusValueOffset : null"
                           outlined dense hide-details
-                          @focus="focusItemUpdate($event, item, 'finalResult')"
+                          @focus="focusItemUpdate($event, item, 'finalResult', index, 0)"
                           @input="validateValueResult($event, 'finalResult')"
                           @change="saveResults(item, 'finalResult', 'finalDisqualificationType')">
                           <template v-if="item.finalResult == '0'" v-slot:append>
@@ -606,6 +606,8 @@ export default {
       confirmRestoreDialogMessage: 'Повернутись на попередній етап змаганнь?',
       confirmRestoreDialogType: null,
 
+      rowIndex: undefined,
+      inputIndex: undefined,
       isUpdatingResults: false,
       isUpdatingTimeout: null,
     }
@@ -853,9 +855,12 @@ export default {
     },
     isUpdatingResults: {
       handler(value) {
-        // refetch best results with delay
         clearTimeout(this.isUpdatingTimeout);
         if (!value) {
+          // focus next row input
+          this.triggerNextInputFocus();
+          
+          // refetch best results with delay
           this.isUpdatingTimeout = setTimeout(() => {
             this.getBestResults();
           }, 3000)
@@ -864,6 +869,18 @@ export default {
     }
   },
   methods: {
+    triggerNextInputFocus() {
+      const rowIndex = this.rowIndex;
+      if (!isNaN(rowIndex)) {
+        this.$nextTick(() => {
+          const row = document.querySelectorAll('.protocols-table .v-data-table__wrapper table tbody tr')[rowIndex + 1]
+          if (row) {
+            const input = row.querySelectorAll('input')[this.inputIndex];
+            if (input) input.focus();
+          }
+        });
+      }
+    },
     async startCompetition() {
       let activeCompetitionType = this.activeCompetitionType;
       if (!activeCompetitionType.reference) return Promise.reject('Competition doesnt exist');
@@ -1132,7 +1149,9 @@ export default {
         }
       }
     },
-    focusItemUpdate(event, key, item) {
+    focusItemUpdate(event, key, item, rowIndex, inputIndex) {
+      this.rowIndex = rowIndex;
+      this.inputIndex = inputIndex;
       if (event) event.target.select();
       this[key] = item[key];
     },
