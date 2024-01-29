@@ -48,7 +48,7 @@
             <template #footer>
               <v-row class="ma-3 py-2 justify-center">
                 <v-edit-dialog large @save="addItem(table.key)" @cancel="cancel">
-                  <v-btn dark color="primary" @click="postNormative">Додати</v-btn>
+                  <v-btn dark color="primary">Додати</v-btn>
                   <template #input>
                     <v-text-field v-model="newItemName" :rules="[max25chars]" label="Розряд" placeholder="Розряд"
                       single-line></v-text-field>
@@ -62,7 +62,7 @@
         </v-col>
       </v-row>
       <v-row class="pa-3 justify-center">
-        <v-btn :disabled="!isChanged" class="white--text" color="green darken-1" @click="editDialog = false">
+        <v-btn :disabled="!isChanged || isSaving" class="white--text" color="green darken-1" @click="saveNormatives">
           Зберегти
         </v-btn>
         <v-btn text class="white--text" @click="editDialog = false">
@@ -78,9 +78,11 @@ export default {
   data: function () {
     return {
       isChanged: false,
+      isSaving: false,
       itemKey: 'type',
       itemValue: 'time',
       competitionType: null,
+      ageTypeForNewItem: '',
       newItemName: '',
       newItemTime: '',
       competitionItems: [
@@ -116,7 +118,7 @@ export default {
         ADULTS_MALE: 'Чоловіки (ADULTS_MALE)',
         JUNIORS_MALE: 'Чоловіки (JUNIORS_MALE)',
       },
-      ageTypes: ["JUNES_MALE", "JUNIORS_MALE", "YOUNGS_MALE", "ADULTS_MALE",],
+      ageTypes: ["JUNES_MALE", "YOUNGS_MALE", "ADULTS_MALE",],
       tableData: [],
       max25chars: v => v.length <= 25 || 'Input too long!',
     }
@@ -154,17 +156,13 @@ export default {
         });
 
         this.isChanged = false;
-
-        // Assuming the API returns an array of normatives for the selected sportType
         this.tableData = [];
 
-        // Initialize empty arrays for each age type
         const ageTypeData = {};
         this.ageTypes.forEach((ageType) => {
           ageTypeData[ageType] = [];
         });
 
-        // Categorize data based on ageType
         response.data.forEach((normative) => {
           ageTypeData[normative.ageType].push({
             id: normative.reference,
@@ -176,7 +174,6 @@ export default {
           });
         });
 
-        // Populate tableData with categorized data
         this.ageTypes.forEach((ageType) => {
           this.tableData.push({
             key: ageType,
@@ -187,83 +184,77 @@ export default {
         console.error('Error fetching data:', error);
       }
     },
-    async postNormative() {
+    async saveNormatives() {
       try {
+        this.isSaving = true;
+
         if (!this.newItemName || !this.newItemTime) {
-          // Add validation logic if necessary
           console.error('Please fill in both Розряд and Час fields');
           return;
         }
 
-        // Assuming competitionType is required, adjust if necessary
         if (!this.competitionType) {
           console.error('Please select a Змагання');
           return;
         }
 
-        // Assuming category is needed, adjust if necessary
-        const category = 'III_TEEN';
+        const defaultGenderType = this.getDefaultGenderType(this.competitionType);
 
-        await this.postNormative(this.competitionType, this.newItemTime, category, this.genderType);
+
+        await this.axios.post('private/sport-regulations', {
+          sportType: this.competitionType,
+          genderType: defaultGenderType,
+          ageType: this.ageTypeForNewItem,
+          time: this.newItemTime,
+          category: this.newItemName,
+        });
+
         this.openNormativesByType(this.competitionType);
-        this.openAddItem(); // Clear the input fields after adding
-      } catch (error) {
-        console.error('Error posting normative:', error);
-      }
-    },
-
-    async patchNormative(normativeId, newData) {
-      try {
-        const response = await this.axios.patch(`private/sport-regulations/${normativeId}`, newData);
-
-        const updatedNormative = response.data;
-
-        for (let i = 0; i < this.tableData.length; i++) {
-          const foundItem = this.tableData[i].rows.find(({ id }) => id === updatedNormative.id);
-          if (foundItem) {
-            foundItem.type = updatedNormative.type;
-            foundItem.time = updatedNormative.time;
-            break;
-          }
-        }
-
+        this.openAddItem();
         this.isChanged = true;
       } catch (error) {
-        console.error('Error patching normative:', error);
+        console.error('Error saving normatives:', error);
+      } finally {
+        this.isSaving = false;
       }
     },
 
-    async save(item) {
-      try {
-        // Assuming `item.id` exists and represents the normative identifier
-        await this.patchNormative(item.id, { type: item.type, time: item.time });
-      } catch (error) {
-        console.error('Error saving normative:', error);
+    getDefaultGenderType(competitionType) {
+      if (this.ageTypeForNewItem === 'JUNES_MALE' || this.ageTypeForNewItem === 'YOUNGS_MALE') {
+        return 'MALE';
+      } else if (this.ageTypeForNewItem === 'JUNES_FEMALE' || this.ageTypeForNewItem === 'YOUNGS_FEMALE') {
+        return 'FEMALE';
+      } else {
+        return 'MALE';
       }
     },
-    // openAddItem() {
-    //   this.newItemName = '';
-    //   this.newItemTime = '';
-    // },
-    // addItem(tableKey) {
-    //   console.warn('tableKey', tableKey)
-    //   let foundItem = this.tableData.find(({ key }) => key === tableKey);
-    //   const nextItem = {
-    //     type: this.newItemName,
-    //     time: this.newItemTime,
-    //   };
-    //   foundItem.rows = [...foundItem.rows, nextItem];
-    //   this.isChanged = true;
-    // },
-    // deleteItem(tableKey, item) {
-    //   let foundItem = this.tableData.find(({ key }) => key === tableKey);
-    //   console.warn('item', item)
-    //   foundItem.rows = foundItem.rows.filter(({ type }) => type !== item.type);
-    //   this.isChanged = true;
-    // },
-    // save() {
-    //   this.isChanged = true;
-    // },
+    addItem(tableKey) {
+      const ageTypeForNewItem = tableKey;
+      let foundItem = this.tableData.find(({ key }) => key === tableKey);
+      const nextItem = {
+        type: this.newItemName,
+        time: this.newItemTime,
+      };
+      foundItem.rows = [...foundItem.rows, nextItem];
+      this.ageTypeForNewItem = ageTypeForNewItem;
+      this.isChanged = true;
+    },
+    async deleteItem(tableKey, item) {
+      try {
+        const response = await this.axios.delete(`private/sport-regulations/${item.id}`);
+        if (response.status === 204) {
+          const foundItem = this.tableData.find(({ key }) => key === tableKey);
+          foundItem.rows.splice(foundItem.rows.findIndex((row) => row.id === item.id), 1);
+          this.isChanged = true;
+
+          await this.openNormativesByType(this.competitionType);
+        } else {
+          console.error('Failed to delete item.');
+        }
+      } catch (error) {
+        console.error('Error deleting item:', error);
+      }
+    },
     cancel() {
     },
   }
