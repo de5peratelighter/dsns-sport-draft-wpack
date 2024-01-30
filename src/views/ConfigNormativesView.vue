@@ -118,7 +118,7 @@ export default {
         ADULTS_MALE: 'Чоловіки (ADULTS_MALE)',
         JUNIORS_MALE: 'Чоловіки (JUNIORS_MALE)',
       },
-      ageTypes: ["JUNES_MALE", "YOUNGS_MALE", "ADULTS_MALE",],
+      ageTypes: ["JUNES_MALE", "JUNIORS_MALE", "YOUNGS_MALE", "ADULTS_MALE",],
       tableData: [],
       max25chars: v => v.length <= 25 || 'Input too long!',
     }
@@ -200,6 +200,8 @@ export default {
 
         const defaultGenderType = this.getDefaultGenderType(this.competitionType);
 
+        // Set isChanged to true before making the API call
+        this.isChanged = true;
 
         await this.axios.post('private/sport-regulations', {
           sportType: this.competitionType,
@@ -211,14 +213,14 @@ export default {
 
         this.openNormativesByType(this.competitionType);
         this.openAddItem();
-        this.isChanged = true;
       } catch (error) {
         console.error('Error saving normatives:', error);
+        // Set isChanged back to false in case of an error
+        this.isChanged = false;
       } finally {
         this.isSaving = false;
       }
     },
-
     getDefaultGenderType(competitionType) {
       if (this.ageTypeForNewItem === 'JUNES_MALE' || this.ageTypeForNewItem === 'YOUNGS_MALE') {
         return 'MALE';
