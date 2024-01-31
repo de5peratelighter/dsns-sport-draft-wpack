@@ -12,10 +12,10 @@
       </v-row>
       <v-row>
         <v-col cols="3" v-for="table in tableData" :key="table.key">
-          <v-data-table :headers="getColumnHeaders(table.ageType)" :items="table.rows" disable-sort disable-pagination
+          <v-data-table :headers="getColumnHeaders(table.key)" :items="table.rows" disable-sort disable-pagination
             hide-default-footer>
             <template #top>
-              <div class="text-center py-2"> {{ table.key }}</div>
+              <div class="text-center py-2">{{ getAgeTypeText(table.key) }}</div>
             </template>
             <template #item="{ item }">
               <tr>
@@ -112,13 +112,20 @@ export default {
         { value: 'MALE', text: 'Чоловіки' },
         { value: 'FEMALE', text: 'Жінки' },
       ],
-      columnHeaders: {
-        JUNES_MALE: 'Чоловіки (JUNES_MALE)',
-        YOUNGS_MALE: 'Чоловіки (YOUNGS_MALE)',
-        ADULTS_MALE: 'Чоловіки (ADULTS_MALE)',
-        JUNIORS_MALE: 'Чоловіки (JUNIORS_MALE)',
+      ageTypes: {
+        MALE: [
+          { value: 'JUNES_MALE', text: 'Юнаки молодшої групи' },
+          { value: 'JUNIORS_MALE', text: 'Юнаки старшої групи' },
+          { value: 'YOUNGS_MALE', text: 'Юніори' },
+          { value: 'ADULTS_MALE', text: 'Чоловіки' },
+        ],
+        FEMALE: [
+          { value: 'JUNES_FEMALE', text: 'Юначки молодшої групи' },
+          { value: 'JUNIORS_FEMALE', text: 'Юначки старшої групи' },
+          { value: 'YOUNGS_FEMALE', text: 'Юніорки' },
+          { value: 'ADULTS_FEMALE', text: 'Жінки' },
+        ],
       },
-      ageTypes: ["JUNES_MALE", "JUNIORS_MALE", "YOUNGS_MALE", "ADULTS_MALE",],
       tableData: [],
       max25chars: v => v.length <= 25 || 'Input too long!',
     }
@@ -129,7 +136,8 @@ export default {
     selectCompetitionType(competitionType) {
       this.competitionType = competitionType;
       if (competitionType) {
-        this.openNormativesByType(competitionType);
+        const genderType = this.genderType === 'MALE' ? 'JUNES_MALE' : 'JUNES_FEMALE';
+        this.openNormativesByType(competitionType, genderType);
       } else {
         this.tableData = false;
       }
@@ -140,12 +148,18 @@ export default {
         { text: 'Час', value: 'time', width: '30%' },
         { text: '', value: 'action', width: '20%' },
       ];
-
       return [
         ...commonHeaders,
-        { text: this.columnHeaders[ageType], align: 'center', value: 'ageTypeHeader' },
       ];
     },
+
+    getAgeTypeText(ageType) {
+      const genderType = this.genderType === 'MALE' ? 'MALE' : 'FEMALE';
+      const selectedAgeType = this.ageTypes[genderType].find(type => type.value === ageType);
+      return selectedAgeType ? selectedAgeType.text : ageType;
+    },
+
+
     async openNormativesByType(sportType, genderType) {
       try {
         const response = await this.axios.get(`private/sport-regulations`, {
@@ -159,31 +173,39 @@ export default {
         this.tableData = [];
 
         const ageTypeData = {};
-        this.ageTypes.forEach((ageType) => {
-          ageTypeData[ageType] = [];
-        });
-
-        response.data.forEach((normative) => {
-          ageTypeData[normative.ageType].push({
-            id: normative.reference,
-            type: normative.category,
-            time: normative.time,
-            category: normative.category,
-            genderType: normative.genderType,
-            ageType: normative.ageType,
+        Object.keys(this.ageTypes).forEach((genderType) => {
+          this.ageTypes[genderType].forEach((ageType) => {
+            ageTypeData[ageType.value] = [];
           });
         });
 
-        this.ageTypes.forEach((ageType) => {
+        response.data.forEach((normative) => {
+          // Check if ageType matches the current selection
+          if (ageTypeData[normative.ageType]) {
+            ageTypeData[normative.ageType].push({
+              id: normative.reference,
+              type: normative.category,
+              time: normative.time,
+              category: normative.category,
+              genderType: genderType,
+              ageType: normative.ageType,
+            });
+          }
+        });
+
+        Object.entries(ageTypeData).forEach(([ageType, rows]) => {
           this.tableData.push({
             key: ageType,
-            rows: ageTypeData[ageType],
+            rows: rows,
           });
         });
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     },
+
+
+
     async saveNormatives() {
       try {
         this.isSaving = true;
@@ -200,8 +222,6 @@ export default {
 
         const defaultGenderType = this.getDefaultGenderType(this.competitionType);
 
-        // Set isChanged to true before making the API call
-        this.isChanged = true;
 
         await this.axios.post('private/sport-regulations', {
           sportType: this.competitionType,
@@ -213,34 +233,38 @@ export default {
 
         this.openNormativesByType(this.competitionType);
         this.openAddItem();
+        this.isChanged = true;
       } catch (error) {
         console.error('Error saving normatives:', error);
-        // Set isChanged back to false in case of an error
-        this.isChanged = false;
       } finally {
         this.isSaving = false;
       }
     },
-    getDefaultGenderType(competitionType) {
-      if (this.ageTypeForNewItem === 'JUNES_MALE' || this.ageTypeForNewItem === 'YOUNGS_MALE') {
+
+    getDefaultGenderType(competitionType, ageTypeForNewItem) {
+      if (ageTypeForNewItem && ageTypeForNewItem.endsWith('_MALE')) {
         return 'MALE';
-      } else if (this.ageTypeForNewItem === 'JUNES_FEMALE' || this.ageTypeForNewItem === 'YOUNGS_FEMALE') {
+      } else if (ageTypeForNewItem && ageTypeForNewItem.endsWith('_FEMALE')) {
         return 'FEMALE';
       } else {
-        return 'MALE';
+        return competitionType === 'FIRE_RELAY' ? 'FEMALE' : 'MALE';
       }
     },
     addItem(tableKey) {
       const ageTypeForNewItem = tableKey;
       let foundItem = this.tableData.find(({ key }) => key === tableKey);
+
       const nextItem = {
         type: this.newItemName,
         time: this.newItemTime,
+        genderType: this.getDefaultGenderType(this.competitionType, ageTypeForNewItem),
       };
+
       foundItem.rows = [...foundItem.rows, nextItem];
       this.ageTypeForNewItem = ageTypeForNewItem;
       this.isChanged = true;
     },
+
     async deleteItem(tableKey, item) {
       try {
         const response = await this.axios.delete(`private/sport-regulations/${item.id}`);
