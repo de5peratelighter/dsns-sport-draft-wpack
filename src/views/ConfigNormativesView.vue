@@ -159,6 +159,9 @@ export default {
       return selectedAgeType ? selectedAgeType.text : ageType;
     },
 
+    getAgeTypesByGender() {
+      return this.genderType === 'MALE' ? this.ageTypes.MALE : this.ageTypes.FEMALE;
+    },
 
     async openNormativesByType(sportType, genderType) {
       try {
@@ -173,10 +176,8 @@ export default {
         this.tableData = [];
 
         const ageTypeData = {};
-        Object.keys(this.ageTypes).forEach((genderType) => {
-          this.ageTypes[genderType].forEach((ageType) => {
-            ageTypeData[ageType.value] = [];
-          });
+        this.getAgeTypesByGender().forEach((ageType) => {
+          ageTypeData[ageType.value] = [];
         });
 
         response.data.forEach((normative) => {
@@ -204,8 +205,6 @@ export default {
       }
     },
 
-
-
     async saveNormatives() {
       try {
         this.isSaving = true;
@@ -222,10 +221,9 @@ export default {
 
         const defaultGenderType = this.getDefaultGenderType(this.competitionType);
 
-
         await this.axios.post('private/sport-regulations', {
           sportType: this.competitionType,
-          genderType: defaultGenderType,
+          genderType: this.genderType, // Використовуйте актуальне значення genderType
           ageType: this.ageTypeForNewItem,
           time: this.newItemTime,
           category: this.newItemName,
