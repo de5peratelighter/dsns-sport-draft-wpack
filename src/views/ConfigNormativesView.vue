@@ -205,6 +205,42 @@ export default {
       }
     },
 
+    async save(item) {
+      try {
+        const { id } = item;
+        const categoryMap = {
+          'I': 'I',
+          'II': 'II',
+          'III': 'III',
+          'I_TEEN': 'I_TEEN',
+          'II_TEEN': 'II_TEEN',
+          'III_TEEN': 'III_TEEN',
+          'CMS': 'CMS',
+          'MS': 'MS',
+          'IMS': 'IMS',
+          'HMS': 'HMS',
+          'NONE': 'NONE'
+        };
+
+        const response = await this.axios.patch(`private/sport-regulations/${id}`, {
+          sportType: this.competitionType,
+          time: item.time,
+          category: categoryMap[item.category],
+          genderType: this.genderType,
+          ageType: item.ageType,
+        });
+
+        if (response.status === 200) {
+          console.log('Item updated successfully');
+          this.isChanged = false;
+        } else {
+          console.error('Failed to update item.');
+        }
+      } catch (error) {
+        console.error('Error updating item:', error);
+      }
+    },
+
     async saveNormatives() {
       try {
         this.isSaving = true;
@@ -223,7 +259,7 @@ export default {
 
         await this.axios.post('private/sport-regulations', {
           sportType: this.competitionType,
-          genderType: this.genderType, // Використовуйте актуальне значення genderType
+          genderType: this.genderType,
           ageType: this.ageTypeForNewItem,
           time: this.newItemTime,
           category: this.newItemName,
