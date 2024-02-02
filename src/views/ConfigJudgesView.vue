@@ -27,6 +27,13 @@
           <v-select v-model="item[nameKey]" :items="participantCategoryItems" item-text="categoryName"
             item-value="qualificationId" hide-details></v-select>
         </template>
+        <template v-slot:[`item.${initialsKey}`]="{ item }">
+          <v-text-field v-model="item[initialsKey]" hide-details></v-text-field>
+        </template>
+        <template v-slot:[`item.${nameKey}_senior`]="{ item }">
+          <v-text-field v-model="item[nameKey + '_senior']" label="Ім'я та прізвище старшого судді"
+            hide-details></v-text-field>
+        </template>
       </v-data-table>
       <v-spacer class="my-3" />
       <v-data-table :headers="assistantConfigurationHeaders" :items="competitionAssistJudges" dense disable-sort
