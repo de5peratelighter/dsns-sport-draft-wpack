@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import { Document, Packer } from "docx";
+import { Document, Packer, PageOrientation } from "docx";
 import { DATA_TO_DOC_PAGES } from '../protocols/defaultUtils';
 import { tableData as pages } from '../protocols/mockedPages';
 
@@ -29,6 +29,13 @@ export default {
       this.doc = new Document({
         sections: [
             {
+              properties: {
+                  page: {
+                    size: {
+                      orientation: PageOrientation.LANDSCAPE,
+                    }
+                  },
+              },
               children: DATA_TO_DOC_PAGES(window.pages),
             },
           ],
