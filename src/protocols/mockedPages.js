@@ -405,6 +405,14 @@ export const tableData = [
     },
     tables: [
       {
+        head: {
+          number: "Номер",
+          team: "Команда",
+          initials: "Імя та призвіще",
+          bday: "Рік народження",
+          result: "Результат",
+          sum: "Сума часу",
+        },
         rows: Array(15).fill({
           number: "2",
           team: {
@@ -452,7 +460,7 @@ export const tableData = [
     ],
   },
   {
-    type: "TEAM_RESULTS_BY_TYPE",
+    type: "TEAM_100_RESULTS",
     header: {
       headerLine:
         "Міністерство молоді та спорту України \n Федерація пожежно-прикладного спорту України",
@@ -467,6 +475,17 @@ export const tableData = [
     },
     tables: [
       {
+        head: {
+          number: "Номер",
+          team: "Команда",
+          initials: "Імя та призвіще",
+          bday: "Рік народження",
+          result: "Результат",
+          sum: "Сума часу",
+          category: "Розряд",
+          before: "before",
+          after: "after",
+        },
         rows: Array(15).fill({
           number: "2",
           team: {
@@ -478,12 +497,16 @@ export const tableData = [
                 bday: "1999",
                 result1: "7,72",
                 result2: "7,75",
+                before: "before",
+                after: "after",
               },
               {
                 initials: "Наталія TT",
                 bday: "1998",
                 result1: "7,72",
                 result2: "7,75",
+                before: "before",
+                after: "after",
               },
             ],
             excluded: [
@@ -492,6 +515,8 @@ export const tableData = [
                 bday: "1995",
                 result1: "7,72",
                 result2: "XXX",
+                before: "before",
+                after: "after",
               },
             ],
           },
@@ -576,6 +601,14 @@ export const tableData = [
     },
     tables: [
       {
+        head: {
+          number: "Номер",
+          team: "Команда",
+          initials: "Імя та призвіще",
+          bday: "Рік народження",
+          result: "Результат",
+          sum: "Сума часу",
+        },
         rows: Array(15).fill({
           number: "2",
           team: {

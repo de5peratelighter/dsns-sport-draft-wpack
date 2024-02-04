@@ -9,6 +9,7 @@ import { TABLE_PERSONAL_RESULTS_ZALIK } from "./tables/PERSONAL_RESULTS_ZALIK";
 import { TABLE_TEAM_RELAY_RESULTS } from "./tables/TEAM_RELAY_RESULTS";
 import { TABLE_TEAM_RESULTS } from "./tables/TEAM_RESULTS";
 import { TABLE_TEAM_RESULTS_BY_TYPE } from "./tables/TEAM_RESULTS_BY_TYPE";
+import { TABLE_TEAM_100_RESULTS } from "./tables/TEAM_100_RESULTS";
 import {
   TABLE_PERSONAL_FINAL_RESULTS,
   TABLE_PERSONAL_HALFFINAL_RESULTS,
@@ -27,6 +28,8 @@ const GIVE_TABLE_BY_TYPE = (type, tables) => {
       return TABLE_TEAM_RELAY_RESULTS(tables);
     case "TEAM_RESULTS_BY_TYPE":
       return TABLE_TEAM_RESULTS_BY_TYPE(tables);
+    case "TEAM_100_RESULTS":
+      return TABLE_TEAM_100_RESULTS(tables);
     case "DUELING_PERSONAL_RESULTS":
       return TABLE_PERSONAL_DUELING_RESULTS(tables);
     case "PERSONAL_RESULTS_FINAL":

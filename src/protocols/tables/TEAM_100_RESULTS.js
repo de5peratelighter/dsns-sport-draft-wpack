@@ -20,7 +20,7 @@ import {
   cellObject,
 } from "../defaultUtilBlocks";
 
-const TABLE_TEAM_RELAY_RESULTS_BY_TYPE_ROW = (item = {}) => {
+const TABLE_TEAM_100_RESULTS_HEAD = (item = {}) => {
   return new TableRow({
     children: [
       new TableCell(cellObject({ text: item.number, width: 10 })),
@@ -43,38 +43,95 @@ const TABLE_TEAM_RELAY_RESULTS_BY_TYPE_ROW = (item = {}) => {
                   new TableCell(
                     cellObject({
                       text: item.team,
-                      width: 25,
+                      width: 20,
                       borders: cellBorders,
                     })
                   ),
                   new TableCell(
                     cellObject({
                       text: item.initials,
-                      width: 30,
+                      width: 25,
                       borders: cellBorders,
                     })
                   ),
                   new TableCell(
                     cellObject({
                       text: item.bday,
-                      width: 15,
+                      width: 10,
                       borders: cellBorders,
                     })
                   ),
                   new TableCell(
                     cellObject({
                       text: item.result,
-                      width: 15,
+                      width: 10,
                       borders: cellBorders,
                     })
                   ),
                   new TableCell(
                     cellObject({
                       text: item.sum,
-                      width: 15,
+                      width: 10,
                       borders: allCellBorders,
                     })
                   ),
+                  new TableCell({
+                    columnSpan: 2,
+                    width: {
+                      size: 25,
+                      type: WidthType.PERCENTAGE,
+                    },
+                    borders: {
+                      top: invisibleBorder,
+                      right: invisibleBorder,
+                      bottom: invisibleBorder,
+                    },
+                    verticalAlign: VerticalAlign.CENTER,
+                    children: [
+                      new Table({
+                        layout: TableLayoutType.FIXED,
+                        width: {
+                          size: 100,
+                          type: WidthType.PERCENTAGE,
+                        },
+                        rows: [
+                          new TableRow({
+                            children: [
+                              new TableCell(
+                                cellObject({
+                                  text: item.category,
+                                  width: 100,
+                                  borders: {
+                                    ...rowBorders,
+                                    right: invisibleBorder,
+                                  },
+                                  columnSpan: 2,
+                                })
+                              ),
+                            ],
+                          }),
+                          new TableRow({
+                            children: [
+                              new TableCell(
+                                cellObject({
+                                  text: item.before,
+                                  width: 50,
+                                  borders: cellBorders,
+                                })
+                              ),
+                              new TableCell(
+                                cellObject({
+                                  text: item.after,
+                                  width: 50,
+                                  borders: allCellBorders,
+                                })
+                              ),
+                            ],
+                          }),
+                        ],
+                      }),
+                    ],
+                  }),
                 ],
               }),
             ],
@@ -85,7 +142,7 @@ const TABLE_TEAM_RELAY_RESULTS_BY_TYPE_ROW = (item = {}) => {
   });
 };
 
-const TABLE_TEAM_RESULTS_BY_TYPE_ROW = (item = { rows: [] }) => {
+const TABLE_TEAM_100_RESULTS_ROW = (item = { rows: [] }) => {
   return new TableRow({
     children: [
       new TableCell(cellObject({ text: item.number, width: 10 })),
@@ -127,14 +184,14 @@ const TABLE_TEAM_RESULTS_BY_TYPE_ROW = (item = { rows: [] }) => {
                                 new TableCell(
                                   cellObject({
                                     text: item.team.name,
-                                    width: 25,
+                                    width: 20,
                                     borders: cellBorders,
                                   })
                                 ),
                                 new TableCell({
                                   columnSpan: 4,
                                   width: {
-                                    size: 75,
+                                    size: 80,
                                     type: WidthType.PERCENTAGE,
                                   },
                                   borders: {
@@ -161,34 +218,76 @@ const TABLE_TEAM_RESULTS_BY_TYPE_ROW = (item = { rows: [] }) => {
                                                 new TableCell(
                                                   cellObject({
                                                     text: participant.initials,
-                                                    width: 40,
+                                                    width: 31,
                                                     borders,
                                                   })
                                                 ),
                                                 new TableCell(
                                                   cellObject({
                                                     text: participant.bday,
-                                                    width: 20,
+                                                    width: 12.66,
                                                     borders,
                                                   })
                                                 ),
                                                 new TableCell(
                                                   cellObject({
                                                     text: participant.result1,
-                                                    width: 20,
+                                                    width: 12.66,
                                                     borders,
                                                   })
                                                 ),
                                                 new TableCell(
                                                   cellObject({
                                                     text: participant.result2,
-                                                    width: 20,
-                                                    borders: {
-                                                      ...borders,
-                                                      right: invisibleBorder,
-                                                    },
+                                                    width: 12.66,
+                                                    borders,
                                                   })
                                                 ),
+                                                new TableCell({
+                                                  columnSpan: 2,
+                                                  width: {
+                                                    size: 31,
+                                                    type: WidthType.PERCENTAGE,
+                                                  },
+                                                  borders: {
+                                                    ...borders,
+                                                    right: invisibleBorder,
+                                                  },
+                                                  verticalAlign:
+                                                    VerticalAlign.CENTER,
+                                                  children: [
+                                                    new Table({
+                                                      layout:
+                                                        TableLayoutType.FIXED,
+                                                      width: {
+                                                        size: 100,
+                                                        type: WidthType.PERCENTAGE,
+                                                      },
+                                                      rows: [
+                                                        new TableRow({
+                                                          children: [
+                                                            new TableCell(
+                                                              cellObject({
+                                                                text: item.before,
+                                                                width: 50,
+                                                                borders:
+                                                                  cellBorders,
+                                                              })
+                                                            ),
+                                                            new TableCell(
+                                                              cellObject({
+                                                                text: item.after,
+                                                                width: 50,
+                                                                borders:
+                                                                  allCellBorders,
+                                                              })
+                                                            ),
+                                                          ],
+                                                        }),
+                                                      ],
+                                                    }),
+                                                  ],
+                                                }),
                                               ],
                                             }),
                                           ];
@@ -230,13 +329,13 @@ const TABLE_TEAM_RESULTS_BY_TYPE_ROW = (item = { rows: [] }) => {
                                     new TableCell(
                                       cellObject({
                                         text: item.team.others,
-                                        width: 25,
+                                        width: 20,
                                         borders: cellBorders,
                                       })
                                     ),
                                     new TableCell({
                                       width: {
-                                        size: 75,
+                                        size: 80,
                                         type: WidthType.PERCENTAGE,
                                       },
                                       children: [
@@ -259,13 +358,13 @@ const TABLE_TEAM_RESULTS_BY_TYPE_ROW = (item = { rows: [] }) => {
                                                     new TableCell(
                                                       cellObject({
                                                         text: participant.initials,
-                                                        width: 40,
+                                                        width: 31,
                                                         borders,
                                                       })
                                                     ),
                                                     new TableCell({
                                                       width: {
-                                                        size: 20,
+                                                        size: 12.66,
                                                         type: WidthType.PERCENTAGE,
                                                       },
                                                       borders,
@@ -282,21 +381,62 @@ const TABLE_TEAM_RESULTS_BY_TYPE_ROW = (item = { rows: [] }) => {
                                                     new TableCell(
                                                       cellObject({
                                                         text: participant.result1,
-                                                        width: 20,
+                                                        width: 12.66,
                                                         borders,
                                                       })
                                                     ),
                                                     new TableCell(
                                                       cellObject({
                                                         text: participant.result2,
-                                                        width: 20,
-                                                        borders: {
-                                                          ...borders,
-                                                          right:
-                                                            invisibleBorder,
-                                                        },
+                                                        width: 12.66,
+                                                        borders,
                                                       })
                                                     ),
+                                                    new TableCell({
+                                                      columnSpan: 2,
+                                                      width: {
+                                                        size: 31,
+                                                        type: WidthType.PERCENTAGE,
+                                                      },
+                                                      borders: {
+                                                        ...borders,
+                                                        right: invisibleBorder,
+                                                      },
+                                                      verticalAlign:
+                                                        VerticalAlign.CENTER,
+                                                      children: [
+                                                        new Table({
+                                                          layout:
+                                                            TableLayoutType.FIXED,
+                                                          width: {
+                                                            size: 100,
+                                                            type: WidthType.PERCENTAGE,
+                                                          },
+                                                          rows: [
+                                                            new TableRow({
+                                                              children: [
+                                                                new TableCell(
+                                                                  cellObject({
+                                                                    text: item.before,
+                                                                    width: 50,
+                                                                    borders:
+                                                                      cellBorders,
+                                                                  })
+                                                                ),
+                                                                new TableCell(
+                                                                  cellObject({
+                                                                    text: item.after,
+                                                                    width: 50,
+                                                                    borders:
+                                                                      allCellBorders,
+                                                                  })
+                                                                ),
+                                                              ],
+                                                            }),
+                                                          ],
+                                                        }),
+                                                      ],
+                                                    }),
                                                   ],
                                                 }),
                                               ];
@@ -328,15 +468,15 @@ const TABLE_TEAM_RESULTS_BY_TYPE_ROW = (item = { rows: [] }) => {
   });
 };
 
-export const TABLE_TEAM_RESULTS_BY_TYPE = (items) => {
+export const TABLE_TEAM_100_RESULTS = (items) => {
   return [
     ...items.reduce((acc = [], data) => {
       return [
         ...acc,
         new Table({
           rows: [
-            TABLE_TEAM_RELAY_RESULTS_BY_TYPE_ROW(data.head),
-            ...data.rows.map((item) => TABLE_TEAM_RESULTS_BY_TYPE_ROW(item)),
+            TABLE_TEAM_100_RESULTS_HEAD(data.head),
+            ...data.rows.map((item) => TABLE_TEAM_100_RESULTS_ROW(item)),
           ],
           width: {
             size: 100,
