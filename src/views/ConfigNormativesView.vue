@@ -99,7 +99,7 @@ export default {
           value: 'RETRACTABLE_LADDER', text: 'Висувна драбина'
         },
         {
-          value: 'FIRE_RELAY', text: 'Пожежна естафета'
+          value: 'RELAY', text: 'Пожежна естафета'
         },
       ],
       headers: [
