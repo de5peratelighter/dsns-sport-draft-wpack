@@ -26,12 +26,10 @@
             <v-sheet :color="'rgba(0, 0, 0, 0.35)'" class="pa-2 white--text">
               <v-expansion-panels accordion>
                 <v-expansion-panel>
-                  <v-btn 
-                    :color="completed ? 'success' : 'grey'"
-                    dark small class="ml-2 mt-2"
-                  >
-                        {{completed ? "Проведено" : "Триває"}}
-                      </v-btn>
+                  <v-btn :color="isCompleted ? 'success' : 'grey'" dark small class="ml-2 mt-2"
+                    @click="changeCompetitionStatus">
+                    {{ isCompleted ? 'Проведено' : 'Триває' }}
+                  </v-btn>
                   <v-expansion-panel-header style="padding: 0 15px;">
                     <h4 class="text-center">
                       {{ activeCompetitionType ? `${competitionTranslations[activeCompetitionType.sportType]}` : '' }}
@@ -216,14 +214,11 @@
                       <template v-else>
                         <template v-if="isRelay">
                           <td>
-                            <v-text-field 
-                              :value="item.bestResultTeam" 
-                              :success="!!item.bestResultTeam"
+                            <v-text-field :value="item.bestResultTeam" :success="!!item.bestResultTeam"
                               :suffix="item.relayResultShifted ? plusValueOffset : null"
-                              :disabled="isUpdatingResults"
-                              :class="['no-border', { 'border-yellow': item.relayResultShifted }]"
-                              outlined dense hide-details
-                              @focus="focusItemUpdate($event, item, 'bestResultTeam', index, 0)"
+                              :disabled="isUpdatingResults || completed"
+                              :class="['no-border', { 'border-yellow': item.relayResultShifted }]" outlined dense
+                              hide-details @focus="focusItemUpdate($event, item, 'bestResultTeam', index, 0)"
                               @input="validateValueResult($event, 'bestResultTeam')"
                               @change="saveResults(item, 'bestResultTeam', 'relayDisqualificationType')">
                               <template v-if="item.bestResultTeam == '0'" v-slot:append>
@@ -247,13 +242,10 @@
                         </template>
                         <template v-else-if="isCombatDeployment">
                           <td>
-                            <v-text-field 
-                              :value="item.firstTeamResult" 
-                              :success="!!item.firstTeamResult"
-                              :disabled="isUpdatingResults"
-                              :class="['no-border', { 'border-yellow': item.firstTeamResultShifted }]"
-                              outlined dense hide-details
-                              @focus="focusItemUpdate($event, item, 'firstTeamResult', index, 0)"
+                            <v-text-field :value="item.firstTeamResult" :success="!!item.firstTeamResult"
+                              :disabled="isUpdatingResults || completed"
+                              :class="['no-border', { 'border-yellow': item.firstTeamResultShifted }]" outlined dense
+                              hide-details @focus="focusItemUpdate($event, item, 'firstTeamResult', index, 0)"
                               @input="validateValueResult($event, 'firstTeamResult')"
                               @change="saveResults(item, 'firstTeamResult', 'firstDisqualificationType')">
                               <template v-if="item.firstTeamResult == '0'" v-slot:append>
@@ -275,13 +267,10 @@
                             </v-text-field>
                           </td>
                           <td>
-                            <v-text-field 
-                              :value="item.secondTeamResult" 
-                              :success="!!item.secondTeamResult"
-                              :disabled="isUpdatingResults"
-                              :class="['no-border', { 'border-yellow': item.secondTeamResultShifted }]"
-                              outlined dense hide-details
-                              @focus="focusItemUpdate($event, item, 'secondTeamResult', index, 1)"
+                            <v-text-field :value="item.secondTeamResult" :success="!!item.secondTeamResult"
+                              :disabled="isUpdatingResults || completed"
+                              :class="['no-border', { 'border-yellow': item.secondTeamResultShifted }]" outlined dense
+                              hide-details @focus="focusItemUpdate($event, item, 'secondTeamResult', index, 1)"
                               @input="validateValueResult($event, 'secondTeamResult')"
                               @change="saveResults(item, 'secondTeamResult', 'secondDisqualificationType')">
                               <template v-if="item.secondTeamResult == '0'" v-slot:append>
@@ -308,13 +297,10 @@
                         </template>
                         <template v-else>
                           <td>
-                            <v-text-field 
-                              :value="item.firstResult" 
-                              :success="!!item.firstResult"
-                              :disabled="isUpdatingResults"
-                              :class="['no-border', { 'border-yellow': item.firstResultShifted }]"
-                              outlined dense hide-details
-                              @focus="focusItemUpdate($event, item, 'firstResult', index, 0)"
+                            <v-text-field :value="item.firstResult" :success="!!item.firstResult"
+                              :disabled="isUpdatingResults || completed"
+                              :class="['no-border', { 'border-yellow': item.firstResultShifted }]" outlined dense
+                              hide-details @focus="focusItemUpdate($event, item, 'firstResult', index, 0)"
                               @input="validateValueResult($event, 'firstResult')"
                               @change="saveResults(item, 'firstResult', 'firstDisqualificationType')">
                               <template v-if="item.firstResult == '0'" v-slot:append>
@@ -336,13 +322,10 @@
                             </v-text-field>
                           </td>
                           <td>
-                            <v-text-field 
-                              :value="item.secondResult" 
-                              :success="!!item.secondResult" 
-                              :disabled="isUpdatingResults"
+                            <v-text-field :value="item.secondResult" :success="!!item.secondResult"
+                              :disabled="isUpdatingResults || completed"
                               :class="['no-border protocols-value-input', { 'border-yellow': item.secondResultShifted }]"
-                              outlined dense hide-details
-                              @focus="focusItemUpdate($event, item, 'secondResult', index, 1)"
+                              outlined dense hide-details @focus="focusItemUpdate($event, item, 'secondResult', index, 1)"
                               @input="validateValueResult($event, 'secondResult')"
                               @change="saveResults(item, 'secondResult', 'secondDisqualificationType')">
                               <template v-if="item.secondResult == '0'" v-slot:append>
@@ -371,13 +354,10 @@
                     </template>
                     <template v-if="stepper == 2">
                       <td>
-                        <v-text-field 
-                          :value="item.halfFinalResult" 
-                          :success="!!item.halfFinalResult" 
-                          :disabled="isUpdatingResults"
+                        <v-text-field :value="item.halfFinalResult" :success="!!item.halfFinalResult"
+                          :disabled="isUpdatingResults || completed"
                           :class="['no-border protocols-value-input', { 'border-yellow': item.halfFinalResultShifted }]"
-                          :suffix="item.halfFinalResultShifted ? plusValueOffset : null"
-                          outlined dense hide-details
+                          :suffix="item.halfFinalResultShifted ? plusValueOffset : null" outlined dense hide-details
                           @focus="focusItemUpdate($event, item, 'halfFinalResult', index, 0)"
                           @input="validateValueResult($event, 'halfFinalResult')"
                           @change="saveResults(item, 'halfFinalResult', 'halfFinalDisqualificationType')">
@@ -402,13 +382,10 @@
                     </template>
                     <template v-if="stepper == 3">
                       <td>
-                        <v-text-field v-if="activeCompetitionStatus === 'FINAL'" 
-                          :value="item.finalResult"
-                          :disabled="isUpdatingResults"
-                          :success="!!item.finalResult"
+                        <v-text-field v-if="activeCompetitionStatus === 'FINAL'" :value="item.finalResult"
+                          :disabled="isUpdatingResults || completed" :success="!!item.finalResult"
                           :class="['no-border protocols-value-input', { 'border-yellow': item.finalResultShifted }]"
-                          :suffix="item.finalResultShifted ? plusValueOffset : null"
-                          outlined dense hide-details
+                          :suffix="item.finalResultShifted ? plusValueOffset : null" outlined dense hide-details
                           @focus="focusItemUpdate($event, item, 'finalResult', index, 0)"
                           @input="validateValueResult($event, 'finalResult')"
                           @change="saveResults(item, 'finalResult', 'finalDisqualificationType')">
@@ -546,6 +523,7 @@
 <script>
 import { Document, Packer } from "docx";
 import { DATA_TO_DOC_PAGES } from '../protocols/defaultUtils';
+import axios from 'axios';
 export default {
   data: function () {
     return {
@@ -578,10 +556,10 @@ export default {
         { text: 'Команда', value: 'teamName', width: '45%' },
         { text: 'Сума', value: 'result', width: '45%' },
       ],
-      completed: false,
       availableHalfFinal: false,
       availableFinal: false,
       stepper: 1,
+      completed: false,
 
       alertType: 'error',
       showAlert: false,
@@ -613,6 +591,15 @@ export default {
     }
   },
   computed: {
+    getButtonColor() {
+      return this.completed ? 'success' : 'grey';
+    },
+    getButtonText() {
+      return this.completed ? 'Проведено' : 'Триває';
+    },
+    isCompleted() {
+      return this.activeCompetitionStatus === 'COMPLETED';
+    },
     printOptions() {
       const options = [
       ];
@@ -859,7 +846,6 @@ export default {
         if (!value) {
           // focus next row input
           this.triggerNextInputFocus();
-          
           // refetch best results with delay
           this.isUpdatingTimeout = setTimeout(() => {
             this.getBestResults();
@@ -869,6 +855,64 @@ export default {
     }
   },
   methods: {
+    async changeCompetitionStatus() {
+      try {
+        // Визначення активного типу змагань
+        const activeCompetitionType = this.activeCompetitionType;
+
+        if (!activeCompetitionType) {
+          throw new Error('Active competition type is not defined');
+        }
+
+        // Знаходимо об'єкт змагань, який потрібно оновити
+        const competitionToUpdate = this.competitionReferences.find(({ reference }) => reference === activeCompetitionType.reference);
+
+        if (!competitionToUpdate) {
+          throw new Error('Competition to update not found');
+        }
+
+        // Визначаємо новий статус
+        const newStatus = competitionToUpdate.status === 'COMPLETED' ? 'FINAL' : 'COMPLETED';
+
+        // Оновлюємо статус змагань
+        const response = await axios.patch(
+          `private/competition-types/${competitionToUpdate.reference}`,
+          { ...competitionToUpdate, status: newStatus }
+        );
+
+        // Оновлюємо дані в масиві competitionReferences
+        const updatedCompetitionReferences = this.competitionReferences.map((competition) => {
+          if (competition.reference === competitionToUpdate.reference) {
+            return { ...competition, status: newStatus };
+          }
+          return competition;
+        });
+
+        this.competitionReferences = updatedCompetitionReferences;
+
+        // Оновлюємо UI відповідно до нового статусу
+        this.completed = newStatus === 'COMPLETED';
+      } catch (error) {
+        console.error('Error updating competition status:', error);
+      }
+    },
+    async getCompetitionReferences() {
+      this.isPageLoading = true;
+      return this.axios.get(`private/competitions/${this.competitionId}/type`)
+        .then(({ data }) => {
+          console.log('Competition references:', data); // Додайте цей рядок
+          this.competitionReferences = data;
+          this.isPageLoading = false;
+          if (this.activeCompetitionType && this.activeCompetitionStatus !== 'INACTIVE') {
+            this.getRaceData();
+          }
+          this.completed = this.activeCompetitionStatus === 'COMPLETED';
+          console.log('Completed status:', this.completed); // Додайте цей рядок
+        })
+        .catch(() => {
+          this.isPageLoading = false;
+        });
+    },
     triggerNextInputFocus() {
       const rowIndex = this.rowIndex;
       if (!isNaN(rowIndex)) {
