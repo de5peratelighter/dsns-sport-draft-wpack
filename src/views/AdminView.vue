@@ -17,11 +17,11 @@
             <v-list-item v-for="user in users.content" :key="user.reference">
               <v-list-item-content>
                 <v-list-item-title>{{ user.username }}</v-list-item-title>
-                <v-list-item-subtitle>Статус: {{ user.isActive ? 'активний' : 'неактивний' }}</v-list-item-subtitle>
+                <v-list-item-subtitle>Статус: {{ user.active ? 'активний' : 'неактивний' }}</v-list-item-subtitle>
               </v-list-item-content>
               <v-list-item-action>
-                <v-btn @click="toggleUserStatus(user.reference, !user.isActive)">
-                  {{ user.isActive ? 'Деактивувати' : 'Активувати' }}
+                <v-btn @click="toggleUserStatus(user.reference, !user.active)">
+                  {{ user.active ? 'Деактивувати' : 'Активувати' }}
                 </v-btn>
               </v-list-item-action>
             </v-list-item>
@@ -48,11 +48,11 @@ export default {
   methods: {
     toggleUserStatus(id, isActive) {
       console.log('Request Payload:', { id, isActive });
-      axios.put(`private/users/${id}/status`, { isActive })
+      axios.put(`private/users/${id}/status?isActive=${isActive}`)
         .then(() => {
           const updatedUserIndex = this.users.content.findIndex(user => user.reference === id);
           if (updatedUserIndex !== -1) {
-            this.$set(this.users.content, updatedUserIndex, { ...this.users.content[updatedUserIndex], isActive });
+            this.$set(this.users.content, updatedUserIndex, { ...this.users.content[updatedUserIndex], active: isActive });
           }
         })
         .catch(error => {
