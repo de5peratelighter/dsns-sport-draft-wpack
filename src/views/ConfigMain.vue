@@ -305,9 +305,6 @@ export default {
         {
           id: 'ADULTS_FEMALE', name: 'Дорослі (жінки) від 18+'
         },
-        {
-          id: 'ADULTS_GENERAL', name: 'Відомчі (чоловіки, жінки) від 18+'
-        },
       ],
       isDataInvalid: false,
 
