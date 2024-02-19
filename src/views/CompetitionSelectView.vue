@@ -6,40 +6,49 @@
           <template v-for="(item, index) in competitions">
             <v-list-item :key="item.title" class="competitions-item">
               <template #default>
-                <v-list-item-content>
-                  <v-list-item-title v-text="item.name" class="text-center"></v-list-item-title>
-
-                  <v-list-item-subtitle class="text--primary" v-text="item.competitionDate"></v-list-item-subtitle>
-
-                </v-list-item-content>
-
-                <v-list-item-action>
-                  <v-list-item-action-text v-text="item.locationName"></v-list-item-action-text>
-                  <v-icon @click.stop.prevent="deleteItem(item)">mdi-delete</v-icon>
-                </v-list-item-action>
+                <div class="d-flex align-center justify-space-between" style="width: 100%;">
+                  <div class="d-flex align-center">
+                    <v-checkbox v-model="item.checked"></v-checkbox>
+                    <v-list-item-content style="margin-left: 20px;">
+                      <v-list-item-title v-text="item.name" class="text-center"></v-list-item-title>
+                      <v-list-item-subtitle class="text--primary" v-text="item.competitionDate"></v-list-item-subtitle>
+                    </v-list-item-content>
+                  </div>
+                  <div class="d-flex align-center">
+                    <v-list-item-action-text v-text="item.locationName"></v-list-item-action-text>
+                    <v-icon @click.stop.prevent="deleteItem(item)">mdi-delete</v-icon>
+                  </div>
+                </div>
               </template>
             </v-list-item>
-
             <v-divider v-if="index < competitions.length - 1" :key="index"></v-divider>
           </template>
         </v-list-item-group>
       </v-list>
     </div>
     <div class="competitions-buttons mt-3 d-flex justify-space-between">
-      <v-btn color="white" @click="$router.push({ name: 'configMain' })">
-        {{ $t('shared.selectCompetitionCreate') }}
-      </v-btn>
-      <v-btn class="white--text" color="green" @click="$router.push({
-        name: 'editCompetition', params: { id: chosenItem.competitionReference }
-      })" :disabled="!chosenItem">
-        {{ $t('shared.selectCompetitionEdit') }}
-      </v-btn>
-      <v-btn color="white" @click="$router.push({ name: 'main' })">
-        {{ $t('shared.selectCompetitionLeave') }}
-      </v-btn>
+      <div>
+        <v-btn color="white" @click="$router.push({ name: 'configMain' })">
+          {{ $t('shared.selectCompetitionCreate') }}
+        </v-btn>
+        <v-btn class="white--text ml-5" color="green" @click="openSettings">
+          {{ $t('shared.selectCompetitionSettings') }}
+        </v-btn>
+      </div>
+      <div>
+        <v-btn class="white--text mr-5" color="green" @click="$router.push({
+          name: 'editCompetition', params: { id: chosenItem.competitionReference }
+        })" :disabled="!chosenItem">
+          {{ $t('shared.selectCompetitionEdit') }}
+        </v-btn>
+        <v-btn color="white" @click="$router.push({ name: 'main' })">
+          {{ $t('shared.selectCompetitionLeave') }}
+        </v-btn>
+      </div>
     </div>
   </v-container>
 </template>
+
 
 <script>
 import axios from 'axios';
