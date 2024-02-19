@@ -25,7 +25,20 @@
             style="cursor: pointer" />
           <div class="d-flex flex-column align-left ml-6 flex-grow-1">
             <div class="d-flex flex-row justify-space-between flex-grow-1 flex-shrink-0 align-center">
-              <div class="text-h6">{{ this.$t(`shared.championshipOfUkraineFirefightingSports`) }}</div>
+              <div class="text-h6">
+                {{ this.$t(`shared.championshipOfUkraineFirefightingSports`) }}
+                <!-- Dropdown Menu Trigger -->
+                <v-menu offset-y>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-icon small class="ml-2" color="white" v-bind="attrs" v-on="on">mdi-chevron-down</v-icon>
+                  </template>
+                  <v-list>
+                    <v-list-item v-for="(item, index) in competitionItems" :key="index" @click="selectItem(item)">
+                      <v-list-item-title>{{ item.name }}</v-list-item-title>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
+              </div>
               <div>{{ this.$t(`shared.eventDate`) }}</div>
               <div>{{ this.$t(`shared.eventPlaceKyiv`) }}</div>
               <div>
@@ -34,7 +47,20 @@
                 </v-btn>
               </div>
             </div>
-            <div class="text-subtitle-1 mb-1">{{ this.$t(`shared.overcoming100mObstacleCourse`) }}</div>
+            <div class="text-subtitle-1 mb-1">
+              {{ this.$t(`shared.overcoming100mObstacleCourse`) }}
+              <v-menu offset-y>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-icon small class="ml-2" color="white" v-bind="attrs" v-on="on">mdi-chevron-down</v-icon>
+                </template>
+                <v-list>
+                  <v-list-item v-for="(eventType, index) in eventTypeItems" :key="index"
+                    @click="selectEventType(eventType)">
+                    <v-list-item-title>{{ eventType.name }}</v-list-item-title>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
+            </div>
           </div>
         </div>
       </v-col>
@@ -152,7 +178,7 @@ export default {
         { title: this.$t(`shared.commandProtocol`), show: isLoggedIn },
         { title: this.$t(`shared.userRegistration`), show: !isLoggedIn },
         { title: this.$t(`shared.userLogin`), show: !isLoggedIn },
-        { title: this.$t(`shared.athletesBase`), show: isLoggedIn },
+        { title: this.$t(`shared.usersBase`), show: isLoggedIn },
         { title: this.$t(`shared.userLogout`), show: isLoggedIn },
       ];
 
@@ -252,7 +278,7 @@ export default {
         this.$emit('toggleLoginDialog', true)
       } else if (item.title === this.$t('shared.userLogout')) {
         this.$emit('logoutUser')
-      } else if (item.title === this.$t('shared.athletesBase')) {
+      } else if (item.title === this.$t('shared.usersBase')) {
         this.$router.push('/admin');
       }
     },
