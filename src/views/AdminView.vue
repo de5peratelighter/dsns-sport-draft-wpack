@@ -9,7 +9,7 @@
             </v-btn>
           </v-col>
           <v-col cols="auto">
-            <h2 class="white--text mb-0">БАЗА СПОРТСМЕНІВ</h2>
+            <h2 class="white--text mb-0">{{ this.$t(`shared.usersBase`) }}</h2>
           </v-col>
         </v-row>
         <v-list>
