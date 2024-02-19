@@ -216,7 +216,7 @@
                           <td>
                             <v-text-field :value="item.bestResultTeam" :success="!!item.bestResultTeam"
                               :suffix="item.relayResultShifted ? plusValueOffset : null"
-                              :disabled="isUpdatingResults || completed"
+                              :disabled="isUpdatingResults || completed || isCompleted"
                               :class="['no-border', { 'border-yellow': item.relayResultShifted }]" outlined dense
                               hide-details @focus="focusItemUpdate($event, item, 'bestResultTeam', index, 0)"
                               @input="validateValueResult($event, 'bestResultTeam')"
@@ -243,7 +243,7 @@
                         <template v-else-if="isCombatDeployment">
                           <td>
                             <v-text-field :value="item.firstTeamResult" :success="!!item.firstTeamResult"
-                              :disabled="isUpdatingResults || completed"
+                              :disabled="isUpdatingResults || completed || isCompleted"
                               :class="['no-border', { 'border-yellow': item.firstTeamResultShifted }]" outlined dense
                               hide-details @focus="focusItemUpdate($event, item, 'firstTeamResult', index, 0)"
                               @input="validateValueResult($event, 'firstTeamResult')"
@@ -268,7 +268,7 @@
                           </td>
                           <td>
                             <v-text-field :value="item.secondTeamResult" :success="!!item.secondTeamResult"
-                              :disabled="isUpdatingResults || completed"
+                              :disabled="isUpdatingResults || completed || isCompleted"
                               :class="['no-border', { 'border-yellow': item.secondTeamResultShifted }]" outlined dense
                               hide-details @focus="focusItemUpdate($event, item, 'secondTeamResult', index, 1)"
                               @input="validateValueResult($event, 'secondTeamResult')"
@@ -298,7 +298,7 @@
                         <template v-else>
                           <td>
                             <v-text-field :value="item.firstResult" :success="!!item.firstResult"
-                              :disabled="isUpdatingResults || completed"
+                              :disabled="isUpdatingResults || completed || isCompleted"
                               :class="['no-border', { 'border-yellow': item.firstResultShifted }]" outlined dense
                               hide-details @focus="focusItemUpdate($event, item, 'firstResult', index, 0)"
                               @input="validateValueResult($event, 'firstResult')"
@@ -323,7 +323,7 @@
                           </td>
                           <td>
                             <v-text-field :value="item.secondResult" :success="!!item.secondResult"
-                              :disabled="isUpdatingResults || completed"
+                              :disabled="isUpdatingResults || completed || isCompleted"
                               :class="['no-border protocols-value-input', { 'border-yellow': item.secondResultShifted }]"
                               outlined dense hide-details @focus="focusItemUpdate($event, item, 'secondResult', index, 1)"
                               @input="validateValueResult($event, 'secondResult')"
@@ -355,7 +355,7 @@
                     <template v-if="stepper == 2">
                       <td>
                         <v-text-field :value="item.halfFinalResult" :success="!!item.halfFinalResult"
-                          :disabled="isUpdatingResults || completed"
+                          :disabled="isUpdatingResults || completed || isCompleted"
                           :class="['no-border protocols-value-input', { 'border-yellow': item.halfFinalResultShifted }]"
                           :suffix="item.halfFinalResultShifted ? plusValueOffset : null" outlined dense hide-details
                           @focus="focusItemUpdate($event, item, 'halfFinalResult', index, 0)"
@@ -383,7 +383,7 @@
                     <template v-if="stepper == 3">
                       <td>
                         <v-text-field v-if="activeCompetitionStatus === 'FINAL'" :value="item.finalResult"
-                          :disabled="isUpdatingResults || completed" :success="!!item.finalResult"
+                          :disabled="isUpdatingResults || completed || isCompleted" :success="!!item.finalResult"
                           :class="['no-border protocols-value-input', { 'border-yellow': item.finalResultShifted }]"
                           :suffix="item.finalResultShifted ? plusValueOffset : null" outlined dense hide-details
                           @focus="focusItemUpdate($event, item, 'finalResult', index, 0)"
