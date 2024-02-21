@@ -36,15 +36,15 @@
                   @change="saveNextLogo('ASSAULT_LADDER')" />
                   <img v-if="logoImage.ASSAULT_LADDER" :src="logoImage.ASSAULT_LADDER" alt="ASSAULT LADDER Logo" class="logo-image" height="40">
                 <p class="text-caption">(Штурмова драбина)</p>
-                <v-file-input class="smaller-input" accept="image/*" v-model="logoFiles.HUNDRED_METTER"
+                <v-file-input class="smaller-input" accept="image/*" v-model="logoFiles.HUNDRED_METER"
                   label="Виберіть файл" :prepend-icon="null" prepend-inner-icon="mdi-paperclip" outlined hide-details
-                  @change="saveNextLogo('HUNDRED_METTER')" />
-                  <img v-if="logoImage.HUNDRED_METTER" :src="logoImage.HUNDRED_METTER" alt="HUNDRED METTER Logo" class="logo-image" height="40">
+                  @change="saveNextLogo('HUNDRED_METER')" />
+                  <img v-if="logoImage.HUNDRED_METER" :src="logoImage.HUNDRED_METER" alt="HUNDRED METER Logo" class="logo-image" height="40">
                 <p class="text-caption">(100-метрова смуга)</p>
-                <v-file-input class="smaller-input" accept="image/*" v-model="logoFiles.DUELLING" label="Виберіть файл"
+                <v-file-input class="smaller-input" accept="image/*" v-model="logoFiles.DUELING" label="Виберіть файл"
                   :prepend-icon="null" prepend-inner-icon="mdi-paperclip" outlined hide-details
-                  @change="saveNextLogo('DUELLING')" />
-                  <img v-if="logoImage.DUELLING" :src="logoImage.DUELLING" alt="DUELLING Logo" class="logo-image" height="40">
+                  @change="saveNextLogo('DUELING')" />
+                  <img v-if="logoImage.DUELING" :src="logoImage.DUELING" alt="DUELING Logo" class="logo-image" height="40">
                 <p class="text-caption">(Двоєборство)</p>
                 <v-file-input class="smaller-input" accept="image/*" v-model="logoFiles.RELAY" label="Виберіть файл"
                   :prepend-icon="null" prepend-inner-icon="mdi-paperclip" outlined hide-details
@@ -84,8 +84,8 @@ export default {
         MAN: null,
         WOMAN: null,
         ASSAULT_LADDER: null,
-        HUNDRED_METTER: null,
-        DUELLING: null,
+        HUNDRED_METER: null,
+        DUELING: null,
         RELAY: null,
         COMBAT_DEPLOYMENT: null,
         RETRACTABLE_LADDER: null,
@@ -96,8 +96,8 @@ export default {
         MAN: null,
         WOMAN: null,
         ASSAULT_LADDER: null,
-        HUNDRED_METTER: null,
-        DUELLING: null,
+        HUNDRED_METER: null,
+        DUELING: null,
         RELAY: null,
         COMBAT_DEPLOYMENT: null,
         RETRACTABLE_LADDER: null,
