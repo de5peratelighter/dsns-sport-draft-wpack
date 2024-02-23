@@ -288,7 +288,22 @@ export default {
       ],
       genderItems: [
         {
-          id: 'JUNES_MALE', name: 'Юнаки, юніори (від 12-14 молодша, 15-16 старша, 17-18 юніори)'
+          id: 'YOUNGSTERS_MALE', name: 'Юніори від 17 до 18 '
+        },
+        {
+          id: 'JUNIORS_MALE', name: 'Юнаки (старша) від 15 до 16'
+        },
+        {
+          id: 'JUNES_MALE', name: 'Юнаки (молодша) від 12 до 14'
+        },
+        {
+          id: 'YOUNGSTERS_FEMALE', name: 'Юніорки від 17 до 18 '
+        },
+        {
+          id: 'JUNIORS_FEMALE', name: 'Дівчата (старша) від 15 до 16'
+        },
+        {
+          id: 'JUNES_FEMALE', name: 'Дівчата (молодша) від 12 до 14'
         },
         {
           id: 'JUNES_FEMALE', name: 'Дівчата, юніорки (від 12-14 молодша, 15-16 старша, 17-18 юніори)'
