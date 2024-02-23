@@ -1,6 +1,6 @@
-import { Paragraph, HeadingLevel, PageBreak } from "docx";
+import { Paragraph, HeadingLevel, PageBreak, SectionProperties, PageOrientation, TextRun, AlignmentType } from "docx";
 
-import { spacer, PAGE_HEADER, SPACE_BETWEEN } from "./defaultUtilBlocks";
+import { spacer, PAGE_HEADER, SPACE_BETWEEN, JUDGES_INFO } from "./defaultUtilBlocks";
 
 import { TABLE_PERSONAL_ZALIK_100_RESULTS } from "./tables/PERSONAL_100_RESULTS_ZALIK";
 import { TABLE_PERSONAL_DUELING_RESULTS } from "./tables/PERSONAL_DUELING_RESULTS";
@@ -22,6 +22,8 @@ import {
 // assign table according to the type
 const GIVE_TABLE_BY_TYPE = (type, tables) => {
   switch (type) {
+    case "START_PROTOCOL":
+      return TABLE_START_PROTOCOL_RESULTS(tables);
     case "TEAM_RESULTS":
       return TABLE_TEAM_RESULTS(tables);
     case "TEAM_RELAY_RESULTS":
@@ -44,33 +46,40 @@ const GIVE_TABLE_BY_TYPE = (type, tables) => {
       return TABLE_PERSONAL_FINAL_100_RESULTS(tables);
     case "PERSONAL_RESULTS_ZALIK_100":
       return TABLE_PERSONAL_ZALIK_100_RESULTS(tables);
-    case "START_PROTOCOL":
-      return TABLE_START_PROTOCOL_RESULTS(tables);
     default:
       console.error(`Incorrect table type, ignoring it`, type);
       return [spacer];
   }
 };
 
-const PAGE_JUDGES = (judges) => {
-  return judges.reduce(
-    (acc = [], judge) => [
-      ...acc,
-      ...SPACE_BETWEEN(judge.title, judge.name, {
-        space: 5,
-        heading: HeadingLevel.HEADING_3,
-      }),
-    ],
-    []
-  );
+const setPageOrientation = () => {
+  return new SectionProperties({
+    type: {
+      orientation: PageOrientation.LANDSCAPE,
+    },
+  });
 };
+
+
+// const setPageMargins = () => {
+//   return new SectionProperties({
+//     page: {
+//       margin: {
+//         top: 567,    // 1 cm in twentieths of a point
+//         right: 454,  // 0.8 cm in twentieths of a point
+//         bottom: 454, // 0.8 cm in twentieths of a point
+//         left: 850,   // 1.5 cm in twentieths of a point
+//       },
+//     },
+//   });
+// };
 
 export const DATA_TO_DOC_PAGES = (pages) => {
   return pages.reduce((acc, next, index) => {
     let mergedTable = [
       ...PAGE_HEADER(next.header),
       ...GIVE_TABLE_BY_TYPE(next.type, next.tables),
-      ...PAGE_JUDGES(next.judges),
+      ...JUDGES_INFO(next.judges),
     ];
     if (index !== pages.length - 1)
       mergedTable.push(new Paragraph({ children: [new PageBreak()] }));

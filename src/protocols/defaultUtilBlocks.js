@@ -36,8 +36,19 @@ const multiLine = (text = "", allCaps = false) =>
     .split("\n")
     .map((t, index) =>
       index
-        ? new TextRun({ text: t, break: 1, allCaps })
-        : new TextRun({ text: t, allCaps })
+        ? new TextRun({
+          text: t,
+          break: 1,
+          allCaps,
+          font: "Times New Roman",
+          size: 22,
+        })
+        : new TextRun({
+          text: t,
+          allCaps,
+          font: "Times New Roman",
+          size: 22,
+        })
     );
 
 /**
@@ -49,7 +60,13 @@ const cellObject = ({ width, text, borders, columnSpan }) => {
   const celData = {
     children: [
       new Paragraph({
-        text: text,
+        children: [
+          new TextRun({
+            text: text,
+            font: "Times New Roman",
+            size: 22,
+          }),
+        ],
         alignment: AlignmentType.CENTER,
       }),
     ],
@@ -66,6 +83,15 @@ const cellObject = ({ width, text, borders, columnSpan }) => {
   return celData;
 };
 
+const createTextRun = (text, options = {}) => {
+  return new TextRun({
+    text: text,
+    font: "Times New Roman",
+    color: "000000",
+    ...options,
+  });
+};
+
 const PAGE_HEADER = (header) => {
   const {
     headerLine,
@@ -75,109 +101,162 @@ const PAGE_HEADER = (header) => {
     location,
     date,
     track,
+    beginning,
     metrics,
   } = header;
   const items = [
-    new Paragraph({
-      children: multiLine(headerLine, true),
-      heading: HeadingLevel.HEADING_1,
+    ...headerLine.split('\n').map(line => new Paragraph({
+      children: [new TextRun({
+        text: line.toUpperCase(),
+        size: 28,
+        bold: true,
+        color: "000000",
+        font: "Times New Roman",
+      })],
       alignment: AlignmentType.CENTER,
-    }),
-    new Paragraph({
-      children: multiLine(subLine),
-      heading: HeadingLevel.HEADING_3,
+      spacing: { before: 0, after: 200 },
+    })),
+    ...subLine.split('\n').map(line => new Paragraph({
+      children: [new TextRun({
+        text: line,
+        size: 24,
+        color: "000000",
+        font: "Times New Roman",
+      })],
       alignment: AlignmentType.CENTER,
-      spacing: { before: 200, after: 400 },
-    }),
+    })),
     new Paragraph({
-      children: multiLine(protocolLine, true),
-      heading: HeadingLevel.HEADING_3,
+      children: [
+        createTextRun(protocolLine.toUpperCase(), {
+          size: 24,
+          bold: true,
+        }),
+      ],
       alignment: AlignmentType.CENTER,
+      spacing: { before: 200, after: 50 },
     }),
-    new Paragraph({
-      children: multiLine(subProtocolLine),
-      heading: HeadingLevel.HEADING_3,
+    ...subProtocolLine.split('\n').map(line => new Paragraph({
+      children: [new TextRun({
+        text: line,
+        size: 24,
+        color: "000000",
+        font: "Times New Roman",
+      })],
       alignment: AlignmentType.CENTER,
-    }),
+    })),
     spacer,
-    ...SPACE_BETWEEN(location, date),
+    ...SPACE_BETWEEN({ location, date, track, beginning, metrics }),
   ];
-  const optionalItems =
-    track || metrics ? [...SPACE_BETWEEN(track, metrics)] : [];
-  return [...items, ...optionalItems];
+  return items;
 };
 
-const SPACE_BETWEEN = (
-  leftText,
-  rightText,
-  options = { space: 0, heading: undefined }
-) => {
-  const items = [
+const SPACE_BETWEEN = (header) => {
+  const {
+    location,
+    date,
+    track,
+    beginning,
+    metrics
+  } = header;
+  const firstRowItems = [
     new TableCell({
       children: [
         new Paragraph({
-          children: multiLine(leftText),
+          children: [new TextRun({ text: location, font: "Times New Roman", size: 22 })],
           alignment: AlignmentType.LEFT,
-          heading: options.heading ? options.heading : undefined,
-          width: {
-            size: 25,
-            type: WidthType.PERCENTAGE,
-          },
         }),
       ],
       verticalAlign: VerticalAlign.CENTER,
-      borders: allCellBorders,
+      borders: noBorders,
+      width: {
+        size: 35,
+        type: WidthType.PERCENTAGE,
+      },
     }),
     new TableCell({
       children: [new Paragraph("")], // Middle cell
-      borders: allCellBorders,
+      borders: noBorders,
+      width: {
+        size: 20,
+        type: WidthType.PERCENTAGE,
+      },
     }),
     new TableCell({
       children: [
         new Paragraph({
-          children: multiLine(rightText),
+          children: [new TextRun({ text: date, font: "Times New Roman", size: 22 })],
           alignment: AlignmentType.RIGHT,
-          heading: options.heading ? options.heading : undefined,
-          width: {
-            size: 25,
-            type: WidthType.PERCENTAGE,
-          },
         }),
       ],
       verticalAlign: VerticalAlign.CENTER,
-      borders: allCellBorders,
-    }),
-  ];
-  return [
-    new Table({
+      borders: noBorders,
       width: {
-        size: 100,
+        size: 35,
         type: WidthType.PERCENTAGE,
       },
-      rows: [
-        new TableRow({
-          children: options.space
-            ? [
-                new TableCell({
-                  children: [new Paragraph(" ")],
-                  width: {
-                    size: options.space,
-                    type: WidthType.PERCENTAGE,
-                  },
-                  borders: allCellBorders,
-                }),
-                ...items,
-                new TableCell({
-                  children: [new Paragraph(" ")],
-                  width: {
-                    size: options.space,
-                    type: WidthType.PERCENTAGE,
-                  },
-                  borders: allCellBorders,
-                }),
-              ]
-            : items,
+    }),
+  ];
+
+  const secondRowItems = [
+    new TableCell({
+      children: [
+        new Paragraph({
+          children: [new TextRun({ text: track, font: "Times New Roman", size: 22 })],
+          alignment: AlignmentType.LEFT,
         }),
+      ],
+      verticalAlign: VerticalAlign.CENTER,
+      borders: noBorders,
+      width: {
+        size: 35,
+        type: WidthType.PERCENTAGE,
+      },
+    }),
+    new TableCell({
+      children: [
+        new Paragraph({
+          children: [new TextRun({ text: beginning, font: "Times New Roman", size: 22 })],
+          alignment: AlignmentType.CENTER,
+        }),
+      ],
+      verticalAlign: VerticalAlign.CENTER,
+      borders: {
+        top: { style: BorderStyle.NONE },
+        bottom: { style: BorderStyle.NONE },
+        left: { style: BorderStyle.NONE },
+        right: { style: BorderStyle.NONE },
+      },
+      width: {
+        size: 20,
+        type: WidthType.PERCENTAGE,
+      },
+    }),
+    new TableCell({
+      children: [
+        new Paragraph({
+          children: [new TextRun({ text: metrics, font: "Times New Roman", size: 22 })],
+          alignment: AlignmentType.RIGHT,
+        }),
+      ],
+      verticalAlign: VerticalAlign.CENTER,
+      borders: {
+        top: { style: BorderStyle.NONE },
+        bottom: { style: BorderStyle.NONE },
+        left: { style: BorderStyle.NONE },
+        right: { style: BorderStyle.NONE },
+      },
+      width: {
+        size: 35,
+        type: WidthType.PERCENTAGE,
+      },
+    }),
+  ];
+
+  return [
+    new Table({
+      rows: [
+        new TableRow({ children: firstRowItems, height: { value: 450 } }),
+        new TableRow({ children: secondRowItems, height: { value: 450 } }),
       ],
       width: {
         size: 100,
@@ -186,6 +265,58 @@ const SPACE_BETWEEN = (
     }),
     spacer,
   ];
+};
+
+export const JUDGES_INFO = (judges) => {
+  const judgeRows = judges.map(judge => new TableRow({
+    children: [
+      new TableCell({
+        children: [
+          new Paragraph({
+            children: multiLine(judge.title, false),
+            alignment: AlignmentType.CENTER,
+          })
+        ],
+        verticalAlign: VerticalAlign.CENTER,
+        borders: noBorders,
+        width: {
+          size: 50,
+          type: WidthType.PERCENTAGE,
+        },
+      }),
+      new TableCell({
+        children: [new Paragraph({
+          children: [new TextRun({ text: judge.name, font: "Times New Roman", size: 22 })],
+          alignment: AlignmentType.CENTER,
+        })],
+        verticalAlign: VerticalAlign.CENTER,
+        borders: noBorders,
+        width: {
+          size: 50,
+          type: WidthType.PERCENTAGE,
+        },
+      }),
+    ],
+    height: { value: 800 },
+  }));
+
+  return [
+    new Table({
+      rows: judgeRows,
+      width: {
+        size: 100,
+        type: WidthType.PERCENTAGE,
+      },
+    }),
+    spacer,
+  ];
+};
+
+const noBorders = {
+  top: { style: BorderStyle.NONE },
+  bottom: { style: BorderStyle.NONE },
+  left: { style: BorderStyle.NONE },
+  right: { style: BorderStyle.NONE },
 };
 
 export {
