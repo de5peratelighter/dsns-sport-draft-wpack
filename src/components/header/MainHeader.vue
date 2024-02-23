@@ -7,7 +7,6 @@
             <v-btn icon @click="$router.push({ name: 'selectCompetition' })">
               <v-icon color="white" large>mdi-account</v-icon>
             </v-btn>
-
             <v-menu offset-y>
               <template v-slot:activator="{ on, attrs }">
                 <v-app-bar-nav-icon x-large color="white" v-bind="attrs" v-on="on" />
@@ -26,15 +25,16 @@
           <div class="d-flex flex-column align-left ml-6 flex-grow-1">
             <div class="d-flex flex-row justify-space-between flex-grow-1 flex-shrink-0 align-center">
               <div class="text-h6">
-                {{ this.$t(`shared.championshipOfUkraineFirefightingSports`) }}
-                <!-- Dropdown Menu Trigger -->
+                {{ selectedCompetition ? selectedCompetition.name :
+                  this.$t(`shared.championshipOfUkraineFirefightingSports`) }}
                 <v-menu offset-y>
                   <template v-slot:activator="{ on, attrs }">
                     <v-icon small class="ml-2" color="white" v-bind="attrs" v-on="on">mdi-chevron-down</v-icon>
                   </template>
                   <v-list>
-                    <v-list-item v-for="(item, index) in competitionItems" :key="index" @click="selectItem(item)">
-                      <v-list-item-title>{{ item.name }}</v-list-item-title>
+                    <v-list-item v-for="(competition, index) in visibleCompetitions" :key="index"
+                      @click="selectCompetition(competition)">
+                      <v-list-item-title>{{ competition.name }}</v-list-item-title>
                     </v-list-item>
                   </v-list>
                 </v-menu>
@@ -48,15 +48,14 @@
               </div>
             </div>
             <div class="text-subtitle-1 mb-1">
-              {{ this.$t(`shared.overcoming100mObstacleCourse`) }}
+              {{ selectedSportType ? selectedSportType.name : this.$t(`shared.overcoming100mObstacleCourse`) }}
               <v-menu offset-y>
                 <template v-slot:activator="{ on, attrs }">
                   <v-icon small class="ml-2" color="white" v-bind="attrs" v-on="on">mdi-chevron-down</v-icon>
                 </template>
                 <v-list>
-                  <v-list-item v-for="(eventType, index) in eventTypeItems" :key="index"
-                    @click="selectEventType(eventType)">
-                    <v-list-item-title>{{ eventType.name }}</v-list-item-title>
+                  <v-list-item v-for="(type, index) in sportTypes" :key="index" @click="selectSportType(type)">
+                    <v-list-item-title>{{ type.name }}</v-list-item-title>
                   </v-list-item>
                 </v-list>
               </v-menu>
@@ -146,6 +145,8 @@ export default {
   },
   data: function () {
     return {
+      competitions: [],
+      selectedCompetition: null,
       loginUsername: '',
       loginPassword: '',
       loginDialog: false,
@@ -163,11 +164,18 @@ export default {
       apiKey: '4a697c396f11e7450074d7f1e5b233ec',
       city: 'Kyiv',
       units: 'metric',
-      accessToken: ''
+      accessToken: '',
+      sportTypes: [
+        { name: 'Подолання 100м смуги з перешкодами', value: 'HUNDRED_METER' },
+        { name: 'Штурмова драбина', value: 'ASSAULT_LADDER' },
+        { name: 'Двоборство', value: 'DUELING' },
+      ],
+      selectedSportType: null,
     }
   },
   mounted() {
     this.fetchWeather();
+    this.fetchCompetitions();
   },
   computed: {
     mainMenuItems() {
@@ -195,6 +203,9 @@ export default {
         { name: 'web', url: '' },
       ];
       return items;
+    },
+    visibleCompetitions() {
+      return this.competitions.filter(competition => competition.show);
     },
     languageOptions() {
       const activeLang = this.activeLang;
@@ -224,6 +235,21 @@ export default {
     }
   },
   methods: {
+    async fetchCompetitions() {
+      try {
+        const response = await axios.get('private/competitions');
+        this.competitions = response.data;
+        console.log('Visible Competitions:', this.visibleCompetitions);
+      } catch (error) {
+        console.error('Error fetching competitions:', error);
+      }
+    },
+    selectCompetition(competition) {
+      this.selectedCompetition = competition;
+    },
+    selectSportType(type) {
+      this.selectedSportType = type;
+    },
     openRegistrationDialog() {
       const registrationButton = this.mainMenuItems.find(item => item.title === this.$t('shared.userRegistration'));
       if (registrationButton) {
