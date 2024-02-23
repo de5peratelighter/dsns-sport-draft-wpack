@@ -8,7 +8,7 @@
               <template #default>
                 <div class="d-flex align-center justify-space-between" style="width: 100%;">
                   <div class="d-flex align-center">
-                    <v-checkbox v-model="item.checked"></v-checkbox>
+                    <v-checkbox v-model="item.show" @change="updateShowStatus(item)"></v-checkbox>
                     <v-list-item-content style="margin-left: 20px;">
                       <v-list-item-title v-text="item.name" class="text-center"></v-list-item-title>
                       <v-list-item-subtitle class="text--primary" v-text="item.competitionDate"></v-list-item-subtitle>
@@ -125,6 +125,25 @@ export default {
       }
 
       return accessToken;
+    },
+    async updateShowStatus(item) {
+      try {
+        const accessToken = this.getAccessToken();
+        if (!accessToken) {
+          console.error('Access token not available. User may not be authenticated.');
+          return;
+        }
+
+        const response = await axios.patch(`private/competitions/${item.competitionReference}`, {
+          show: item.show,
+        }, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+
+        console.log('Show status updated:', response.data);
+      } catch (error) {
+        console.error('Error updating show status:', error);
+      }
     },
   },
 }
