@@ -12,7 +12,6 @@ import {
 const TABLE_START_PROTOCOL_RESULTS_HEAD = (item) => {
   return new TableRow({
     children: [
-      new TableCell(cellObject({ text: item.set, width: 6 })),
       new TableCell({
         width: {
           size: 94,
@@ -30,16 +29,35 @@ const TABLE_START_PROTOCOL_RESULTS_HEAD = (item) => {
                 children: [
                   new TableCell(
                     cellObject({
-                      text: item.track,
-                      width: 9,
+                      text: item.set,
+                      width: 5,
                       borders: cellBorders,
+                      vertical: true,
+                    })
+                  ),
+                  new TableCell(
+                    cellObject({
+                      text: item.track,
+                      width: 5,
+                      borders: cellBorders,
+                      vertical: true,
+
                     })
                   ),
                   new TableCell(
                     cellObject({
                       text: item.number,
+                      width: 5,
+                      borders: cellBorders,
+                      vertical: true,
+                    })
+                  ),
+                  new TableCell(
+                    cellObject({
+                      text: item.category,
                       width: 9,
                       borders: cellBorders,
+                      vertical: true,
                     })
                   ),
                   new TableCell(
@@ -60,13 +78,6 @@ const TABLE_START_PROTOCOL_RESULTS_HEAD = (item) => {
                     cellObject({
                       text: item.team,
                       width: 14,
-                      borders: cellBorders,
-                    })
-                  ),
-                  new TableCell(
-                    cellObject({
-                      text: item.category,
-                      width: 9,
                       borders: cellBorders,
                     })
                   ),
@@ -104,7 +115,6 @@ const TABLE_START_PROTOCOL_RESULTS_HEAD = (item) => {
 const TABLE_START_PROTOCOL_RESULTS_ROW = (item) => {
   return new TableRow({
     children: [
-      new TableCell(cellObject({ text: item.set, width: 6 })),
       new TableCell({
         width: {
           size: 94,
@@ -126,14 +136,28 @@ const TABLE_START_PROTOCOL_RESULTS_ROW = (item) => {
                 children: [
                   new TableCell(
                     cellObject({
+                      text: item.set,
+                      width: 5,
+                      borders,
+                    })
+                  ),
+                  new TableCell(
+                    cellObject({
                       text: participant.track,
-                      width: 9,
+                      width: 5,
                       borders,
                     })
                   ),
                   new TableCell(
                     cellObject({
                       text: participant.number,
+                      width: 5,
+                      borders,
+                    })
+                  ),
+                  new TableCell(
+                    cellObject({
+                      text: participant.category,
                       width: 9,
                       borders,
                     })
@@ -156,13 +180,6 @@ const TABLE_START_PROTOCOL_RESULTS_ROW = (item) => {
                     cellObject({
                       text: participant.team,
                       width: 14,
-                      borders,
-                    })
-                  ),
-                  new TableCell(
-                    cellObject({
-                      text: participant.category,
-                      width: 9,
                       borders,
                     })
                   ),
