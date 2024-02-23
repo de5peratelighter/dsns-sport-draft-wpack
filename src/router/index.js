@@ -31,6 +31,11 @@ const routes = [
     component: () => import('../views/CompetitionSelectView.vue'),
   },
   {
+    path: '/competitionSettings',
+    name: 'competitionSettings',
+    component: () => import('../views/CompetitionSettings.vue'),
+  },  
+  {
     path: '/editCompetition/:id',
     name: 'editCompetition',
     component: () => import('../views/CompetitionEditView.vue'),
