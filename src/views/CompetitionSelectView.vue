@@ -14,9 +14,12 @@
                       <v-list-item-subtitle class="text--primary" v-text="item.competitionDate"></v-list-item-subtitle>
                     </v-list-item-content>
                   </div>
-                  <div class="d-flex align-center">
-                    <v-list-item-action-text v-text="item.locationName"></v-list-item-action-text>
-                    <v-icon @click.stop.prevent="deleteItem(item)">mdi-delete</v-icon>
+                  <div class="d-flex">
+                    <v-checkbox v-model="item.checked"></v-checkbox>
+                    <div class="d-flex align-center location-delete-block">
+                      <v-list-item-action-text v-text="item.locationName"></v-list-item-action-text>
+                      <v-icon @click.stop.prevent="deleteItem(item)">mdi-delete</v-icon>
+                    </div>
                   </div>
                 </div>
               </template>
@@ -31,8 +34,11 @@
         <v-btn color="white" @click="$router.push({ name: 'configMain' })">
           {{ $t('shared.selectCompetitionCreate') }}
         </v-btn>
-        <v-btn class="white--text ml-5" color="green" @click="openSettings">
+        <v-btn class="white--text ml-5" color="green" @click="$router.push({ name: 'competitionSettings' })">
           {{ $t('shared.selectCompetitionSettings') }}
+        </v-btn>
+        <v-btn class="white--text ml-5" color="blue" @click="consolidatedProtocol">
+          {{ $t('shared.selectCompetitionConsolidatedProtocol') }}
         </v-btn>
       </div>
       <div>
@@ -131,7 +137,41 @@ export default {
     overflow: auto;
   }
 
-  &-item {}
+  &-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    &>.d-flex:first-child,
+    &>.d-flex:last-child {
+      flex: 1;
+    }
+
+    .v-checkbox:first-of-type {
+      // Для першого чекбокса в блоку, щоб він був вирівняний з другим
+      margin-right: 0;
+    }
+
+    .location-delete-block {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 120px;
+      padding-left: 15px;
+
+      .v-list-item-action-text {
+        white-space: nowrap; // Запобігає переносу тексту
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+
+  .v-checkbox {
+    padding: 0;
+    margin: 0;
+    flex-shrink: 0;
+  }
 }
 </style>
 
