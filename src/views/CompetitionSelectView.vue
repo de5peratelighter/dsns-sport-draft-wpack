@@ -34,18 +34,18 @@
         <v-btn color="white" @click="$router.push({ name: 'configMain' })">
           {{ $t('shared.selectCompetitionCreate') }}
         </v-btn>
-        <v-btn class="white--text ml-5" color="green" @click="$router.push({ name: 'competitionSettings' })">
-          {{ $t('shared.selectCompetitionSettings') }}
-        </v-btn>
-        <v-btn class="white--text ml-5" color="blue" @click="consolidatedProtocol">
-          {{ $t('shared.selectCompetitionConsolidatedProtocol') }}
-        </v-btn>
-      </div>
-      <div>
-        <v-btn class="white--text mr-5" color="green" @click="$router.push({
+        <v-btn class="white--text ml-5" color="green" @click="$router.push({
           name: 'editCompetition', params: { id: chosenItem.competitionReference }
         })" :disabled="!chosenItem">
           {{ $t('shared.selectCompetitionEdit') }}
+        </v-btn>
+        <v-btn class="white--text ml-5" color="green" @click="$router.push({ name: 'competitionSettings' })">
+          {{ $t('shared.selectCompetitionSettings') }}
+        </v-btn>
+      </div>
+      <div>
+        <v-btn class="white--text mr-5" color="blue" @click="consolidatedProtocol">
+          {{ $t('shared.selectCompetitionConsolidatedProtocol') }}
         </v-btn>
         <v-btn color="white" @click="$router.push({ name: 'main' })">
           {{ $t('shared.selectCompetitionLeave') }}
