@@ -25,8 +25,8 @@
           <div class="d-flex flex-column align-left ml-6 flex-grow-1">
             <div class="d-flex flex-row justify-space-between flex-grow-1 flex-shrink-0 align-center">
               <div class="text-h6">
-                {{ selectedCompetition ? selectedCompetition.name :
-                  this.$t(`shared.championshipOfUkraineFirefightingSports`) }}
+                {{ selectedCompetition ? selectedCompetition.name : (visibleCompetitions.length ?
+                  visibleCompetitions[0].name : this.$t(`shared.noActiveCompetitions`)) }}
                 <v-menu offset-y>
                   <template v-slot:activator="{ on, attrs }">
                     <v-icon small class="ml-2" color="white" v-bind="attrs" v-on="on">mdi-chevron-down</v-icon>
@@ -48,7 +48,7 @@
               </div>
             </div>
             <div class="text-subtitle-1 mb-1">
-              {{ selectedSportType ? selectedSportType.name : this.$t(`shared.overcoming100mObstacleCourse`) }}
+              {{ selectedCompetition ? selectedSportType.name : this.$t(`shared.noActiveSportTypes`) }}
               <v-menu offset-y>
                 <template v-slot:activator="{ on, attrs }">
                   <v-icon small class="ml-2" color="white" v-bind="attrs" v-on="on">mdi-chevron-down</v-icon>
@@ -161,8 +161,8 @@ export default {
       registrationSuccessDialog: false,
       activeLang: null,
       weatherData: null,
+      socialLinks: [],
       apiKey: '4a697c396f11e7450074d7f1e5b233ec',
-      city: 'Kyiv',
       units: 'metric',
       accessToken: '',
       sportTypes: [
@@ -171,11 +171,21 @@ export default {
         { name: 'Двоборство', value: 'DUELING' },
       ],
       selectedSportType: null,
+      selectedCompetitionReference: localStorage.getItem('selectedCompetitionReference') || null,
+      selectedSportTypeValue: localStorage.getItem('selectedSportTypeValue') || null,
     }
   },
   mounted() {
     this.fetchWeather();
-    this.fetchCompetitions();
+    this.fetchCompetitions().then(() => {
+      if (this.selectedCompetitionReference) {
+        this.selectedCompetition = this.competitions.find(competition => competition.competitionReference === this.selectedCompetitionReference);
+      }
+      if (this.selectedSportTypeValue) {
+        this.selectedSportType = this.sportTypes.find(type => type.value === this.selectedSportTypeValue);
+      }
+    });
+    this.fetchSocialLinks();
   },
   computed: {
     mainMenuItems() {
@@ -235,9 +245,20 @@ export default {
     }
   },
   methods: {
+    async fetchSocialLinks() {
+      try {
+        const response = await axios.get('public/social-network');
+        this.socialLinks = response.data.map(link => ({
+          name: link.linkType.toLowerCase(),
+          url: link.link
+        }));
+      } catch (error) {
+        console.error('Error fetching social links:', error);
+      }
+    },
     async fetchCompetitions() {
       try {
-        const response = await axios.get('private/competitions');
+        const response = await axios.get('public/competitions/available');
         this.competitions = response.data;
         console.log('Visible Competitions:', this.visibleCompetitions);
       } catch (error) {
@@ -246,9 +267,11 @@ export default {
     },
     selectCompetition(competition) {
       this.selectedCompetition = competition;
+      localStorage.setItem('selectedCompetitionReference', competition.competitionReference);
     },
     selectSportType(type) {
       this.selectedSportType = type;
+      localStorage.setItem('selectedSportTypeValue', type.value);
     },
     openRegistrationDialog() {
       const registrationButton = this.mainMenuItems.find(item => item.title === this.$t('shared.userRegistration'));
