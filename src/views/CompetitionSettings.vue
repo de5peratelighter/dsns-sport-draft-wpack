@@ -19,7 +19,7 @@
                         hide-details></v-text-field>
                     <v-text-field v-model="instagramLink" label="Instagram" prepend-icon="mdi-instagram" dark
                         hide-details></v-text-field>
-                    <v-text-field v-model="fpsuSiteLink" label="Сайт ФПСУ" prepend-icon="mdi-web" dark
+                    <v-text-field v-model="fpsuSiteLink" label="Сайт ФППСУ" prepend-icon="mdi-web" dark
                         hide-details></v-text-field>
                     <v-text-field v-model="liveStreamLink" label="Онлайн трансляція" prepend-icon="mdi-video" dark
                         hide-details></v-text-field>
