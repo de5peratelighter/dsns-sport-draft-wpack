@@ -12,6 +12,7 @@ import {
 const TABLE_START_PROTOCOL_RESULTS_HEAD = (item) => {
   return new TableRow({
     children: [
+      new TableCell(cellObject({ text: item.set, width: 6 })),
       new TableCell({
         width: {
           size: 94,
@@ -29,33 +30,25 @@ const TABLE_START_PROTOCOL_RESULTS_HEAD = (item) => {
                 children: [
                   new TableCell(
                     cellObject({
-                      text: item.set,
-                      width: 5,
-                      borders: cellBorders,
-                      vertical: true,
-                    })
-                  ),
-                  new TableCell(
-                    cellObject({
                       text: item.track,
-                      width: 5,
+                      width: 6,
+                      size: 24,
                       borders: cellBorders,
-                      vertical: true,
-
                     })
                   ),
                   new TableCell(
                     cellObject({
                       text: item.number,
-                      width: 5,
+                      width: 6,
+                      size: 24,
                       borders: cellBorders,
-                      vertical: true,
                     })
                   ),
                   new TableCell(
                     cellObject({
                       text: item.category,
-                      width: 9,
+                      width: 10,
+                      size: 24,
                       borders: cellBorders,
                       vertical: true,
                     })
@@ -64,6 +57,7 @@ const TABLE_START_PROTOCOL_RESULTS_HEAD = (item) => {
                     cellObject({
                       text: item.initials,
                       width: 16,
+                      size: 24,
                       borders: cellBorders,
                     })
                   ),
@@ -78,27 +72,31 @@ const TABLE_START_PROTOCOL_RESULTS_HEAD = (item) => {
                     cellObject({
                       text: item.team,
                       width: 14,
+                      size: 24,
                       borders: cellBorders,
                     })
                   ),
                   new TableCell(
                     cellObject({
                       text: item.first,
-                      width: 11,
+                      width: 8,
+                      size: 24,
                       borders: cellBorders,
                     })
                   ),
                   new TableCell(
                     cellObject({
                       text: item.second,
-                      width: 11,
+                      width: 8,
+                      size: 24,
                       borders: cellBorders,
                     })
                   ),
                   new TableCell(
                     cellObject({
                       text: item.final,
-                      width: 11,
+                      width: 8,
+                      size: 24,
                       borders: allCellBorders,
                     })
                   ),
@@ -115,6 +113,7 @@ const TABLE_START_PROTOCOL_RESULTS_HEAD = (item) => {
 const TABLE_START_PROTOCOL_RESULTS_ROW = (item) => {
   return new TableRow({
     children: [
+      new TableCell(cellObject({ text: item.set, width: 6 })),
       new TableCell({
         width: {
           size: 94,
@@ -136,29 +135,25 @@ const TABLE_START_PROTOCOL_RESULTS_ROW = (item) => {
                 children: [
                   new TableCell(
                     cellObject({
-                      text: item.set,
-                      width: 5,
-                      borders,
-                    })
-                  ),
-                  new TableCell(
-                    cellObject({
                       text: participant.track,
-                      width: 5,
+                      width: 6,
+                      size: 24,
                       borders,
                     })
                   ),
                   new TableCell(
                     cellObject({
                       text: participant.number,
-                      width: 5,
+                      width: 6,
+                      size: 24,
                       borders,
                     })
                   ),
                   new TableCell(
                     cellObject({
                       text: participant.category,
-                      width: 9,
+                      width: 10,
+                      size: 24,
                       borders,
                     })
                   ),
@@ -166,6 +161,7 @@ const TABLE_START_PROTOCOL_RESULTS_ROW = (item) => {
                     cellObject({
                       text: participant.initials,
                       width: 16,
+                      size: 24,
                       borders,
                     })
                   ),
@@ -173,6 +169,7 @@ const TABLE_START_PROTOCOL_RESULTS_ROW = (item) => {
                     cellObject({
                       text: participant.bday,
                       width: 9,
+                      size: 24,
                       borders,
                     })
                   ),
@@ -180,27 +177,31 @@ const TABLE_START_PROTOCOL_RESULTS_ROW = (item) => {
                     cellObject({
                       text: participant.team,
                       width: 14,
+                      size: 24,
                       borders,
                     })
                   ),
                   new TableCell(
                     cellObject({
                       text: participant.first,
-                      width: 11,
+                      width: 8,
+                      size: 24,
                       borders,
                     })
                   ),
                   new TableCell(
                     cellObject({
                       text: participant.second,
-                      width: 11,
+                      width: 8,
+                      size: 24,
                       borders,
                     })
                   ),
                   new TableCell(
                     cellObject({
                       text: participant.final,
-                      width: 11,
+                      width: 8,
+                      size: 24,
                       borders: { ...borders, right: invisibleBorder },
                     })
                   ),
