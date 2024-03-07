@@ -92,6 +92,12 @@ const createTextRun = (text, options = {}) => {
   });
 };
 
+const whiteBorder = {
+  size: 2, // Ви можете змінити розмір рамки за бажанням
+  style: BorderStyle.SOLID,
+  color: "FFFFFF",
+};
+
 const PAGE_HEADER = (header) => {
   const {
     headerLine,
@@ -167,7 +173,7 @@ const SPACE_BETWEEN = (header) => {
         }),
       ],
       verticalAlign: VerticalAlign.CENTER,
-      borders: noBorders,
+      borders: whiteBorder,
       width: {
         size: 35,
         type: WidthType.PERCENTAGE,
@@ -175,7 +181,7 @@ const SPACE_BETWEEN = (header) => {
     }),
     new TableCell({
       children: [new Paragraph("")], // Middle cell
-      borders: noBorders,
+      borders: whiteBorder,
       width: {
         size: 20,
         type: WidthType.PERCENTAGE,
@@ -189,7 +195,7 @@ const SPACE_BETWEEN = (header) => {
         }),
       ],
       verticalAlign: VerticalAlign.CENTER,
-      borders: noBorders,
+      borders: whiteBorder,
       width: {
         size: 35,
         type: WidthType.PERCENTAGE,
@@ -206,7 +212,7 @@ const SPACE_BETWEEN = (header) => {
         }),
       ],
       verticalAlign: VerticalAlign.CENTER,
-      borders: noBorders,
+      borders: whiteBorder,
       width: {
         size: 35,
         type: WidthType.PERCENTAGE,
@@ -220,12 +226,7 @@ const SPACE_BETWEEN = (header) => {
         }),
       ],
       verticalAlign: VerticalAlign.CENTER,
-      borders: {
-        top: { style: BorderStyle.NONE },
-        bottom: { style: BorderStyle.NONE },
-        left: { style: BorderStyle.NONE },
-        right: { style: BorderStyle.NONE },
-      },
+      borders: whiteBorder,
       width: {
         size: 20,
         type: WidthType.PERCENTAGE,
@@ -239,12 +240,7 @@ const SPACE_BETWEEN = (header) => {
         }),
       ],
       verticalAlign: VerticalAlign.CENTER,
-      borders: {
-        top: { style: BorderStyle.NONE },
-        bottom: { style: BorderStyle.NONE },
-        left: { style: BorderStyle.NONE },
-        right: { style: BorderStyle.NONE },
-      },
+      borders: whiteBorder,
       width: {
         size: 35,
         type: WidthType.PERCENTAGE,
@@ -262,6 +258,7 @@ const SPACE_BETWEEN = (header) => {
         size: 100,
         type: WidthType.PERCENTAGE,
       },
+      borders: whiteBorder,
     }),
     spacer,
   ];
