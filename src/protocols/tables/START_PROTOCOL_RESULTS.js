@@ -31,7 +31,7 @@ const TABLE_START_PROTOCOL_RESULTS_HEAD = (item) => {
                   new TableCell(
                     cellObject({
                       text: item.track,
-                      width: 6,
+                      width: 10,
                       size: 24,
                       borders: cellBorders,
                     })
@@ -39,7 +39,7 @@ const TABLE_START_PROTOCOL_RESULTS_HEAD = (item) => {
                   new TableCell(
                     cellObject({
                       text: item.number,
-                      width: 6,
+                      width: 10,
                       size: 24,
                       borders: cellBorders,
                     })
@@ -64,42 +64,69 @@ const TABLE_START_PROTOCOL_RESULTS_HEAD = (item) => {
                   new TableCell(
                     cellObject({
                       text: item.bday,
-                      width: 9,
+                      width: 12,
                       borders: cellBorders,
                     })
                   ),
                   new TableCell(
                     cellObject({
                       text: item.team,
-                      width: 14,
+                      width: 18,
                       size: 24,
                       borders: cellBorders,
                     })
                   ),
-                  new TableCell(
-                    cellObject({
-                      text: item.first,
-                      width: 8,
-                      size: 24,
-                      borders: cellBorders,
-                    })
-                  ),
-                  new TableCell(
-                    cellObject({
-                      text: item.second,
-                      width: 8,
-                      size: 24,
-                      borders: cellBorders,
-                    })
-                  ),
-                  new TableCell(
-                    cellObject({
-                      text: item.final,
-                      width: 8,
-                      size: 24,
-                      borders: allCellBorders,
-                    })
-                  ),
+                  new TableCell({
+                    columnSpan: 3,
+                    children: [
+                      new Table({
+                        layout: TableLayoutType.FIXED,
+                        width: {
+                          size: 100,
+                          type: WidthType.PERCENTAGE,
+                        },
+                        rows: [
+                          new TableRow({
+                            children: [
+                              new TableCell(
+                                cellObject({
+                                  text: item.results,
+                                  width: 99.99,
+                                  borders: { ...rowBorders, right: invisibleBorder },
+                                  columnSpan: 3,
+                                })
+                              ),
+                            ],
+                          }),
+                          new TableRow({
+                            children: [
+                              new TableCell(
+                                cellObject({
+                                  text: item.first,
+                                  width: 33.33,
+                                  borders: cellBorders,
+                                })
+                              ),
+                              new TableCell(
+                                cellObject({
+                                  text: item.second,
+                                  width: 33.33,
+                                  borders: cellBorders,
+                                })
+                              ),
+                              new TableCell(
+                                cellObject({
+                                  text: item.final,
+                                  width: 33.33,
+                                  borders: allCellBorders,
+                                })
+                              ),
+                            ],
+                          }),
+                        ],
+                      }),
+                    ],
+                  }),
                 ],
               }),
             ],
@@ -136,7 +163,7 @@ const TABLE_START_PROTOCOL_RESULTS_ROW = (item) => {
                   new TableCell(
                     cellObject({
                       text: participant.track,
-                      width: 6,
+                      width: 10,
                       size: 24,
                       borders,
                     })
@@ -144,7 +171,7 @@ const TABLE_START_PROTOCOL_RESULTS_ROW = (item) => {
                   new TableCell(
                     cellObject({
                       text: participant.number,
-                      width: 6,
+                      width: 10,
                       size: 24,
                       borders,
                     })
@@ -168,7 +195,7 @@ const TABLE_START_PROTOCOL_RESULTS_ROW = (item) => {
                   new TableCell(
                     cellObject({
                       text: participant.bday,
-                      width: 9,
+                      width: 12,
                       size: 24,
                       borders,
                     })
@@ -176,35 +203,50 @@ const TABLE_START_PROTOCOL_RESULTS_ROW = (item) => {
                   new TableCell(
                     cellObject({
                       text: participant.team,
-                      width: 14,
+                      width: 18,
                       size: 24,
                       borders,
                     })
                   ),
-                  new TableCell(
-                    cellObject({
-                      text: participant.first,
-                      width: 8,
-                      size: 24,
-                      borders,
-                    })
-                  ),
-                  new TableCell(
-                    cellObject({
-                      text: participant.second,
-                      width: 8,
-                      size: 24,
-                      borders,
-                    })
-                  ),
-                  new TableCell(
-                    cellObject({
-                      text: participant.final,
-                      width: 8,
-                      size: 24,
-                      borders: { ...borders, right: invisibleBorder },
-                    })
-                  ),
+                  new TableCell({
+                    columnSpan: 3,
+                    children: [
+                      new Table({
+                        layout: TableLayoutType.FIXED,
+                        width: {
+                          size: 100,
+                          type: WidthType.PERCENTAGE,
+                        },
+                        rows: [
+                          new TableRow({
+                            children: [
+                              new TableCell(
+                                cellObject({
+                                  text: item.first,
+                                  width: 33.33,
+                                  borders: cellBorders,
+                                })
+                              ),
+                              new TableCell(
+                                cellObject({
+                                  text: item.second,
+                                  width: 33.33,
+                                  borders: cellBorders,
+                                })
+                              ),
+                              new TableCell(
+                                cellObject({
+                                  text: item.final,
+                                  width: 33.33,
+                                  borders: allCellBorders,
+                                })
+                              ),
+                            ],
+                          }),
+                        ],
+                      }),
+                    ],
+                  }),
                 ],
               });
             }),
@@ -215,11 +257,44 @@ const TABLE_START_PROTOCOL_RESULTS_ROW = (item) => {
   });
 };
 
+const TABLE_CATEGORY_RECORDS_ROW = (item) => {
+  return [
+    new TableRow({
+      children: [
+        new TableCell(
+          cellObject({
+            text: item.category,
+            width: 100,
+            size: 24,
+            borders: cellBorders,
+            columnSpan: 7 // Якщо в таблиці 7 колонок, тоді використовуємо columnSpan: 7
+          })
+        ),
+      ],
+    }),
+    new TableRow({
+      children: [
+        new TableCell(
+          cellObject({
+            text: item.records,
+            width: 100,
+            size: 24,
+            borders: cellBorders,
+            columnSpan: 7 // Якщо в таблиці 7 колонок, тоді використовуємо columnSpan: 7
+          })
+        ),
+      ],
+      margins: { bottom: 200 }
+    }),
+  ];
+};
+
 export const TABLE_START_PROTOCOL_RESULTS = (items) => {
   return [
     ...items.map((data) => {
       return new Table({
         rows: [
+          ...TABLE_CATEGORY_RECORDS_ROW(data.head), // Додаємо нові рядки перед головкою таблиці
           TABLE_START_PROTOCOL_RESULTS_HEAD(data.head),
           ...data.rows.map((item) => TABLE_START_PROTOCOL_RESULTS_ROW(item)),
         ],
