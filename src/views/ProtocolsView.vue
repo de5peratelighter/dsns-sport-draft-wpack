@@ -21,6 +21,7 @@
         </div>
       </v-row>
       <v-row v-else>
+
         <template v-if="activeCompetitionType">
           <v-col lg="7" md="12" class="pr-0">
             <v-sheet :color="'rgba(0, 0, 0, 0.35)'" class="pa-2 white--text">
@@ -67,6 +68,7 @@
                         :suffix="getChronometrySuffix(activeCompetitionType.sportType)" class="border-yellow mr-1"
                         style="border: 1px solid darkorange" />
                       <v-text-field value="Дискваліфікований" outlined dense hide-details>
+
                         <template v-slot:append>
                           <v-menu style="top: -12px" offset-y>
                             <template v-slot:activator="{ on, attrs }">
@@ -97,6 +99,7 @@
                         @click.stop.prevent="restoreCompetition('INACTIVE')">mdi-history</v-icon>
                     </span>
                   </v-stepper-step>
+
                   <template v-if="!isDueling && !isRelay && !isCombatDeployment">
                     <v-divider></v-divider>
 
@@ -118,7 +121,8 @@
                     <v-divider></v-divider>
 
                     <v-stepper-step step="3" :editable="availableFinal"
-                      :color="activeCompetitionStatus === 'FINAL' ? 'primary' : 'success'" @click="getRaceData('FINAL')">
+                      :color="activeCompetitionStatus === 'FINAL' ? 'primary' : 'success'"
+                      @click="getRaceData('FINAL')">
                       <span :class="{ 'text-decoration-underline': stepper === 3 }">
                         Фінал
                         <v-icon v-if="activeCompetitionStatus === 'FINAL'" left class="ml-1" color="red"
@@ -134,6 +138,7 @@
               </v-stepper>
               <v-data-table :headers="participantHeaders" :items="participants" :loading="isLoading" disable-pagination
                 disable-sort hide-default-footer :style="columnWidths" class="protocols-table">
+
                 <template #item="{ item, index }">
                   <tr
                     :class="{ 'tr-height-extended': isRelay || isCombatDeployment, 'tr-odd': isRelay || isCombatDeployment ? index % 2 : item[stepper == 1 ? 'trackNumber' : stepper == 2 ? 'halfFinalTrackNumber' : 'finalTrackNumber'] % 2 === 0 }"
@@ -148,6 +153,7 @@
                         </td>
                       </template>
                     </template>
+
                     <template v-if="stepper == 2">
                       <td>
                         {{ item.halfFinalTrackNumber }}
@@ -156,6 +162,7 @@
                         {{ item.halfFinalRoadNumber }}
                       </td>
                     </template>
+
                     <template v-if="stepper == 3">
                       <td>
                         {{ item.finalTrackNumber }}
@@ -164,6 +171,7 @@
                         {{ item.finalRoadNumber }}
                       </td>
                     </template>
+
                     <template v-if="isRelay || isCombatDeployment">
                       <td style="display:grid;grid-column: 3/6;">
                         <div v-for="(subitem, subItemIndex) in item.teamParticipants" :key="subItemIndex"
@@ -174,6 +182,7 @@
                         </div>
                       </td>
                     </template>
+
                     <template v-else>
                       <td>
                         {{ item.participantNumber }}
@@ -185,6 +194,7 @@
                         {{ item.participantBirthday ? item.participantBirthday.slice(0, 4) : '' }}
                       </td>
                     </template>
+
                     <template v-if="!isRelay && !isCombatDeployment">
                       <template v-if="item.personal">
                         <v-tooltip left>
@@ -196,6 +206,7 @@
                           Особистий результат
                         </v-tooltip>
                       </template>
+
                       <template v-else>
                         <td>
                           {{ item.participantFullName }}
@@ -205,12 +216,14 @@
                     <td>
                       {{ isRelay || isCombatDeployment ? item.teamName : item.participantTeamName }}
                     </td>
+
                     <template v-if="stepper == 1">
                       <template v-if="isDueling">
                         <td>{{ item.hundredMeterResult }}</td>
                         <td>{{ item.assaultLadderResult }}</td>
                         <td>{{ item.duelingResult }}</td>
                       </template>
+
                       <template v-else>
                         <template v-if="isRelay">
                           <td>
@@ -240,6 +253,7 @@
                             </v-text-field>
                           </td>
                         </template>
+
                         <template v-else-if="isCombatDeployment">
                           <td>
                             <v-text-field :value="item.firstTeamResult" :success="!!item.firstTeamResult"
@@ -273,6 +287,7 @@
                               hide-details @focus="focusItemUpdate($event, item, 'secondTeamResult', index, 1)"
                               @input="validateValueResult($event, 'secondTeamResult')"
                               @change="saveResults(item, 'secondTeamResult', 'secondDisqualificationType')">
+
                               <template v-if="item.secondTeamResult == '0'" v-slot:append>
                                 <v-menu style="top: -12px" offset-y>
                                   <template v-slot:activator="{ on, attrs }">
@@ -295,6 +310,7 @@
                             {{ item.bestResultTeam }}
                           </td>
                         </template>
+
                         <template v-else>
                           <td>
                             <v-text-field :value="item.firstResult" :success="!!item.firstResult"
@@ -325,9 +341,11 @@
                             <v-text-field :value="item.secondResult" :success="!!item.secondResult"
                               :disabled="isUpdatingResults || completed || isCompleted"
                               :class="['no-border protocols-value-input', { 'border-yellow': item.secondResultShifted }]"
-                              outlined dense hide-details @focus="focusItemUpdate($event, item, 'secondResult', index, 1)"
+                              outlined dense hide-details
+                              @focus="focusItemUpdate($event, item, 'secondResult', index, 1)"
                               @input="validateValueResult($event, 'secondResult')"
                               @change="saveResults(item, 'secondResult', 'secondDisqualificationType')">
+
                               <template v-if="item.secondResult == '0'" v-slot:append>
                                 <v-menu style="top: -12px" offset-y>
                                   <template v-slot:activator="{ on, attrs }">
@@ -352,6 +370,7 @@
                         </template>
                       </template>
                     </template>
+
                     <template v-if="stepper == 2">
                       <td>
                         <v-text-field :value="item.halfFinalResult" :success="!!item.halfFinalResult"
@@ -380,6 +399,7 @@
                         </v-text-field>
                       </td>
                     </template>
+
                     <template v-if="stepper == 3">
                       <td>
                         <v-text-field v-if="activeCompetitionStatus === 'FINAL'" :value="item.finalResult"
@@ -406,6 +426,7 @@
                             </v-menu>
                           </template>
                         </v-text-field>
+
                         <template v-else>
                           {{ item.finalResult }}
                         </template>
@@ -417,12 +438,14 @@
                 <template #no-data>
                   No data
                 </template>
+
                 <template #footer />
               </v-data-table>
             </v-sheet>
           </v-col>
           <v-col lg="5" md="12">
             <v-sheet :color="'rgba(0, 0, 0, 0.35)'" class="pa-2 white--text" style="position: sticky; top: 5px;">
+
               <template v-if="!isRelay && !isCombatDeployment">
                 <h4 class="text-center">Кращі результати</h4>
                 <v-data-table :headers="bestResultsHeaders" :items="bestParticipants" disable-pagination disable-sort
@@ -452,8 +475,9 @@
                     <v-icon dark @click="fetchteamResultsByType">mdi-refresh</v-icon>
                   </h4>
                   <v-data-table :headers="isRelayOrCombat ? sortedTeamResultsByTypeHeaders : teamResultsByTypeHeaders"
-                    :items="isRelayOrCombat ? sortedTeamResultsByType : teamResultsByType" disable-pagination disable-sort
-                    hide-default-footer class="protocols-best-type">
+                    :items="isRelayOrCombat ? sortedTeamResultsByType : teamResultsByType" disable-pagination
+                    disable-sort hide-default-footer class="protocols-best-type">
+
                     <template #item="{ item, index }">
                       <tr>
                         <td>
@@ -475,6 +499,7 @@
                   </h4>
                   <v-data-table :headers="teamResultsOverallHeaders" :items="teamResultsOverall" disable-pagination
                     disable-sort hide-default-footer class="protocols-best-team">
+
                     <template #item="{ item, index }">
                       <tr>
                         <td>
@@ -521,12 +546,12 @@
 </template>
 
 <script>
-import { Document, Packer } from "docx";
+import { Document, Packer, PageOrientation } from "docx";
 import { DATA_TO_DOC_PAGES } from '../protocols/defaultUtils';
 import axios from 'axios';
 export default {
   data: function () {
-    return {
+    return { 
       competitionReferences: [], // has to be fetched so we know what SPORT_TYPE we're actually dealing with (id is taken from route)
       isPageLoading: false,
       isLoading: false,
@@ -1066,6 +1091,13 @@ export default {
             const nextFile = new Document({
               sections: [
                 {
+                  properties: {
+                    page: {
+                      size: {
+                        orientation: PageOrientation.LANDSCAPE, // Змінено тут
+                      }
+                    }
+                  },
                   children: DATA_TO_DOC_PAGES(data),
                 },
               ],
