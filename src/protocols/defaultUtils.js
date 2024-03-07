@@ -1,4 +1,4 @@
-import { Paragraph, HeadingLevel, PageBreak, SectionProperties, PageOrientation, TextRun, AlignmentType } from "docx";
+import { Paragraph, HeadingLevel, PageBreak } from "docx";
 
 import { spacer, PAGE_HEADER, SPACE_BETWEEN, JUDGES_INFO } from "./defaultUtilBlocks";
 
@@ -51,15 +51,6 @@ const GIVE_TABLE_BY_TYPE = (type, tables) => {
       return [spacer];
   }
 };
-
-const setPageOrientation = () => {
-  return new SectionProperties({
-    type: {
-      orientation: PageOrientation.LANDSCAPE,
-    },
-  });
-};
-
 
 // const setPageMargins = () => {
 //   return new SectionProperties({
