@@ -640,6 +640,7 @@ export default {
           )
         } else {
           options.push(
+            { text: '++ Стартовий протокол', value: 'START_DOC' },
             { text: 'Стартовий протокол', value: 'START_CSV' },
             { text: 'Пів-фінальний протокол', value: 'START_HALF_FINAL_CSV' },
             { text: 'Фінальний протокол', value: 'START_FINAL_CSV' },
