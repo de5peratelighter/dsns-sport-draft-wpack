@@ -45,7 +45,7 @@ const TABLE_TEAM_RESULTS_HEAD = (item = { columns: [] }) => {
                         left: invisibleBorder,
                         right: invisibleBorder,
                       },
-                      columnSpan: 4,
+                      columnSpan: 3,
                     })
                   ),
                 ],
@@ -72,7 +72,7 @@ const TABLE_TEAM_RESULTS_HEAD = (item = { columns: [] }) => {
                                     left: invisibleBorder,
                                     right: invisibleBorder,
                                   },
-                                  columnSpan: 2,
+                                  columnSpan: 3,
                                 })
                               ),
                             ],
@@ -83,15 +83,22 @@ const TABLE_TEAM_RESULTS_HEAD = (item = { columns: [] }) => {
                             children: [
                               new TableCell(
                                 cellObject({
-                                  text: "Час",
-                                  width: 50,
+                                  text: "час",
+                                  width: 100/3,
                                   borders: cellBorders,
                                 })
                               ),
                               new TableCell(
                                 cellObject({
-                                  text: "Місце",
-                                  width: 50,
+                                  text: "зкс",
+                                  width: 100/3,
+                                  borders: cellBorders,
+                                })
+                              ),
+                              new TableCell(
+                                cellObject({
+                                  text: "місце",
+                                  width: 100/3,
                                   borders: {
                                     ...cellBorders,
                                     right: invisibleBorder,
@@ -122,12 +129,14 @@ const TABLE_TEAM_RESULTS_HEAD = (item = { columns: [] }) => {
     ],
   });
 };
-const TABLE_TEAM_RESULTS_ROW = (item = { columns: [] }) => {
+
+const TABLE_TEAM_RESULTS_NUM = (item = { columns: [] }) => {
   const ItemColumnWidth = item.columns.length ? 100 / item.columns.length : 25;
+  //const cellWidth = 100/9; // Calculate the width for each cell
   return new TableRow({
-    children: [
-      new TableCell(cellObject({ text: item.teamNumber, width: 5 })),
-      new TableCell(cellObject({ text: item.teamName, width: 18 })),
+    children:[
+      new TableCell(cellObject ({text: "1", width: 10 })),
+      new TableCell(cellObject ({text: "2", width: 15 })),
       new TableCell({
         children: [
           new Table({
@@ -138,7 +147,7 @@ const TABLE_TEAM_RESULTS_ROW = (item = { columns: [] }) => {
             rows: [
               new TableRow({
                 children: item.columns.map((column, index) => {
-                  return new TableCell({
+                  return new TableCell({ 
                     children: [
                       new Table({
                         width: {
@@ -150,15 +159,64 @@ const TABLE_TEAM_RESULTS_ROW = (item = { columns: [] }) => {
                             children: [
                               new TableCell(
                                 cellObject({
-                                  text: column.time,
-                                  width: 50,
+                                  text: column.three,
+                                  width: 100/9,
                                   borders: cellBorders,
                                 })
                               ),
                               new TableCell(
                                 cellObject({
-                                  text: column.position,
-                                  width: 50,
+                                  text: column.four,
+                                  width: 100/9,
+                                  borders: cellBorders,
+                                })
+                              ),
+                              new TableCell(
+                                cellObject({
+                                  text: column.five,
+                                  width: 100/9,
+                                  borders: cellBorders,
+                                })
+                              ),
+                              new TableCell(
+                                cellObject({
+                                  text: column.six,
+                                  width: 100/9,
+                                  borders: cellBorders,
+                                })
+                              ),
+                              new TableCell(
+                                cellObject({
+                                  text: column.seven,
+                                  width: 100/9,
+                                  borders: cellBorders,
+                                })
+                              ),
+                              new TableCell(
+                                cellObject({
+                                  text: column.eight,
+                                  width: 100/9,
+                                  borders: cellBorders,
+                                })
+                              ),
+                              new TableCell(
+                                cellObject({
+                                  text: column.nine,
+                                  width: 100/9,
+                                  borders: cellBorders,
+                                })
+                              ),
+                              new TableCell(
+                                cellObject({
+                                  text: column.ten,
+                                  width: 100/9,
+                                  borders: cellBorders,
+                                })
+                              ),
+                              new TableCell(
+                                cellObject({
+                                  text: column.eleven,
+                                  width: 100/9,
                                   borders: {
                                     ...cellBorders,
                                     right: invisibleBorder,
@@ -190,7 +248,88 @@ const TABLE_TEAM_RESULTS_ROW = (item = { columns: [] }) => {
         },
         verticalAlign: VerticalAlign.CENTER,
       }),
-      new TableCell(cellObject({ text: item.teamTotals, width: 12 })),
+      new TableCell(cellObject ({text: "12", width: 15 })),
+    ]
+  });
+};
+
+
+const TABLE_TEAM_RESULTS_ROW = (item = { columns: [] }) => {
+  const ItemColumnWidth = item.columns.length ? 100 / item.columns.length : 25;
+  return new TableRow({
+    children: [
+      new TableCell(cellObject({ text: item.teamNumber, width: 10 })),
+      new TableCell(cellObject({ text: item.teamName, width: 15 })),
+      new TableCell({
+        children: [
+          new Table({
+            width: {
+              size: 100,
+              type: WidthType.PERCENTAGE,
+            },
+            rows: [
+              new TableRow({
+                children: item.columns.map((column, index) => {
+                  return new TableCell({
+                    children: [
+                      new Table({
+                        width: {
+                          size: 100,
+                          type: WidthType.PERCENTAGE,
+                        },
+                        rows: [
+                          new TableRow({
+                            children: [
+                              new TableCell(
+                                cellObject({
+                                  text: column.time,
+                                  width: 100/3,
+                                  borders: cellBorders,
+                                })
+                              ),
+                              new TableCell(
+                                cellObject({
+                                  text: column.zks,
+                                  width: 100/3,
+                                  borders: cellBorders,
+                                })
+                              ),
+                              new TableCell(
+                                cellObject({
+                                  text: column.position,
+                                  width: 100/3,
+                                  borders: {
+                                    ...cellBorders,
+                                    right: invisibleBorder,
+                                  },
+                                })
+                              ),
+                            ],
+                          }),
+                        ],
+                      }),
+                    ],
+                    width: {
+                      size: ItemColumnWidth,
+                      type: WidthType.PERCENTAGE,
+                    },
+                    borders:
+                      index === item.columns.length - 1
+                        ? { ...cellBorders, right: invisibleBorder }
+                        : cellBorders,
+                  });
+                }),
+              }),
+            ],
+          }),
+        ],
+        width: {
+          size: 65,
+          type: WidthType.PERCENTAGE,
+        },
+        verticalAlign: VerticalAlign.CENTER,
+      }),
+      new TableCell(cellObject({ text: item.teamTotals, width: 15 })),
     ],
   });
 };
@@ -201,6 +340,7 @@ export const TABLE_TEAM_RESULTS = (items) => {
       return new Table({
         rows: [
           TABLE_TEAM_RESULTS_HEAD(data.head),
+          ...data.rowBetween.map((item) => TABLE_TEAM_RESULTS_NUM(item)),
           ...data.rows.map((item) => TABLE_TEAM_RESULTS_ROW(item)),
         ],
         width: {
