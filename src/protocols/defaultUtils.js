@@ -77,3 +77,11 @@ export const DATA_TO_DOC_PAGES = (pages) => {
     return [...acc, ...mergedTable];
   }, []);
 };
+
+export const DATA_TO_DOC_PAGE = (page) => {
+  return [
+    ...PAGE_HEADER(page.header),
+    ...GIVE_TABLE_BY_TYPE(page.type, page.tables),
+    ...JUDGES_INFO(page.judges),
+  ];
+};
