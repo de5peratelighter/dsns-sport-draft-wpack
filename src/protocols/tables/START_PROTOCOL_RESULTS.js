@@ -31,7 +31,7 @@ const TABLE_START_PROTOCOL_RESULTS_HEAD = (item) => {
                   new TableCell(
                     cellObject({
                       text: item.track,
-                      width: 10,
+                      width: 7,
                       size: 24,
                       borders: cellBorders,
                     })
@@ -39,7 +39,7 @@ const TABLE_START_PROTOCOL_RESULTS_HEAD = (item) => {
                   new TableCell(
                     cellObject({
                       text: item.number,
-                      width: 10,
+                      width: 8,
                       size: 24,
                       borders: cellBorders,
                     })
@@ -56,7 +56,7 @@ const TABLE_START_PROTOCOL_RESULTS_HEAD = (item) => {
                   new TableCell(
                     cellObject({
                       text: item.initials,
-                      width: 16,
+                      width: 20,
                       size: 24,
                       borders: cellBorders,
                     })
@@ -64,7 +64,7 @@ const TABLE_START_PROTOCOL_RESULTS_HEAD = (item) => {
                   new TableCell(
                     cellObject({
                       text: item.bday,
-                      width: 12,
+                      width: 10,
                       borders: cellBorders,
                     })
                   ),
@@ -91,7 +91,7 @@ const TABLE_START_PROTOCOL_RESULTS_HEAD = (item) => {
                               new TableCell(
                                 cellObject({
                                   text: item.results,
-                                  width: 99.99,
+                                  width: 90,
                                   borders: { ...rowBorders, right: invisibleBorder },
                                   columnSpan: 3,
                                 })
@@ -103,21 +103,21 @@ const TABLE_START_PROTOCOL_RESULTS_HEAD = (item) => {
                               new TableCell(
                                 cellObject({
                                   text: item.first,
-                                  width: 33.33,
+                                  width: 30,
                                   borders: cellBorders,
                                 })
                               ),
                               new TableCell(
                                 cellObject({
                                   text: item.second,
-                                  width: 33.33,
+                                  width: 30,
                                   borders: cellBorders,
                                 })
                               ),
                               new TableCell(
                                 cellObject({
                                   text: item.final,
-                                  width: 33.33,
+                                  width: 30,
                                   borders: allCellBorders,
                                 })
                               ),
@@ -163,7 +163,7 @@ const TABLE_START_PROTOCOL_RESULTS_ROW = (item) => {
                   new TableCell(
                     cellObject({
                       text: participant.track,
-                      width: 10,
+                      width: 7,
                       size: 24,
                       borders,
                     })
@@ -171,7 +171,7 @@ const TABLE_START_PROTOCOL_RESULTS_ROW = (item) => {
                   new TableCell(
                     cellObject({
                       text: participant.number,
-                      width: 10,
+                      width: 8,
                       size: 24,
                       borders,
                     })
@@ -187,7 +187,7 @@ const TABLE_START_PROTOCOL_RESULTS_ROW = (item) => {
                   new TableCell(
                     cellObject({
                       text: participant.initials,
-                      width: 16,
+                      width: 20,
                       size: 24,
                       borders,
                     })
@@ -195,7 +195,7 @@ const TABLE_START_PROTOCOL_RESULTS_ROW = (item) => {
                   new TableCell(
                     cellObject({
                       text: participant.bday,
-                      width: 12,
+                      width: 10,
                       size: 24,
                       borders,
                     })
@@ -223,21 +223,21 @@ const TABLE_START_PROTOCOL_RESULTS_ROW = (item) => {
                               new TableCell(
                                 cellObject({
                                   text: item.first,
-                                  width: 33.33,
+                                  width: 30,
                                   borders: cellBorders,
                                 })
                               ),
                               new TableCell(
                                 cellObject({
                                   text: item.second,
-                                  width: 33.33,
+                                  width: 30,
                                   borders: cellBorders,
                                 })
                               ),
                               new TableCell(
                                 cellObject({
                                   text: item.final,
-                                  width: 33.33,
+                                  width: 30,
                                   borders: allCellBorders,
                                 })
                               ),
