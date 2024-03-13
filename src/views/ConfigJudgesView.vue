@@ -87,10 +87,11 @@ export default {
       snackbarColor: 'primary',
       snackbarError: '',
       participantCategoryItems: [
-        { categoryName: 'cуддя міжнародної категорії', qualificationId: 'IC' },
-        { categoryName: 'cуддя національної категорії', qualificationId: 'NC' },
-        { categoryName: 'cуддя I категорії', qualificationId: 'ICAT' },
-        { categoryName: 'cуддя II категорії', categoryId: 'IICAT' },
+        { categoryName: 'cуддя міжнародної категорії', qualificationId: 'cуддя міжнародної категорії' },
+        { categoryName: 'cуддя національної категорії', qualificationId: 'cуддя національної категорії' },
+        { categoryName: 'cуддя I категорії', qualificationId: 'cуддя I категорії' },
+        { categoryName: 'cуддя II категорії', categoryId: 'cуддя II категорії' },
+        { categoryName: '', categoryId: '' },
       ],
     }
   },
