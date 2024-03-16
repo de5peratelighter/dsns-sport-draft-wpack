@@ -116,7 +116,7 @@ const TABLE_START_PROTOCOL_RESULTS_HEAD = (item) => {
                               ),
                               new TableCell(
                                 cellObject({
-                                  text: item.final,
+                                  text: item.best,
                                   width: 30,
                                   borders: allCellBorders,
                                 })
@@ -222,21 +222,21 @@ const TABLE_START_PROTOCOL_RESULTS_ROW = (item) => {
                             children: [
                               new TableCell(
                                 cellObject({
-                                  text: item.first,
+                                  text: participant.firstResult,
                                   width: 30,
                                   borders: cellBorders,
                                 })
                               ),
                               new TableCell(
                                 cellObject({
-                                  text: item.second,
+                                  text: participant.secondResult,
                                   width: 30,
                                   borders: cellBorders,
                                 })
                               ),
                               new TableCell(
                                 cellObject({
-                                  text: item.final,
+                                  text: participant.bestResult,
                                   width: 30,
                                   borders: allCellBorders,
                                 })
