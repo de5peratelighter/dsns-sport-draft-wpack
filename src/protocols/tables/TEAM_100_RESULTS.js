@@ -50,42 +50,42 @@ const TABLE_TEAM_100_RESULTS_HEAD = (item = {}) => {
                   new TableCell(
                     cellObject({
                       text: item.number,
-                      width: 11,
+                      width: 8,
                       borders: cellBorders,
                     })
                   ),
                   new TableCell(
                     cellObject({
                       text: item.initials,
-                      width: 15,
+                      width: 22,
                       borders: cellBorders,
                     })
                   ),
                   new TableCell(
                     cellObject({
                       text: item.bday,
-                      width: 12.66,
+                      width: 10,
                       borders: cellBorders,
                     })
                   ),
                   new TableCell(
                     cellObject({
                       text: item.result,
-                      width: 12.66,
+                      width: 11,
                       borders: cellBorders,
                     })
                   ),
                   new TableCell(
                     cellObject({
                       text: item.sum,
-                      width: 16,
+                      width: 11,
                       borders: cellBorders,
                     })
                   ),
                   new TableCell({
                     columnSpan: 4,
                     width: {
-                      size: 16,
+                      size: 20,
                       type: WidthType.PERCENTAGE,
                     },
                     borders: {
@@ -122,14 +122,14 @@ const TABLE_TEAM_100_RESULTS_HEAD = (item = {}) => {
                               new TableCell(
                                 cellObject({
                                   text: item.before,
-                                  width: 20,
+                                  width: 50,
                                   borders: cellBorders,
                                 })
                               ),
                               new TableCell(
                                 cellObject({
                                   text: item.after,
-                                  width: 20,
+                                  width: 50,
                                   borders: allCellBorders,
                                 })
                               ),
@@ -221,42 +221,42 @@ const TABLE_TEAM_100_RESULTS_ROW = (item = { rows: [] }) => {
                                               new TableCell(
                                                 cellObject({
                                                   text: participant.number,
-                                                  width: 10,
+                                                  width: 8,
                                                   borders,
                                                 })
                                               ),
                                               new TableCell(
                                                 cellObject({
                                                   text: participant.initials,
-                                                  width: 14,
+                                                  width: 22,
                                                   borders,
                                                 })
                                               ),
                                               new TableCell(
                                                 cellObject({
                                                   text: participant.bday,
-                                                  width: 12.66,
+                                                  width: 10,
                                                   borders,
                                                 })
                                               ),
                                               new TableCell(
                                                 cellObject({
                                                   text: participant.result1,
-                                                  width: 12.66,
+                                                  width: 11,
                                                   borders,
                                                 })
                                               ),
                                               new TableCell(
                                                 cellObject({
                                                   text: participant.result2,
-                                                  width: 12.66,
+                                                  width: 11,
                                                   borders,
                                                 })
                                               ),
                                               new TableCell({
                                                 columnSpan: 4,
                                                 width: {
-                                                  size: 16,
+                                                  size: 20,
                                                   type: WidthType.PERCENTAGE,
                                                 },
                                                 borders: {
@@ -279,7 +279,7 @@ const TABLE_TEAM_100_RESULTS_ROW = (item = { rows: [] }) => {
                                                           new TableCell(
                                                             cellObject({
                                                               text: item.before,
-                                                              width: 20,
+                                                              width: 50,
                                                               borders:
                                                                 cellBorders,
                                                             })
@@ -287,7 +287,7 @@ const TABLE_TEAM_100_RESULTS_ROW = (item = { rows: [] }) => {
                                                           new TableCell(
                                                             cellObject({
                                                               text: item.after,
-                                                              width: 20,
+                                                              width: 50,
                                                               borders:
                                                                 allCellBorders,
                                                             })
