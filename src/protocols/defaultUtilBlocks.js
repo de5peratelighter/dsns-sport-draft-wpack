@@ -40,12 +40,14 @@ const multiLine = (text = "", allCaps = false) =>
           text: t,
           break: 1,
           allCaps,
+          сolor: "000000",
           font: "Times New Roman",
           size: 22,
         })
         : new TextRun({
           text: t,
           allCaps,
+          color: "000000",
           font: "Times New Roman",
           size: 22,
         })
