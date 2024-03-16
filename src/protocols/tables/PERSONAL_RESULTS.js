@@ -103,15 +103,15 @@ const TABLE_PERSONAL_RESULTS_BETWEEN = (item) => {
   return new TableRow({
     tableHeader: true,
     children: [
-      new TableCell(cellObject({ width: 5, borders:{...cellBorders, left: undefined,right:invisibleBorder}})),
-      new TableCell(cellObject({ width: 5, borders:{...cellBorders, right:invisibleBorder}})),
-      new TableCell(cellObject({ width: 6, borders:{...cellBorders, right:invisibleBorder}})),
-      new TableCell(cellObject({ width: 8, borders:{...cellBorders, right:invisibleBorder}})),
-      new TableCell(cellObject({ width: 12, borders:{...cellBorders, right:invisibleBorder}})),
-      new TableCell(cellObject({ text: item, width: 30, borders:{...cellBorders, right:invisibleBorder} })),
-      new TableCell(cellObject({ width: 9, borders:{...cellBorders, right:invisibleBorder} })),
-      new TableCell(cellObject({ width: 16, borders:{...cellBorders, right:invisibleBorder} })),
-      new TableCell(cellObject({ width: 9, borders:{...cellBorders, left:invisibleBorder,right:undefined} })),
+      new TableCell(cellObject({ width: 5, borders: { ...cellBorders, left: undefined, right: invisibleBorder } })),
+      new TableCell(cellObject({ width: 5, borders: { ...cellBorders, right: invisibleBorder } })),
+      new TableCell(cellObject({ width: 6, borders: { ...cellBorders, right: invisibleBorder } })),
+      new TableCell(cellObject({ width: 8, borders: { ...cellBorders, right: invisibleBorder } })),
+      new TableCell(cellObject({ width: 12, borders: { ...cellBorders, right: invisibleBorder } })),
+      new TableCell(cellObject({ text: item, width: 30, borders: { ...cellBorders, right: invisibleBorder } })),
+      new TableCell(cellObject({ width: 9, borders: { ...cellBorders, right: invisibleBorder } })),
+      new TableCell(cellObject({ width: 16, borders: { ...cellBorders, right: invisibleBorder } })),
+      new TableCell(cellObject({ width: 9, borders: { ...cellBorders, left: invisibleBorder, right: undefined } })),
     ],
   });
 };
@@ -150,11 +150,11 @@ export const TABLE_PERSONAL_HALFFINAL_RESULTS = (items) => {
           rows: [
             TABLE_PERSONAL_RESULTS_HEAD(data.head),
             TABLE_PERSONAL_RESULTS_BETWEEN(data.nameFirstSemi),
-            ...data.rows.map((item) => TABLE_PERSONAL_RESULTS_ROW(item)),
+            ...data.row1.map((item) => TABLE_PERSONAL_RESULTS_ROW(item)),
             TABLE_PERSONAL_RESULTS_BETWEEN(data.nameSecondSemi),
-            ...data.rows.map((item) => TABLE_PERSONAL_RESULTS_ROW(item)),
+            ...data.row2.map((item) => TABLE_PERSONAL_RESULTS_ROW(item)),
             TABLE_PERSONAL_RESULTS_BETWEEN(data.nameFinal),
-            ...data.rows.map((item) => TABLE_PERSONAL_RESULTS_ROW(item)),
+            ...data.row3.map((item) => TABLE_PERSONAL_RESULTS_ROW(item)),
           ],
           width: {
             size: 100,
