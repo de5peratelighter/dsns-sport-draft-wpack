@@ -100,6 +100,19 @@ const whiteBorder = {
   color: "FFFFFF",
 };
 
+const translateJudgeTitle = (title) => {
+  const translations = {
+    MAIN: 'Головний суддя змаганнь',
+    MAIN_SECRETARY: 'Головний секретар змаганнь',
+    INSPECTOR: 'Суддя-інспектор змаганнь',
+    STARTER: 'Основний стартер',
+    ASSISTANCE_STARTER: 'Помічник стартера',
+  };
+
+  return translations[title] || title;
+};
+
+
 const PAGE_HEADER = (header) => {
   const {
     headerLine,
@@ -272,7 +285,7 @@ export const JUDGES_INFO = (judges) => {
       new TableCell({
         children: [
           new Paragraph({
-            children: multiLine(judge.title, false),
+            children: multiLine(translateJudgeTitle(judge.title), false),
             alignment: AlignmentType.CENTER,
           })
         ],
