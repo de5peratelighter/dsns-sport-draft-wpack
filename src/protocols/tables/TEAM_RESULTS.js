@@ -337,11 +337,14 @@ const TABLE_TEAM_RESULTS_ROW = (item = { columns: [] }) => {
 export const TABLE_TEAM_RESULTS = (items) => {
   return [
     ...items.map((data) => {
+      const rowBetween = Array.isArray(data.rowBetween) ? data.rowBetween : [];
+      const rows = Array.isArray(data.rows) ? data.rows : [];
+
       return new Table({
         rows: [
           TABLE_TEAM_RESULTS_HEAD(data.head),
-          ...data.rowBetween.map((item) => TABLE_TEAM_RESULTS_NUM(item)),
-          ...data.rows.map((item) => TABLE_TEAM_RESULTS_ROW(item)),
+          ...rowBetween.map((item) => TABLE_TEAM_RESULTS_NUM(item)),
+          ...rows.map((item) => TABLE_TEAM_RESULTS_ROW(item)),
         ],
         width: {
           size: 100,
