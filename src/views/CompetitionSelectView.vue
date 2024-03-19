@@ -34,9 +34,7 @@
         <v-btn color="white" @click="$router.push({ name: 'configMain' })">
           {{ $t('shared.selectCompetitionCreate') }}
         </v-btn>
-        <v-btn class="white--text ml-5" color="green" @click="$router.push({
-          name: 'editCompetition', params: { id: chosenItem.competitionReference }
-        })" :disabled="!chosenItem">
+        <v-btn class="white--text ml-5" color="green" @click="selectCompetition" :disabled="!chosenItem">
           {{ $t('shared.selectCompetitionEdit') }}
         </v-btn>
         <v-btn class="white--text ml-5" color="green" @click="$router.push({ name: 'competitionSettings' })">
@@ -74,6 +72,13 @@ export default {
     this.fetchCompetitions();
   },
   methods: {
+    selectCompetition() {
+      localStorage.setItem('selectedCompetitionName', this.chosenItem.name);
+      this.$router.push({
+        name: 'editCompetition',
+        params: { id: this.chosenItem.competitionReference }
+      });
+    },
     async fetchCompetitions() {
       try {
         const accessToken = this.getAccessToken();
@@ -193,5 +198,3 @@ export default {
   }
 }
 </style>
-
-
