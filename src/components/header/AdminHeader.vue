@@ -1,6 +1,13 @@
 <template>
   <v-container ma-0 pa-0 fluid>
     <v-row justify="center" class="ma-0">
+      <v-col cols="12" class="text-center">
+        <v-list-item-title class="white--text">
+          {{ selectedCompetitionName }}
+        </v-list-item-title>
+      </v-col>
+    </v-row>
+    <v-row justify="center" class="ma-0">
       <v-btn text color="white" @click="$router.push({ name: 'selectCompetition' })">
         {{ $t('shared.navMenuCompetitionChange') }}
       </v-btn>
@@ -68,6 +75,7 @@ export default {
     return {
       competitionReferences: [],
       isLoading: false,
+      selectedCompetitionName: localStorage.getItem('selectedCompetitionName') || 'Назва змагання',
     }
   },
   mounted() {
