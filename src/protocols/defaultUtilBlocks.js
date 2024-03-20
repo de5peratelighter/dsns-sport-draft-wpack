@@ -102,9 +102,9 @@ const whiteBorder = {
 
 const translateJudgeTitle = (title) => {
   const translations = {
-    MAIN: 'Головний суддя змаганнь',
-    MAIN_SECRETARY: 'Головний секретар змаганнь',
-    INSPECTOR: 'Суддя-інспектор змаганнь',
+    MAIN: 'Головний суддя змагань',
+    MAIN_SECRETARY: 'Головний секретар змагань',
+    INSPECTOR: 'Суддя-інспектор змагань',
     STARTER: 'Основний стартер',
     ASSISTANCE_STARTER: 'Помічник стартера',
   };
