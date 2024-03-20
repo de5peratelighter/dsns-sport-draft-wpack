@@ -20,6 +20,12 @@ import {
   cellObject,
 } from "../defaultUtilBlocks";
 
+const categoryMapping = {
+  "CMS": "КМС",
+  "MS": "МС",
+  "HMS": "ЗМС",
+};
+
 const TABLE_TEAM_100_RESULTS_HEAD = (item = {}) => {
   return new TableRow({
     children: [
@@ -278,7 +284,7 @@ const TABLE_TEAM_100_RESULTS_ROW = (item = { rows: [] }) => {
                                                         children: [
                                                           new TableCell(
                                                             cellObject({
-                                                              text: item.before,
+                                                              text: categoryMapping[participant.before] || participant.before,
                                                               width: 50,
                                                               borders:
                                                                 cellBorders,
@@ -286,7 +292,7 @@ const TABLE_TEAM_100_RESULTS_ROW = (item = { rows: [] }) => {
                                                           ),
                                                           new TableCell(
                                                             cellObject({
-                                                              text: item.after,
+                                                              text: categoryMapping[participant.after] || participant.after,
                                                               width: 50,
                                                               borders:
                                                                 allCellBorders,
