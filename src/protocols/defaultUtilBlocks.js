@@ -31,7 +31,7 @@ const allCellBorders = { ...cellBorders, right: invisibleBorder };
 
 const spacing = { before: 50, after: 50 };
 
-const multiLine = (text = "", allCaps = false) =>
+const multiLine = (text = "", allCaps = false, bold = false) =>
   text
     .split("\n")
     .map((t, index) =>
@@ -40,6 +40,7 @@ const multiLine = (text = "", allCaps = false) =>
           text: t,
           break: 1,
           allCaps,
+          bold,
           сolor: "000000",
           font: "Times New Roman",
           size: 22,
@@ -47,6 +48,7 @@ const multiLine = (text = "", allCaps = false) =>
         : new TextRun({
           text: t,
           allCaps,
+          bold,
           color: "000000",
           font: "Times New Roman",
           size: 22,
