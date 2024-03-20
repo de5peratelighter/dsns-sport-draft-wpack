@@ -1,3 +1,5 @@
+// 
+
 import {
   Paragraph,
   HeadingLevel,
@@ -56,7 +58,7 @@ const TABLE_PERSONAL_RESULTS_HEAD_CATEGORY_EXTENDED = (item) => {
     children: [
       new TableCell(cellObject({ text: item.location, width: 7 })),
       new TableCell(cellObject({ text: item.number, width: 7 })),
-      new TableCell(cellObject({ text: item.initials, width: 19 })),
+      new TableCell(cellObject({ text: item.initials, width: 22 })),
       new TableCell(cellObject({ text: item.bday, width: 9 })),
       new TableCell(cellObject({ text: item.team, width: 18 })),
       new TableCell({
@@ -174,7 +176,7 @@ const TABLE_PERSONAL_RESULTS_ROW_CATEGORY_EXTENDED = (item) => {
     children: [
       new TableCell(cellObject({ text: item.location, width: 7 })),
       new TableCell(cellObject({ text: item.number, width: 7 })),
-      new TableCell(cellObject({ text: item.initials, width: 19 })),
+      new TableCell(cellObject({ text: item.initials, width: 22 })),
       new TableCell(cellObject({ text: item.bday, width: 9 })),
       new TableCell(cellObject({ text: item.team, width: 18 })),
       new TableCell(
@@ -216,7 +218,7 @@ export const TABLE_PERSONAL_FINAL_100_RESULTS = (items) => {
       return [
         ...acc,
         new Paragraph({
-          children: multiLine(data.nameFinal, true),
+          children: multiLine(data.nameFinal, true, true),
           heading: HeadingLevel.HEADING_3,
           alignment: AlignmentType.CENTER,
         }),
@@ -234,7 +236,7 @@ export const TABLE_PERSONAL_FINAL_100_RESULTS = (items) => {
         }),
         spacer,
         new Paragraph({
-          children: multiLine(data.nameSemiFinal, true),
+          children: multiLine(data.nameSemiFinal, true, true),
           heading: HeadingLevel.HEADING_3,
           alignment: AlignmentType.CENTER,
         }),
@@ -252,7 +254,7 @@ export const TABLE_PERSONAL_FINAL_100_RESULTS = (items) => {
         }),
         spacer,
         new Paragraph({
-          children: multiLine(data.nameZalik, true),
+          children: multiLine(data.nameZalik, true, true),
           heading: HeadingLevel.HEADING_3,
           alignment: AlignmentType.CENTER,
         }),
