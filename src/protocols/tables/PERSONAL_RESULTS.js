@@ -20,6 +20,13 @@ import {
   cellObject,
 } from "../defaultUtilBlocks";
 
+const qualificationMapping = {
+  "CMS": "КМС",
+  "MS": "МС",
+  "HMS": "ЗМС",
+  // Додайте інші кваліфікації за необхідності
+};
+
 const TABLE_PERSONAL_RESULTS_HEAD = (item) => {
   return new TableRow({
     tableHeader: true,
@@ -91,7 +98,7 @@ const TABLE_PERSONAL_RESULTS_ROW = (item) => {
       new TableCell(cellObject({ text: item.time, width: 5 })),
       new TableCell(cellObject({ text: item.track, width: 6 })),
       new TableCell(cellObject({ text: item.number, width: 8 })),
-      new TableCell(cellObject({ text: item.qualification, width: 12 })),
+      new TableCell(cellObject({ text: qualificationMapping[item.qualification] || item.qualification, width: 12 })),
       new TableCell(cellObject({ text: item.initials, width: 30 })),
       new TableCell(cellObject({ text: item.bday, width: 9 })),
       new TableCell(cellObject({ text: item.team, width: 16 })),
@@ -122,7 +129,7 @@ export const TABLE_PERSONAL_FINAL_RESULTS = (items) => {
       return [
         ...acc,
         new Paragraph({
-          children: multiLine(data.name, true),
+          children: multiLine(data.name, true, true),
           heading: HeadingLevel.HEADING_3,
           alignment: AlignmentType.CENTER,
         }),

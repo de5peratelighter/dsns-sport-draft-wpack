@@ -9,6 +9,13 @@ import {
   cellObject,
 } from "../defaultUtilBlocks";
 
+const categoryMapping = {
+  "CMS": "КМС",
+  "MS": "МС",
+  "HMS": "ЗМС",
+  // Додайте інші кваліфікації за необхідності
+};
+
 const TABLE_START_PROTOCOL_RESULTS_HEAD = (item) => {
   return new TableRow({
     children: [
@@ -178,7 +185,7 @@ const TABLE_START_PROTOCOL_RESULTS_ROW = (item) => {
                   ),
                   new TableCell(
                     cellObject({
-                      text: participant.category,
+                      text: categoryMapping[participant.category] || participant.category,
                       width: 10,
                       size: 24,
                       borders,
