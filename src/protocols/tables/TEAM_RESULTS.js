@@ -259,7 +259,7 @@ const TABLE_TEAM_RESULTS_ROW = (item = { columns: [] }) => {
   return new TableRow({
     children: [
       new TableCell(cellObject({ text: item.teamNumber, width: 10 })),
-      new TableCell(cellObject({ text: item.teamName, width: 15 })),
+      new TableCell(cellObject({ text: item.teamName, width: 18 })),
       new TableCell({
         children: [
           new Table({
