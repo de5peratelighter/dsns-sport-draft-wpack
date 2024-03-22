@@ -21,89 +21,160 @@ import {
 } from "../defaultUtilBlocks";
 
 const TABLE_DUELING_PERSONAL_RESULTS_HEAD = (item) => {
-  const ItemColumnWidth = item.columns.length ? 100 / item.columns.length : 25;
   return new TableRow({
     tableHeader: true,
     children: [
       new TableCell(cellObject({ text: item.location, width: 7 })),
       new TableCell(cellObject({ text: item.number, width: 7 })),
-      new TableCell(cellObject({ text: item.initials, width: 25 })),
-      new TableCell(cellObject({ text: item.bday, width: 10 })),
-      new TableCell(cellObject({ text: item.team, width: 20 })),
+      new TableCell(cellObject({ text: item.initials, width: 17 })),
+      new TableCell(cellObject({ text: item.bday, width: 7 })),
+      new TableCell(cellObject({ text: item.team, width: 17 })),
       new TableCell({
+        columnSpan: 3,
+        width: {
+          size: 25,
+          type: WidthType.PERCENTAGE,
+        },
+        verticalAlign: VerticalAlign.CENTER,
         children: [
           new Table({
+            layout: TableLayoutType.FIXED,
             width: {
               size: 100,
               type: WidthType.PERCENTAGE,
             },
             rows: [
               new TableRow({
-                children: item.columns.map((columnText, index) => {
-                  return new TableCell(
+                children: [
+                  new TableCell(
                     cellObject({
-                      text: columnText,
-                      width: ItemColumnWidth,
-                      borders:
-                        index === item.columns.length - 1
-                          ? { ...cellBorders, right: invisibleBorder }
-                          : cellBorders,
+                      text: item.results,
+                      width: 99.99,
+                      borders: { ...rowBorders, right: invisibleBorder },
+                      columnSpan: 3,
                     })
-                  );
-                }),
+                  ),
+                ],
+              }),
+              new TableRow({
+                children: [
+                  new TableCell(
+                    cellObject({
+                      text: item.first,
+                      width: 30,
+                      borders: cellBorders,
+                    })
+                  ),
+                  new TableCell(
+                    cellObject({
+                      text: item.second,
+                      width: 40,
+                      borders: cellBorders,
+                    })
+                  ),
+                  new TableCell(
+                    cellObject({
+                      text: item.final,
+                      width: 30,
+                      borders: allCellBorders,
+                    })
+                  ),
+                ],
               }),
             ],
           }),
         ],
+      }),
+      new TableCell({
+        columnSpan: 2,
         width: {
-          size: 30,
+          size: 25,
           type: WidthType.PERCENTAGE,
         },
         verticalAlign: VerticalAlign.CENTER,
+        children: [
+          new Table({
+            layout: TableLayoutType.FIXED,
+            width: {
+              size: 100,
+              type: WidthType.PERCENTAGE,
+            },
+            rows: [
+              new TableRow({
+                children: [
+                  new TableCell(
+                    cellObject({
+                      text: item.qualification,
+                      width: 99.99,
+                      borders: { ...rowBorders, right: invisibleBorder },
+                      columnSpan: 2,
+                    })
+                  ),
+                ],
+              }),
+              new TableRow({
+                children: [
+                  new TableCell(
+                    cellObject({
+                      text: item.before,
+                      width: 50,
+                      borders: cellBorders,
+                    })
+                  ),
+                  new TableCell(
+                    cellObject({
+                      text: item.after,
+                      width: 50,
+                      borders: allCellBorders,
+                    })
+                  ),
+                ],
+              }),
+            ],
+          }),
+        ],
       }),
     ],
   });
 };
 const TABLE_DUELING_PERSONAL_RESULTS_ROW = (item) => {
-  const ItemColumnWidth = item.columns.length ? 100 / item.columns.length : 25;
   return new TableRow({
     children: [
       new TableCell(cellObject({ text: item.location, width: 7 })),
-      new TableCell(cellObject({ text: item.number, width: 8 })),
-      new TableCell(cellObject({ text: item.initials, width: 25 })),
-      new TableCell(cellObject({ text: item.bday, width: 10 })),
-      new TableCell(cellObject({ text: item.team, width: 20 })),
-      new TableCell({
-        children: [
-          new Table({
-            width: {
-              size: 100,
-              type: WidthType.PERCENTAGE,
-            },
-            rows: [
-              new TableRow({
-                children: item.columns.map((columnText, index) => {
-                  return new TableCell(
-                    cellObject({
-                      text: columnText,
-                      width: ItemColumnWidth,
-                      borders:
-                        index === item.columns.length - 1
-                          ? { ...cellBorders, right: invisibleBorder }
-                          : cellBorders,
-                    })
-                  );
-                }),
-              }),
-            ],
-          }),
-        ],
-        width: {
-          size: 30,
-          type: WidthType.PERCENTAGE,
-        },
-        verticalAlign: VerticalAlign.CENTER,
-      }),
+      new TableCell(cellObject({ text: item.number, width: 7 })),
+      new TableCell(cellObject({ text: item.initials, width: 17 })),
+      new TableCell(cellObject({ text: item.bday, width: 7 })),
+      new TableCell(cellObject({ text: item.team, width: 17 })),
+      new TableCell(
+        cellObject({
+          text: item.first,
+          width: 10,
+        })
+      ),
+      new TableCell(
+        cellObject({
+          text: item.second,
+          width: 13,
+        })
+      ),
+      new TableCell(
+        cellObject({
+          text: item.final,
+          width: 10,
+        })
+      ),
+      new TableCell(
+        cellObject({
+          text: item.before,
+          width: 8,
+        })
+      ),
+      new TableCell(
+        cellObject({
+          text: item.after,
+          width: 12,
+        })
+      ),
     ],
   });
 };
