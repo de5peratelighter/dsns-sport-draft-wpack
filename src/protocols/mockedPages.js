@@ -308,61 +308,6 @@ export const tableData = [
       },
     ],
   },
-  // {
-  //   type: "PERSONAL_RESULTS_HALFFINAL_100",
-  //   header: {
-  //     headerLine:
-  //       "Міністерство молоді та спорту України \n Федерація пожежно-прикладного спорту України",
-  //     subLine: "Чемпіонат України з пожежно-прикладного спорту жінки III ранг",
-  //     protocolLine: "Протокол",
-  //     subProtocolLine:
-  //       "Особистих результатів \n з подолання 100м смуги з перешкодами",
-  //     date: "20 червня 2023 року",
-  //     location: "м. Івано-Франківськ",
-  //     track: "покриття бігової доріжки - рездор",
-  //     metrics: "вид хронометражу - електронний",
-  //   },
-  //   tables: [
-  //     {
-  //       name: "ПівФінальні забіги",
-  //       head: {
-  //         location: "Місце",
-  //         number: "№ Учасника",
-  //         initials: "Імя та призвіще",
-  //         bday: "Рік народження",
-  //         team: "Команда",
-  //         results: "Результати",
-  //         before: "до змаганнь",
-  //         after: "після змаганнь",
-  //         category: "Розряд",
-  //       },
-  //       rows: Array(8).fill({
-  //         location: "1",
-  //         number: "2",
-  //         initials: "Bobby there",
-  //         bday: "1993",
-  //         team: "Some team",
-  //         results: "Some results",
-  //         before: "before",
-  //         after: "after",
-  //       }),
-  //     },
-  //   ],
-  //   judges: [
-  //     {
-  //       title: "Головний суддя змаганнь, \nсуддя міжнародної категорії",
-  //       name: "Ігор Ущапівський",
-  //     },
-  //     {
-  //       title: `Головний секретар змаганнь, \nсуддя міжнародної категорії`,
-  //       name: "Зіновій Карапінка",
-  //     },
-  //     {
-  //       title: `Старший суддя, \nсуддя міжнародної категорії`,
-  //       name: "Володимир Новгородченко",
-  //     },
-  //   ],
-  // },
   {
     type: "PERSONAL_RESULTS_ZALIK_100",
     header: {
@@ -440,38 +385,69 @@ export const tableData = [
     tables: [
       {
         head: {
-          number: "Номер",
+          location: "Місце",
+          number: "№ учасника",
           team: "Команда",
-          initials: "Імя та призвіще",
+          initials: "Ім'я та прізвище",
           bday: "Рік народження",
           result: "Результат",
           sum: "Сума часу",
+          category: "Спортивна\nкваліфікація",
+          before: "до\nзмагань",
+          after: "після\nзмагань",
         },
         rows: Array(15).fill({
-          number: "2",
+          location: "2",
           team: {
             name: "Чернівецька область",
             others: "поза заліком",
             participants: [
               {
-                initials: "Наталія Маньякова",
+                number: "1",
+                initials: "Наталія Крепінка",
                 bday: "1999",
                 result1: "7,72",
                 result2: "7,75",
+                before: "before",
+                after: "after",
               },
               {
+                number: "2",
+                initials: "Наталія Крепінка",
+                bday: "1999",
+                result1: "7,72",
+                result2: "7,75",
+                before: "before",
+                after: "after",
+              },
+              {
+                number: "3",
+                initials: "Наталія Крепінка",
+                bday: "1999",
+                result1: "7,72",
+                result2: "7,75",
+                before: "before",
+                after: "after",
+              },
+              {
+                number: "4",
                 initials: "Наталія TT",
                 bday: "1998",
                 result1: "7,72",
                 result2: "7,75",
+                before: "before",
+                after: "after",
               },
             ],
             excluded: [
               {
+                number: "5",
                 initials: "Наталія поза заліком",
-                bday: "1998",
+                bday: "1995",
                 result1: "7,72",
                 result2: "XXX",
+                before: "before",
+                after: "after",
               },
             ],
           },
@@ -481,15 +457,11 @@ export const tableData = [
     judges: [
       {
         title: "Головний суддя змаганнь, \nсуддя міжнародної категорії",
-        name: "Ігор Ущапівський",
+        name: "Ігор УЩАПІВСЬКИЙ",
       },
       {
         title: `Головний секретар змаганнь, \nсуддя міжнародної категорії`,
-        name: "Зіновій Карапінка",
-      },
-      {
-        title: `Старший суддя, \nсуддя національної категорії`,
-        name: "Олександр Черненко",
+        name: "Зіновій КАРАПІНКА",
       },
     ],
   },
@@ -529,6 +501,7 @@ export const tableData = [
             others: "поза заліком",
             participants: [
               {
+                number: "1",
                 initials: "Наталія Крепінка",
                 bday: "1999",
                 result1: "7,72",
@@ -537,6 +510,7 @@ export const tableData = [
                 after: "after",
               },
               {
+                number: "2",
                 initials: "Наталія Крепінка",
                 bday: "1999",
                 result1: "7,72",
@@ -545,6 +519,7 @@ export const tableData = [
                 after: "after",
               },
               {
+                number: "3",
                 initials: "Наталія Крепінка",
                 bday: "1999",
                 result1: "7,72",
@@ -553,6 +528,7 @@ export const tableData = [
                 after: "after",
               },
               {
+                number: "4",
                 initials: "Наталія TT",
                 bday: "1998",
                 result1: "7,72",
@@ -563,6 +539,7 @@ export const tableData = [
             ],
             excluded: [
               {
+                number: "5",
                 initials: "Наталія поза заліком",
                 bday: "1995",
                 result1: "7,72",
@@ -607,30 +584,40 @@ export const tableData = [
           initials: "Імя та призвіще",
           bday: "Рік народження",
           team: "Команда",
-          columns: ["100м смуга", "штурмова драбина", "сума часу"],
+          first: "Підіймання штурмовою драбиною",
+          second: "Подолання 100-метрової смуги з перешкодами",
+          final: "Сума часу",
+          results: "Результати",
+          before: "до змагань",
+          after: "після змагань",
+          qualification: "Спортивна кваліфікація",
         },
-        rows: Array(35).fill({
+        rows: Array(10).fill({
           location: "1",
           number: "2",
-          initials: "Bobby here and there",
+          initials: "Bobby there",
           bday: "1993",
           team: "Some team",
-          columns: ["55.2", "33.22", "44.2"],
+          first: "11.5",
+          second: "12.5",
+          final: "12.5",
+          before: "before",
+          after: "after",
         }),
       },
     ],
     judges: [
       {
         title: "Головний суддя змаганнь, \nсуддя міжнародної категорії",
-        name: "Ігор Ущапівський",
+        name: "Ігор УЩАПІВСЬКИЙ",
       },
       {
         title: `Головний секретар змаганнь, \nсуддя міжнародної категорії`,
-        name: "Зіновій Карапінка",
+        name: "Зіновій КАРАПІНКА",
       },
       {
-        title: `Старший суддя, \nсуддя міжнародної категорії`,
-        name: "Павло Скуба",
+        title: `Старший суддя, \nнаціональної категорії`,
+        name: "Володимир ЧЕРНЕНКО",
       },
     ],
   },
@@ -650,38 +637,69 @@ export const tableData = [
     tables: [
       {
         head: {
-          number: "Номер",
+          location: "Місце",
+          number: "№ учасника",
           team: "Команда",
-          initials: "Імя та призвіще",
+          initials: "Ім'я та прізвище",
           bday: "Рік народження",
           result: "Результат",
           sum: "Сума часу",
+          category: "Спортивна\nкваліфікація",
+          before: "до\nзмагань",
+          after: "після\nзмагань",
         },
         rows: Array(15).fill({
-          number: "2",
+          location: "2",
           team: {
             name: "Чернівецька область",
             others: "поза заліком",
             participants: [
               {
+                number: "1",
                 initials: "Наталія Крепінка",
                 bday: "1999",
                 result1: "7,72",
                 result2: "7,75",
+                before: "before",
+                after: "after",
               },
               {
+                number: "2",
+                initials: "Наталія Крепінка",
+                bday: "1999",
+                result1: "7,72",
+                result2: "7,75",
+                before: "before",
+                after: "after",
+              },
+              {
+                number: "3",
+                initials: "Наталія Крепінка",
+                bday: "1999",
+                result1: "7,72",
+                result2: "7,75",
+                before: "before",
+                after: "after",
+              },
+              {
+                number: "4",
                 initials: "Наталія TT",
                 bday: "1998",
                 result1: "7,72",
                 result2: "7,75",
+                before: "before",
+                after: "after",
               },
             ],
             excluded: [
               {
+                number: "5",
                 initials: "Наталія поза заліком",
                 bday: "1995",
                 result1: "7,72",
                 result2: "XXX",
+                before: "before",
+                after: "after",
               },
             ],
           },
@@ -691,15 +709,11 @@ export const tableData = [
     judges: [
       {
         title: "Головний суддя змаганнь, \nсуддя міжнародної категорії",
-        name: "Ігор Ущапівський",
+        name: "Ігор УЩАПІВСЬКИЙ",
       },
       {
         title: `Головний секретар змаганнь, \nсуддя міжнародної категорії`,
-        name: "Зіновій Карапінка",
-      },
-      {
-        title: `Старший суддя, \nсуддя міжнародної категорії`,
-        name: "Володимир Новгородченко",
+        name: "Зіновій КАРАПІНКА",
       },
     ],
   },
@@ -858,4 +872,65 @@ export const tableData = [
       },
     ],
   },
+
+
+
+
+
+// не юзається
+// {
+  //   type: "PERSONAL_RESULTS_HALFFINAL_100",
+  //   header: {
+  //     headerLine:
+  //       "Міністерство молоді та спорту України \n Федерація пожежно-прикладного спорту України",
+  //     subLine: "Чемпіонат України з пожежно-прикладного спорту жінки III ранг",
+  //     protocolLine: "Протокол",
+  //     subProtocolLine:
+  //       "Особистих результатів \n з подолання 100м смуги з перешкодами",
+  //     date: "20 червня 2023 року",
+  //     location: "м. Івано-Франківськ",
+  //     track: "покриття бігової доріжки - рездор",
+  //     metrics: "вид хронометражу - електронний",
+  //   },
+  //   tables: [
+  //     {
+  //       name: "ПівФінальні забіги",
+  //       head: {
+  //         location: "Місце",
+  //         number: "№ Учасника",
+  //         initials: "Імя та призвіще",
+  //         bday: "Рік народження",
+  //         team: "Команда",
+  //         results: "Результати",
+  //         before: "до змаганнь",
+  //         after: "після змаганнь",
+  //         category: "Розряд",
+  //       },
+  //       rows: Array(8).fill({
+  //         location: "1",
+  //         number: "2",
+  //         initials: "Bobby there",
+  //         bday: "1993",
+  //         team: "Some team",
+  //         results: "Some results",
+  //         before: "before",
+  //         after: "after",
+  //       }),
+  //     },
+  //   ],
+  //   judges: [
+  //     {
+  //       title: "Головний суддя змаганнь, \nсуддя міжнародної категорії",
+  //       name: "Ігор Ущапівський",
+  //     },
+  //     {
+  //       title: `Головний секретар змаганнь, \nсуддя міжнародної категорії`,
+  //       name: "Зіновій Карапінка",
+  //     },
+  //     {
+  //       title: `Старший суддя, \nсуддя міжнародної категорії`,
+  //       name: "Володимир Новгородченко",
+  //     },
+  //   ],
+  // },
 ];
