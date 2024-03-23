@@ -546,12 +546,14 @@
 </template>
 
 <script>
-import { Document, Packer, PageOrientation } from "docx";
-import { DATA_TO_DOC_PAGES } from '../protocols/defaultUtils';
 import axios from 'axios';
+import { Document, Packer, PageOrientation } from "docx";
+import { saveAs } from 'file-saver';
+import { DATA_TO_DOC_PAGE, DATA_TO_DOC_PAGES } from '../protocols/defaultUtils';
+import { TABLE_START_PROTOCOL_RESULTS } from '../protocols/tables/START_PROTOCOL_RESULTS';
 export default {
   data: function () {
-    return { 
+    return {
       competitionReferences: [], // has to be fetched so we know what SPORT_TYPE we're actually dealing with (id is taken from route)
       isPageLoading: false,
       isLoading: false,
@@ -630,7 +632,9 @@ export default {
       ];
       if (this.isDueling) {
         options.push(
-          { text: 'Результати', value: 'DUELING_RESULT_CSV' },
+          { text: 'Зведений протокол', value: 'DUELING_RESULT_CSV' },
+          { text: 'Протокол особистих результатів', value: 'DUELING_RESULT_CSV' },
+          { text: 'Протокол командних результатів', value: 'DUELING_RESULT_CSV' },
         )
       } else {
         if (this.isCombatDeployment || this.isRelay) {
@@ -640,13 +644,16 @@ export default {
           )
         } else {
           options.push(
-            { text: '++ Стартовий протокол', value: 'START_DOC' },
-            { text: 'Стартовий протокол', value: 'START_CSV' },
-            { text: 'Пів-фінальний протокол', value: 'START_HALF_FINAL_CSV' },
-            { text: 'Фінальний протокол', value: 'START_FINAL_CSV' },
-            { text: 'Результати Стартовий протокол', value: 'RESULT_CSV' },
-            { text: 'Результати Пів-фінальний протокол', value: 'RESULT_HALF_FINAL_CSV' },
-            { text: 'Результати Фінальний протокол', value: 'RESULT_FINAL_CSV' }
+            { text: 'Зведений протокол', value: 'merged-team-competition-result-protocol' },
+            { text: 'Стартовий протокол', value: 'start-protocol' },
+            { text: 'Стартовий протокол (фінальні/півфінальні забіги)', value: 'start-protocol-finals' },
+            { text: 'Протокол особистих результатів', value: 'result-protocol' },
+            { text: 'Протокол командних результатів', value: 'team-competition-result-protocol' },
+            // { text: 'Пів-фінальний протокол', value: 'START_HALF_FINAL_CSV' },
+            // { text: 'Фінальний протокол', value: 'START_FINAL_CSV' },
+            // { text: 'Результати Стартовий протокол', value: 'RESULT_CSV' },
+            // { text: 'Результати Пів-фінальний протокол', value: 'RESULT_HALF_FINAL_CSV' },
+            // { text: 'Результати Фінальний протокол', value: 'RESULT_FINAL_CSV' }
           )
         }
       }
@@ -881,6 +888,17 @@ export default {
     }
   },
   methods: {
+    getJudgeTitleInUkrainian(title) {
+      const coreJudgesTypes = {
+        MAIN: 'Головний суддя змаганнь',
+        MAIN_SECRETARY: 'Головний секретар змаганнь',
+        INSPECTOR: 'Суддя-інспектор змаганнь',
+        STARTER: 'Основний стартер',
+        ASSISTANCE_STARTER: 'Помічник стартера'
+      };
+
+      return coreJudgesTypes[title] || title;
+    },
     async changeCompetitionStatus() {
       try {
         // Визначення активного типу змагань
@@ -1095,7 +1113,7 @@ export default {
                   properties: {
                     page: {
                       size: {
-                        orientation: PageOrientation.LANDSCAPE, // Змінено тут
+                        orientation: PageOrientation.LANDSCAPE,
                       }
                     }
                   },
@@ -1120,23 +1138,83 @@ export default {
           }
         });
     },
+    async printStartProtocol() {
+      return this.axios.get(`private/protocols/competition-types/${this.competitionType}/start-protocol`)
+        .then(({ data }) => {
+          if (!data) return;
+          try {
+            const doc = new Document({
+              sections: [
+                {
+                  properties: {
+                    page: {
+                      size: {
+                        orientation: PageOrientation.LANDSCAPE,
+                      }
+                    }
+                  },
+                  children: TABLE_START_PROTOCOL_RESULTS(data),
+                },
+              ],
+            });
+            if (doc) {
+              Packer.toBlob(doc).then(blob => {
+                const url = URL.createObjectURL(blob);
+                const downloadLink = document.createElement("a");
+                downloadLink.href = url;
+                downloadLink.download = "StartProtocol.docx";
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+              })
+            }
+          } catch (err) {
+            console.error('Parsing:', err)
+            this.showError({ message: 'Protocol parsing failed' })
+          }
+        });
+    },
+    // async printProtocol(option) {
+    //   return this.axios.get(`private/competition-types/${this.competitionType}/csv/download?csvType=${option.value}`)
+    //     .then((res) => {
+    //       const data = res.data;
+    //       const blob = new Blob([data], { type: 'text/csv;charset=utf-8' });
+    //       const fileName = `${this.competitionTranslations[this.activeCompetitionType.sportType]}`
+    //       if (!blob) return;
+    //       const a = document.createElement('a');
+    //       a.download = fileName + ' - ' + option.text + '.csv';
+    //       a.href = URL.createObjectURL(blob);
+    //       document.body.prepend(a);
+    //       a.style.position = 'absolute';
+    //       a.style.left = '-9999px'
+    //       a.click();
+    //       a.remove()
+    //     })
+    //     .catch((error) => this.showError(error))
+    // },
     async printProtocol(option) {
-      return this.axios.get(`private/competition-types/${this.competitionType}/csv/download?csvType=${option.value}`)
-        .then((res) => {
-          const data = res.data;
-          const blob = new Blob([data], { type: 'text/csv;charset=utf-8' });
-          const fileName = `${this.competitionTranslations[this.activeCompetitionType.sportType]}`
-          if (!blob) return;
-          const a = document.createElement('a');
-          a.download = fileName + ' - ' + option.text + '.csv';
-          a.href = URL.createObjectURL(blob);
-          document.body.prepend(a);
-          a.style.position = 'absolute';
-          a.style.left = '-9999px'
-          a.click();
-          a.remove()
-        })
-        .catch((error) => this.showError(error))
+      try {
+        const { data } = await this.axios.get(`private/protocols/competition-types/${this.competitionType}/${option.value}`);
+        const doc = new Document({
+          sections: [
+            {
+              properties: {
+                page: {
+                  size: {
+                    orientation: PageOrientation.LANDSCAPE,
+                  }
+                }
+              },
+              children: DATA_TO_DOC_PAGE(data),
+            },
+          ],
+        });
+        const blob = await Packer.toBlob(doc);
+        saveAs(blob, `${option.text}.docx`);
+      } catch (error) {
+        console.error('Error generating protocol:', error);
+        this.showError(error);
+      }
     },
     async saveResults(participant, key, disqualifiedKey = null, disqualifiedValue = null) {
       const [isRelay, isCombatDeployment] = [this.isRelay, this.isCombatDeployment];
