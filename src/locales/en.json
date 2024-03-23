@@ -44,6 +44,9 @@
     "navSubMenuParticipants": "Participants"
   },
   "const": {
+    "athlete": "Athlete",
+    "team": "Team",
+    "timeSec": "Time, sec",
     "ASSAULT_LADDER": "Assault ladder", 
     "HUNDRED_METER": "Hundred meters",
     "DUELING": "Dueling",

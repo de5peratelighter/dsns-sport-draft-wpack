@@ -44,6 +44,12 @@
     "navSubMenuParticipants": "Учасники"
   },
   "const": {
+    "athlete": "Спортсмен",
+    "team": "Команда",
+    "timeSec": "Час, сек",
+    "sum": "Сума",
+    "teamChampionshipByType": "Командна першість по виду",
+    "overallTeamChampionship": "Загальнокомандна першість",
     "ASSAULT_LADDER": "Штурмова драбина", 
     "HUNDRED_METER": "100 метрова смуга",
     "DUELING": "Двоборство",
