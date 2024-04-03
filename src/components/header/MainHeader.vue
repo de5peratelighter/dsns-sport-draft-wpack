@@ -39,8 +39,10 @@
                   </v-list>
                 </v-menu>
               </div>
-              <div>{{ this.$t(`shared.eventDate`) }}</div>
-              <div>{{ this.$t(`shared.eventPlaceKyiv`) }}</div>
+              <div v-if="hasCompetitions" class="d-flex justify-space-between align-center" style="min-width: 15%;"">
+                <div>{{ selectedCompetition ? selectedCompetition.startDate : this.$t(`shared.noDate`) }}</div>
+                <div>{{ selectedCompetition ? selectedCompetition.locationName : this.$t(`shared.noLocation`) }}</div>
+              </div>
               <div>
                 <v-btn v-for="(social, index) in socialLinks" :key="index" :href="social.url" small icon
                   target="_blank">
@@ -136,6 +138,7 @@
 </template>
 
 <script>
+import { EventBus } from '../../eventBus';
 import axios from 'axios';
 export default {
   props: {
@@ -147,6 +150,7 @@ export default {
   data: function () {
     return {
       competitions: [],
+      hasCompetitions: false,
       selectedCompetition: null,
       loginUsername: '',
       loginPassword: '',
@@ -261,7 +265,24 @@ export default {
       try {
         const response = await axios.get('public/competitions/available');
         this.competitions = response.data;
-        console.log('Visible Competitions:', this.visibleCompetitions);
+        this.hasCompetitions = this.competitions.length > 0;
+
+        if (this.competitions.length > 0) {
+          if (!this.selectedCompetitionReference) {
+            this.selectCompetition(this.competitions[0]);
+            const firstSportType = this.competitions[0].competitionTypes.find(ct => ct.sportType === 'HUNDRED_METER');
+            if (firstSportType) {
+              this.selectSportType({ name: 'Подолання 100м смуги з перешкодами', value: 'HUNDRED_METER' });
+            }
+          }
+        } else {
+          localStorage.removeItem('selectedCompetitionReference');
+          localStorage.removeItem('selectedCompetitionName');
+          localStorage.removeItem('selectedSportTypeReference');
+          localStorage.removeItem('selectedSportTypeValue');
+          this.selectedCompetition = null;
+          this.selectedSportType = null;
+        }
       } catch (error) {
         console.error('Error fetching competitions:', error);
       }
@@ -269,10 +290,30 @@ export default {
     selectCompetition(competition) {
       this.selectedCompetition = competition;
       localStorage.setItem('selectedCompetitionReference', competition.competitionReference);
+      EventBus.$emit('competitionChanged', competition.competitionReference);
+
+      const currentSportTypeValue = localStorage.getItem('selectedSportTypeValue');
+
+      const correspondingSportType = competition.competitionTypes.find(ct => ct.sportType === currentSportTypeValue);
+      if (correspondingSportType) {
+        const sportType = this.sportTypes.find(type => type.value === correspondingSportType.sportType);
+        if (sportType) {
+          this.selectSportType(sportType);
+        }
+      } else {
+        const firstSportType = competition.competitionTypes[0];
+        if (firstSportType) {
+          const sportType = this.sportTypes.find(type => type.value === firstSportType.sportType);
+          if (sportType) {
+            this.selectSportType(sportType);
+          }
+        }
+      }
     },
     selectSportType(type) {
       this.selectedSportType = type;
       localStorage.setItem('selectedSportTypeValue', type.value);
+      EventBus.$emit('sportTypeChanged', type.value);
       const selectedType = this.selectedCompetition.competitionTypes.find(ct => ct.sportType === type.value);
       if (selectedType) {
         localStorage.setItem('selectedSportTypeReference', selectedType.reference);
