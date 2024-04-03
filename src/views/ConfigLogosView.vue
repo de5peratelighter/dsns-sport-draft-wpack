@@ -34,32 +34,37 @@
                 <v-file-input class="smaller-input" accept="image/*" v-model="logoFiles.ASSAULT_LADDER"
                   label="Виберіть файл" :prepend-icon="null" prepend-inner-icon="mdi-paperclip" outlined hide-details
                   @change="saveNextLogo('ASSAULT_LADDER')" />
-                  <img v-if="logoImage.ASSAULT_LADDER" :src="logoImage.ASSAULT_LADDER" alt="ASSAULT LADDER Logo" class="logo-image" height="40">
+                <img v-if="logoImage.ASSAULT_LADDER" :src="logoImage.ASSAULT_LADDER" alt="ASSAULT LADDER Logo"
+                  class="logo-image" height="40">
                 <p class="text-caption">(Штурмова драбина)</p>
                 <v-file-input class="smaller-input" accept="image/*" v-model="logoFiles.HUNDRED_METER"
                   label="Виберіть файл" :prepend-icon="null" prepend-inner-icon="mdi-paperclip" outlined hide-details
                   @change="saveNextLogo('HUNDRED_METER')" />
-                  <img v-if="logoImage.HUNDRED_METER" :src="logoImage.HUNDRED_METER" alt="HUNDRED METER Logo" class="logo-image" height="40">
+                <img v-if="logoImage.HUNDRED_METER" :src="logoImage.HUNDRED_METER" alt="HUNDRED METER Logo"
+                  class="logo-image" height="40">
                 <p class="text-caption">(100-метрова смуга)</p>
                 <v-file-input class="smaller-input" accept="image/*" v-model="logoFiles.DUELING" label="Виберіть файл"
                   :prepend-icon="null" prepend-inner-icon="mdi-paperclip" outlined hide-details
                   @change="saveNextLogo('DUELING')" />
-                  <img v-if="logoImage.DUELING" :src="logoImage.DUELING" alt="DUELING Logo" class="logo-image" height="40">
+                <img v-if="logoImage.DUELING" :src="logoImage.DUELING" alt="DUELING Logo" class="logo-image"
+                  height="40">
                 <p class="text-caption">(Двоєборство)</p>
                 <v-file-input class="smaller-input" accept="image/*" v-model="logoFiles.RELAY" label="Виберіть файл"
                   :prepend-icon="null" prepend-inner-icon="mdi-paperclip" outlined hide-details
                   @change="saveNextLogo('RELAY')" />
-                  <img v-if="logoImage.RELAY" :src="logoImage.RELAY" alt="RELAY Logo" class="logo-image" height="40">
+                <img v-if="logoImage.RELAY" :src="logoImage.RELAY" alt="RELAY Logo" class="logo-image" height="40">
                 <p class="text-caption">(Пожежна естафета)</p>
                 <v-file-input class="smaller-input" accept="image/*" v-model="logoFiles.COMBAT_DEPLOYMENT"
                   label="Виберіть файл" :prepend-icon="null" prepend-inner-icon="mdi-paperclip" outlined hide-details
                   @change="saveNextLogo('COMBAT_DEPLOYMENT')" />
-                  <img v-if="logoImage.COMBAT_DEPLOYMENT" :src="logoImage.COMBAT_DEPLOYMENT" alt="RELAY Logo" class="logo-image" height="40">
+                <img v-if="logoImage.COMBAT_DEPLOYMENT" :src="logoImage.COMBAT_DEPLOYMENT" alt="RELAY Logo"
+                  class="logo-image" height="40">
                 <p class="text-caption">(Бойове розгортання)</p>
                 <v-file-input class="smaller-input" accept="image/*" v-model="logoFiles.RETRACTABLE_LADDER"
                   label="Виберіть файл" :prepend-icon="null" prepend-inner-icon="mdi-paperclip" outlined hide-details
                   @change="saveNextLogo('RETRACTABLE_LADDER')" />
-                  <img v-if="logoImage.RETRACTABLE_LADDER" :src="logoImage.RETRACTABLE_LADDER" alt="RELAY Logo" class="logo-image" height="40">
+                <img v-if="logoImage.RETRACTABLE_LADDER" :src="logoImage.RETRACTABLE_LADDER" alt="RELAY Logo"
+                  class="logo-image" height="40">
                 <p class="text-caption">(Висувна драбина)</p>
               </v-col>
             </v-row>
@@ -143,11 +148,12 @@ export default {
     async parseFiles() {
       const { data } = await this.axios.get(`private/files/competition/${this.competitionId}`);
       this.logos = data;
-      this.loadLogoImages(); 
+      this.loadLogoImages();
     },
     async retrieveFileReference(reference) {
-      const data = await this.axios.get(`private/files/${reference}`);
-      return data.config ? data.config.baseURL + data.config.url : null;
+      const response = await this.axios.get(`private/files/${reference}`, { responseType: 'blob' });
+      const blob = new Blob([response.data], { type: 'image/jpeg' }); // Змініть тип зображення за потребою
+      return URL.createObjectURL(blob);
     },
     async loadLogoImages() {
       for (const logo of this.logos) {
