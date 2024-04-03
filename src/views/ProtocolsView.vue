@@ -633,8 +633,8 @@ export default {
       if (this.isDueling) {
         options.push(
           { text: 'Зведений протокол', value: 'DUELING_RESULT_CSV' },
-          { text: 'Протокол особистих результатів', value: 'DUELING_RESULT_CSV' },
-          { text: 'Протокол командних результатів', value: 'DUELING_RESULT_CSV' },
+          { text: 'Протокол особистих результатів', value: 'dueling-result-protocol' },
+          { text: 'Протокол командних результатів', value: 'team-result-protocol' },
         )
       } else {
         if (this.isCombatDeployment || this.isRelay) {
@@ -649,11 +649,6 @@ export default {
             { text: 'Стартовий протокол (фінальні/півфінальні забіги)', value: 'start-protocol-finals' },
             { text: 'Протокол особистих результатів', value: 'result-protocol' },
             { text: 'Протокол командних результатів', value: 'team-competition-result-protocol' },
-            // { text: 'Пів-фінальний протокол', value: 'START_HALF_FINAL_CSV' },
-            // { text: 'Фінальний протокол', value: 'START_FINAL_CSV' },
-            // { text: 'Результати Стартовий протокол', value: 'RESULT_CSV' },
-            // { text: 'Результати Пів-фінальний протокол', value: 'RESULT_HALF_FINAL_CSV' },
-            // { text: 'Результати Фінальний протокол', value: 'RESULT_FINAL_CSV' }
           )
         }
       }
@@ -1194,23 +1189,25 @@ export default {
     // },
     async printProtocol(option) {
       try {
-        const { data } = await this.axios.get(`private/protocols/competition-types/${this.competitionType}/${option.value}`);
-        const doc = new Document({
-          sections: [
-            {
-              properties: {
-                page: {
-                  size: {
-                    orientation: PageOrientation.LANDSCAPE,
+        if (option.value === 'dueling-result-protocol' || option.value === 'team-result-protocol') {
+          const { data } = await this.axios.get(`private/protocols/competition-types/${this.competitionType}/${option.value}`);
+          const doc = new Document({
+            sections: [
+              {
+                properties: {
+                  page: {
+                    size: {
+                      orientation: PageOrientation.LANDSCAPE,
+                    }
                   }
-                }
+                },
+                children: DATA_TO_DOC_PAGE(data),
               },
-              children: DATA_TO_DOC_PAGE(data),
-            },
-          ],
-        });
-        const blob = await Packer.toBlob(doc);
-        saveAs(blob, `${option.text}.docx`);
+            ],
+          });
+          const blob = await Packer.toBlob(doc);
+          saveAs(blob, `${option.text}.docx`);
+        }
       } catch (error) {
         console.error('Error generating protocol:', error);
         this.showError(error);
