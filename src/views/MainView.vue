@@ -13,8 +13,9 @@
       </v-row>
       <v-row>
         <v-col cols="12 mt-1">
-          <div :class="sheetHeadingClasses">{{ $t('shared.bestByType') }}</div>
-          <v-row>
+          <div v-if="hasActiveCompetition" style="height: 100%;">
+            <div :class="sheetHeadingClasses">{{ $t('shared.bestByType') }}</div>
+            <v-row>
               <v-col cols="12">
                 <div class="controls text-center pb-1">
                   <v-btn-toggle v-model="currentStage" mandatory small dense>
@@ -25,39 +26,39 @@
                 </div>
               </v-col>
             </v-row>
-          <v-sheet v-bind="sheetData" class="scrollable-sheet personalSheet">
-            <v-simple-table>
-              <template v-slot:default>
-                <thead>
-                  <tr>
-                    <th class="text-left">Забіг</th>
-                    <th class="text-left">Доріж.</th>
-                    <th class="text-left">№ учас.</th>
-                    <th class="text-left">Звання/розряд</th>
-                    <th class="text-left">Ім'я та прізвище</th>
-                    <th class="text-left">Команда</th>
-                    <th class="text-left">Перша спроба</th>
-                    <th class="text-left">Друга спроба</th>
-                    <th class="text-left">Кращий</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(result, index) in raceResults" :key="index">
-                    <td>{{ result.roadNumber }}</td>
-                    <td>{{ result.trackNumber }}</td>
-                    <td>{{ result.participantNumber }}</td>
-                    <td>{{ result.participantCategory }}</td>
-                    <td>{{ result.participantFullName }}</td>
-                    <td>{{ result.participantTeamName }}</td>
-                    <td>{{ result.firstResult }}</td>
-                    <td>{{ result.secondResult }}</td>
-                    <td>{{ result.bestResult }}</td>
-                  </tr>
-                </tbody>
-              </template>
-            </v-simple-table>
-
-          </v-sheet>
+            <v-sheet v-bind="sheetData" class="scrollable-sheet personalSheet">
+              <v-simple-table>
+                <template v-slot:default>
+                  <thead>
+                    <tr>
+                      <th class="text-left">Забіг</th>
+                      <th class="text-left">Доріж.</th>
+                      <th class="text-left">№ учас.</th>
+                      <th class="text-left">Звання/розряд</th>
+                      <th class="text-left">Ім'я та прізвище</th>
+                      <th class="text-left">Команда</th>
+                      <th class="text-left">Перша спроба</th>
+                      <th class="text-left">Друга спроба</th>
+                      <th class="text-left">Кращий</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(result, index) in raceResults" :key="index">
+                      <td>{{ result.roadNumber }}</td>
+                      <td>{{ result.trackNumber }}</td>
+                      <td>{{ result.participantNumber }}</td>
+                      <td>{{ result.participantCategory }}</td>
+                      <td>{{ result.participantFullName }}</td>
+                      <td>{{ result.participantTeamName }}</td>
+                      <td>{{ result.firstResult }}</td>
+                      <td>{{ result.secondResult }}</td>
+                      <td>{{ result.bestResult }}</td>
+                    </tr>
+                  </tbody>
+                </template>
+              </v-simple-table>
+            </v-sheet>
+          </div>
         </v-col>
       </v-row>
 
@@ -66,86 +67,91 @@
     <v-col cols="5" class="fill-height pb-0">
       <v-row class="fill-height">
         <v-col cols="12">
-          <div :class="sheetHeadingClasses">{{ $t('shared.bestResults') }}</div>
-          <v-sheet v-bind="sheetData" class="scrollable-sheet">
-            <v-simple-table fixed-header>
-              <template>
-                <v-sheet v-bind="sheetData" class="scrollable-sheet">
-                  <v-simple-table>
-                    <thead>
-                      <tr>
-                        <th class="text-left">№</th>
-                        <th class="text-left">{{ $t('const.athlete') }}</th>
-                        <th class="text-left">{{ $t('const.team') }}</th>
-                        <th class="text-left">{{ $t('const.timeSec') }}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="(result, index) in bestResults" :key="result.participantFullName">
-                        <td>{{ index + 1 }}</td>
-                        <td>{{ result.participantFullName }}</td>
-                        <td>{{ result.participantTeamName }}</td>
-                        <td>{{ result.bestResult }}</td>
-                      </tr>
-                    </tbody>
-                  </v-simple-table>
-                </v-sheet>
-              </template>
-            </v-simple-table>
-          </v-sheet>
+          <div v-if="hasActiveCompetition">
+            <div :class="sheetHeadingClasses">{{ $t('shared.bestResults') }}</div>
+            <v-sheet v-bind="sheetData" class="scrollable-sheet">
+              <v-simple-table fixed-header>
+                <template>
+                  <v-sheet v-bind="sheetData" class="scrollable-sheet">
+                    <v-simple-table>
+                      <thead>
+                        <tr>
+                          <th class="text-left">№</th>
+                          <th class="text-left">{{ $t('const.athlete') }}</th>
+                          <th class="text-left">{{ $t('const.team') }}</th>
+                          <th class="text-left">{{ $t('const.timeSec') }}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="(result, index) in bestResults" :key="result.participantFullName">
+                          <td>{{ index + 1 }}</td>
+                          <td>{{ result.participantFullName }}</td>
+                          <td>{{ result.participantTeamName }}</td>
+                          <td>{{ result.bestResult }}</td>
+                        </tr>
+                      </tbody>
+                    </v-simple-table>
+                  </v-sheet>
+                </template>
+              </v-simple-table>
+            </v-sheet>
+          </div>
         </v-col>
 
         <v-col cols="12" md="12" class="pb-0">
-          <v-row>
-            <v-col cols="6">
-              <div :class="sheetHeadingClasses">{{ $t('const.teamChampionshipByType') }}</div>
-              <v-sheet v-bind="sheetData" class="scrollable-sheet">
-                <v-simple-table fixed-header>
-                  <template v-slot:default>
-                    <thead>
-                      <tr>
-                        <th>№</th>
-                        <th>{{ $t('const.team') }}</th>
-                        <th>{{ $t('const.timeSec') }}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="(teamResult, index) in teamResultsByType" :key="teamResult.teamCompetitionReference">
-                        <td>{{ teamResult.position }}</td>
-                        <td>{{ teamResult.teamName }}</td>
-                        <td>{{ teamResult.result }}</td>
-                      </tr>
-                    </tbody>
-                  </template>
-                </v-simple-table>
-              </v-sheet>
-            </v-col>
+          <div v-if="hasActiveCompetition">
+            <v-row>
+              <v-col cols="6">
+                <div :class="sheetHeadingClasses">{{ $t('const.teamChampionshipByType') }}</div>
+                <v-sheet v-bind="sheetData" class="scrollable-sheet">
+                  <v-simple-table fixed-header>
+                    <template v-slot:default>
+                      <thead>
+                        <tr>
+                          <th>№</th>
+                          <th>{{ $t('const.team') }}</th>
+                          <th>{{ $t('const.timeSec') }}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="(teamResult, index) in teamResultsByType" :key="teamResult.teamCompetitionReference">
+                          <td>{{ teamResult.position }}</td>
+                          <td>{{ teamResult.teamName }}</td>
+                          <td>{{ teamResult.result }}</td>
+                        </tr>
+                      </tbody>
+                    </template>
+                  </v-simple-table>
+                </v-sheet>
+              </v-col>
 
-            <v-col cols="6">
-              <div :class="sheetHeadingClasses">{{ $t('const.overallTeamChampionship') }}</div>
-              <v-sheet v-bind="sheetData" class="scrollable-sheet">
-                <v-simple-table fixed-header>
-                  <template v-slot:default>
-                    <thead>
-                      <tr>
-                        <th>№</th>
-                        <th>{{ $t('const.team') }}</th>
-                        <th>{{ $t('const.sum') }}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="(teamResult, index) in overallTeamResults" :key="teamResult.teamCompetitionReference">
-                        <td>{{ teamResult.position }}</td>
-                        <td>{{ teamResult.teamName }}</td>
-                        <td>{{ teamResult.result }}</td>
-                      </tr>
-                    </tbody>
-                  </template>
-                </v-simple-table>
-              </v-sheet>
-            </v-col>
+              <v-col cols="6">
+                <div :class="sheetHeadingClasses">{{ $t('const.overallTeamChampionship') }}</div>
+                <v-sheet v-bind="sheetData" class="scrollable-sheet">
+                  <v-simple-table fixed-header>
+                    <template v-slot:default>
+                      <thead>
+                        <tr>
+                          <th>№</th>
+                          <th>{{ $t('const.team') }}</th>
+                          <th>{{ $t('const.sum') }}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="(teamResult, index) in overallTeamResults"
+                          :key="teamResult.teamCompetitionReference">
+                          <td>{{ teamResult.position }}</td>
+                          <td>{{ teamResult.teamName }}</td>
+                          <td>{{ teamResult.result }}</td>
+                        </tr>
+                      </tbody>
+                    </template>
+                  </v-simple-table>
+                </v-sheet>
+              </v-col>
 
-          </v-row>
+            </v-row>
+          </div>
         </v-col>
       </v-row>
     </v-col>
@@ -154,6 +160,7 @@
 </template>
 
 <script>
+import { EventBus } from '../eventBus';
 import axios from 'axios';
 export default {
   data: function () {
@@ -164,6 +171,8 @@ export default {
       raceResults: [],
       currentStage: 'start',
       liveStreamLink: null,
+      currentCompetitionReference: localStorage.getItem('selectedCompetitionReference') || null,
+      currentSportTypeReference: localStorage.getItem('selectedSportTypeReference') || null,
       sheetData: {
         color: 'rgba(0, 0, 0, 0.35)',
         minHeight: 'calc(100% - 30px)'
@@ -172,20 +181,53 @@ export default {
     }
   },
   mounted() {
+    window.addEventListener('storage', this.updateData);
+    EventBus.$on('competitionChanged', this.updateTablesData);
+    EventBus.$on('sportTypeChanged', this.updateTablesData);
+
     this.fetchSocialLinks();
     this.fetchBestResults();
     this.fetchTeamResultsByType();
     this.fetchOverallTeamResults();
     this.fetchRaceResults();
+    this.fetchCompetitions();
+    this.updateTablesData();
+  },
+  beforeDestroy() {
+    EventBus.$off('competitionChanged', this.updateTablesData);
+    EventBus.$off('sportTypeChanged', this.updateTablesData);
   },
   watch: {
     currentStage(newVal) {
       if (newVal) {
         this.fetchRaceResults();
       }
-    }
+    },
+    currentCompetitionReference(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        localStorage.setItem('selectedCompetitionReference', newVal);
+        this.updateTablesData();
+      }
+    },
+    currentSportTypeReference(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        localStorage.setItem('selectedSportTypeReference', newVal);
+        this.updateTablesData();
+      }
+    },
+  },
+  computed: {
+    hasActiveCompetition() {
+      return !!localStorage.getItem('selectedCompetitionReference');
+    },
   },
   methods: {
+    updateTablesData() {
+      this.fetchBestResults();
+      this.fetchTeamResultsByType();
+      this.fetchOverallTeamResults();
+      this.fetchRaceResults();
+    },
     async fetchSocialLinks() {
       try {
         const response = await axios.get('public/social-network');
@@ -265,58 +307,45 @@ export default {
   background-color: white;
 }
 
-/* Видалення фону і відступів для всіх v-sheet у компоненті */
 .v-sheet {
   background-color: transparent !important;
-  /* Використовуємо !important для перекриття глобальних стилів */
   padding: 0 !important;
   margin: 0 !important;
 }
 
-/* Забираємо відступи та фон для таблиць */
 .v-simple-table {
   margin: 0;
   width: 100%;
   background-color: transparent;
 }
 
-/* Стилі для кнопок, якщо потрібно зменшити відступи */
 .v-btn--small {
   min-width: auto;
   margin: 0 2px;
-  /* Додаємо невеликі відступи між кнопками, якщо потрібно */
 }
 
 .live-stream {
   width: 100%;
   height: auto;
   aspect-ratio: 16 / 7;
-  /* Зберегти пропорції відео */
 }
 
 .scrollable-sheet {
   overflow-y: auto;
   overflow-x: auto;
-  /* Забезпечення адаптивності блоку до змін розміру вікна */
   height: calc(61vh - 200px);
-  /* Приклад, де 200px — це сумарна висота інших компонентів та падінгів */
   max-height: 35vh;
   width: 100%;
-  /* Максимальна висота, щоб уникнути переповнення за межі екрану */
 }
 
 .personalSheet {
   overflow-y: auto;
   overflow-x: auto;
-  /* Забезпечення адаптивності блоку до змін розміру вікна */
   height: calc(50vh - 200px);
-  /* Приклад, де 200px — це сумарна висота інших компонентів та падінгів */
   max-height: 35vh;
   width: 100%;
-  /* Максимальна висота, щоб уникнути переповнення за межі екрану */
 }
 
-/* Додайте медіа-запити для забезпечення адаптивності при зміні розміру вікна */
 @media (max-width: 600px) {
   .scrollable-sheet {
     height: calc(70vh - 100px);
