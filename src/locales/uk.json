@@ -1,8 +1,8 @@
 {
   "shared": {
     "profile": "Профіль",
-    "eventDate": "28-30 травня",
-    "eventPlaceKyiv": "Київ",
+    "noDate": "Дата не вказана",
+    "noLocation": "Місце не вказано",
     "weather": "Погода",
     "usersBase": "База користувачів",
     "userRegistration": "Реєстрація користувача",

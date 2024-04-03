@@ -1,8 +1,8 @@
 {
   "shared": {
     "profile": "Profile",
-    "eventDate": "May 28-30",
-    "eventPlaceKyiv": "Kyiv",
+    "noDate": "Date not specified",
+    "noLocation": "Place not specified",
     "weather": "Weather",
     "usersBase": "Base of users",
     "userRegistration": "User registration",
@@ -47,6 +47,9 @@
     "athlete": "Athlete",
     "team": "Team",
     "timeSec": "Time, sec",
+    "sum": "Sum",
+    "teamChampionshipByType": "Team championship by type",
+    "overallTeamChampionship": "All-team championship",
     "ASSAULT_LADDER": "Assault ladder", 
     "HUNDRED_METER": "Hundred meters",
     "DUELING": "Dueling",
