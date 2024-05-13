@@ -1169,6 +1169,30 @@ export default {
           }
         });
     },
+    async printTeamResultProtocol() {
+      try {
+        const { data } = await this.axios.get(`private/protocols/competition-types/${this.competitionId}/team-result-protocol`);
+        const doc = new Document({
+          sections: [
+            {
+              properties: {
+                page: {
+                  size: {
+                    orientation: PageOrientation.LANDSCAPE,
+                  }
+                }
+              },
+              children: DATA_TO_DOC_PAGE(data),
+            },
+          ],
+        });
+        const blob = await Packer.toBlob(doc);
+        saveAs(blob, `TeamResultProtocol.docx`);
+      } catch (error) {
+        console.error('Error generating team result protocol:', error);
+        this.showError(error);
+      }
+    },
     // async printProtocol(option) {
     //   return this.axios.get(`private/competition-types/${this.competitionType}/csv/download?csvType=${option.value}`)
     //     .then((res) => {
