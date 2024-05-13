@@ -42,8 +42,8 @@ const TABLE_START_PROTOCOL_COMBAT_RESULTS_HEAD = (item) => {
                                             text: item.track,
                                             width: 7,
                                             size: 24,
-                                            borders: { ...cellBorders, right: invisibleBorder },
-                                        })
+                                            borders: cellBorders,
+                                        }) 
                                     ),
                                     new TableCell(
                                         cellObject({
@@ -147,7 +147,7 @@ const TABLE_START_PROTOCOL_COMBAT_RESULTS_ROW = (item) => {
                                             text: participant.track,
                                             width: 7,
                                             size: 24,
-                                            borders: { ...cellBorders, right: invisibleBorder },
+                                            borders: cellBorders,
                                         })
                                     ),
                                     new TableCell(
@@ -155,7 +155,7 @@ const TABLE_START_PROTOCOL_COMBAT_RESULTS_ROW = (item) => {
                                             text: participant.team,
                                             width: 18,
                                             size: 24,
-                                            borders,
+                                            borders: cellBorders,
                                         })
                                     ),
                                     new TableCell(
@@ -194,14 +194,14 @@ const TABLE_START_PROTOCOL_COMBAT_RESULTS_ROW = (item) => {
                                         cellObject({
                                             text: participant.firstResult,
                                             width: 10,
-                                            borders,
+                                            borders: cellBorders,
                                         })
                                     ),
                                     new TableCell(
                                         cellObject({
                                             text: participant.secondResult,
                                             width: 10,
-                                            borders,
+                                            borders: cellBorders,
                                         })
                                     ),
                                     new TableCell(
@@ -227,9 +227,9 @@ export const TABLE_START_PROTOCOL_COMBAT_RESULTS = (items) => {
         ...items.map((data) => {
             return new Table({
                 rows: [
-                    TABLE_START_PROTOCOL_COMBAT_RESULTS_HEAD(data.head),
+                    TABLE_START_PROTOCOL_- COMBAT_RESULTS_HEAD(data.head),
                     ...data.rows.map((item) => TABLE_START_PROTOCOL_COMBAT_RESULTS_ROW(item)),
-                ],
+                ],                             
                 layout: TableLayoutType.FIXED,
                 width: {
                     size: 100,
