@@ -5,7 +5,7 @@ import router from './router'
 import i18n from './i18n'
 
 import axios from 'axios';
-axios.defaults.baseURL = 'http://ec2-3-70-248-126.eu-central-1.compute.amazonaws.com/api/v1/';
+axios.defaults.baseURL = 'http://localhost:8080/api/v1/';
 import VueAxios from 'vue-axios'
 Vue.use(VueAxios, axios)
 
