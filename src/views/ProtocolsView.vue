@@ -1213,25 +1213,28 @@ export default {
     // },
     async printProtocol(option) {
       try {
-        if (option.value === 'dueling-result-protocol' || option.value === 'team-result-protocol') {
-          const { data } = await this.axios.get(`private/protocols/competition-types/${this.competitionType}/${option.value}`);
-          const doc = new Document({
-            sections: [
-              {
-                properties: {
-                  page: {
-                    size: {
-                      orientation: PageOrientation.LANDSCAPE,
-                    }
+        // Запит до відповідної апішки для отримання даних протоколу
+        const { data } = await this.axios.get(`private/protocols/competition-types/${this.competitionType}/${option.value}`);
+
+        // Створення документа Word з отриманими даними
+        const doc = new Document({
+          sections: [
+            {
+              properties: {
+                page: {
+                  size: {
+                    orientation: PageOrientation.LANDSCAPE,
                   }
-                },
-                children: DATA_TO_DOC_PAGE(data),
+                }
               },
-            ],
-          });
-          const blob = await Packer.toBlob(doc);
-          saveAs(blob, `${option.text}.docx`);
-        }
+              children: DATA_TO_DOC_PAGE(data),
+            },
+          ],
+        });
+
+        // Генерація блобу з документом та його завантаження
+        const blob = await Packer.toBlob(doc);
+        saveAs(blob, `${option.text}.docx`);
       } catch (error) {
         console.error('Error generating protocol:', error);
         this.showError(error);
