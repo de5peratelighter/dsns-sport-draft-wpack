@@ -3,7 +3,7 @@
     <v-row>
       <v-col cols="10" class="pa-0">
         <div class="d-flex flex-row align-center flex-grow-1">
-          <div class="d-flex flex-column align-center">
+          <div class="d-flex flex-column" :class="{ 'align-center': !isLoggedIn }">
             <v-menu offset-y>
               <template v-slot:activator="{ on, attrs }">
                 <v-btn icon v-bind="attrs" v-on="on">
@@ -17,7 +17,8 @@
                 </v-list-item>
               </v-list>
             </v-menu>
-            <v-app-bar-nav-icon x-large color="white" @click="$router.push({ name: 'selectCompetition' })" />
+            <v-app-bar-nav-icon v-if="isLoggedIn" x-large color="white"
+              @click="$router.push({ name: 'selectCompetition' })" />
           </div>
           <v-spacer class="app-header-logo-spacer mr-4 ml-2 flex-grow-0" />
           <v-img max-height="90" max-width="90" contain :src="require('@/assets/sport1.png')" @click="$router.push('/')"
