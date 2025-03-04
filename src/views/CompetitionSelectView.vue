@@ -1,6 +1,16 @@
 <template>
   <v-container class="competitions-container white--text" ma-0 pa-0 fluid>
     <div class="competitions-wrapper">
+      <div class="d-flex justify-space-between px-4 mb-2">
+        <div class="d-flex flex-column align-center">
+          <span class="text-subtitle-1 text-center" style="max-width: 100px; margin-left: -20px; word-wrap: break-word;">Активні
+            змагання</span>
+        </div>
+        <div class="d-flex flex-column align-center">
+          <span class="text-subtitle-1 text-center" style="max-width: 100px; margin-right: 90px; word-wrap: break-word;">Зведений
+            протокол</span>
+        </div>
+      </div>
       <v-list two-line pa-0 class="pa-0">
         <v-list-item-group v-model="selectedIndex" active-class="primary--text">
           <template v-for="(item, index) in competitions">
@@ -8,7 +18,7 @@
               <template #default>
                 <div class="d-flex align-center justify-space-between" style="width: 100%;">
                   <div class="d-flex align-center">
-                    <v-checkbox v-model="item.show" @change="updateShowStatus(item)"></v-checkbox>
+                    <v-checkbox v-model="item.show" style="margin-left: 10px" @change="updateShowStatus(item)"></v-checkbox>
                     <v-list-item-content style="margin-left: 20px;">
                       <v-list-item-title v-text="item.name" class="text-center"></v-list-item-title>
                       <v-list-item-subtitle class="text--primary" v-text="item.competitionDate"></v-list-item-subtitle>
@@ -29,6 +39,7 @@
         </v-list-item-group>
       </v-list>
     </div>
+
     <div class="competitions-buttons mt-3 d-flex justify-space-between">
       <div>
         <v-btn color="white" @click="$router.push({ name: 'configMain' })">
