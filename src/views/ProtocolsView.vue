@@ -185,7 +185,7 @@
 
                     <template v-else>
                       <td>
-                        {{ item.participantNumber }}
+                        <!-- {{ item.participantNumber }} номер учасника -->  
                       </td>
                       <td>
                         {{ participantCategoryTranslations[item.participantCategory] }}
@@ -747,7 +747,7 @@ export default {
         );
       } else {
         headers.push(
-          { text: '№ учас.', value: 'participantNumber', width: '60px' },
+          { text: '', value: 'participantNumber', width: '5px' }, // номер учасника забрали
           { text: 'Звання/розряд', value: 'participantCategory', width: '60px' },
           { text: 'Рік народж.', value: 'participantBirthday', width: '60px' },
         )

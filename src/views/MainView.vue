@@ -33,7 +33,7 @@
                     <tr>
                       <th class="text-left">Забіг</th>
                       <th class="text-left">Доріж.</th>
-                      <th class="text-left">№ учас.</th>
+                      <!-- <th class="text-left">№ учас.</th> -->
                       <th class="text-left">Звання/розряд</th>
                       <th class="text-left">Ім'я та прізвище</th>
                       <th class="text-left">Команда</th>
@@ -46,7 +46,7 @@
                     <tr v-for="(result, index) in raceResults" :key="index">
                       <td>{{ result.roadNumber }}</td>
                       <td>{{ result.trackNumber }}</td>
-                      <td>{{ result.participantNumber }}</td>
+                      <!-- <td>{{ result.participantNumber }}</td> -->
                       <td>{{ result.participantCategory }}</td>
                       <td>{{ result.participantFullName }}</td>
                       <td>{{ result.participantTeamName }}</td>
